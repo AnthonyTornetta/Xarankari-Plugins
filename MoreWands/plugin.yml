@@ -1,0 +1,25 @@
+name: CornchipssPlugin
+main: com.cornchipss.main.Main
+version: 1.0
+commands:
+    heal:
+        description: Heals the player who calls it or the specified player
+        usage: /heal <target>
+    gmc:
+        description: Sets your gamemode to creative
+        usage: /gmc <target>
+    gms:
+        description: Sets your gamemode to survival
+        usage: /gms <target>
+    gma:
+        description: Sets your gamemode to adventure
+        usage: /gma <target>
+    gmsp:
+        description: Sets your gamemode to spectator
+        usage: /gmsp <target>
+    color:
+        description: Test
+        usage: /color <color>
+    wand:
+        description: Gives the target a wand of the specified type
+        usage: /wand [type] <receiver>
