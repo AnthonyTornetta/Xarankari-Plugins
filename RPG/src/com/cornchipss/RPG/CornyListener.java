@@ -8,6 +8,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
+import net.md_5.bungee.api.ChatColor;
+
 public class CornyListener implements Listener
 {
 	RPG rpg;
@@ -33,9 +35,20 @@ public class CornyListener implements Listener
 			}
 		}
 		
+		if(message.toLowerCase().contains("you all can talk again"))
+		{
+			if(p.hasPermission("management.mute.all"))
+			{
+				serverSilence = false;
+				return;
+			}
+		}
 		
-		
-		
+		if(serverSilence && !p.hasPermission("management.resist.mute"))
+		{
+			p.sendMessage(ChatColor.GRAY + "You seem to be at a loss for words");
+			e.setCancelled(true);
+		}
 		
 		
 		
