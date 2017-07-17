@@ -1,29 +1,27 @@
-package com.cornchipss.RPG;
+package com.cornchipss.rpg;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
-import ru.tehkode.permissions.bukkit.PermissionsEx;
-
 public class RPG extends JavaPlugin
 {
-	PermissionsEx pex;
+	CornyListener cl;
 	@Override
 	public void onEnable()
 	{
+		cl = new CornyListener(this);
 		loadConfig();
-		pex = (PermissionsEx) getServer().getPluginManager().getPlugin("PermissionsEx");
+		
+		getServer().getPluginManager().registerEvents(cl, this);
 	}
 	
 	@Override
 	public void onDisable()
 	{
-		
+		cl.regenAllBlocks();
 	}
 	
 	private void loadConfig()
 	{
 		
 	}
-	
-	public PermissionsEx getPex() { return pex; }
 }

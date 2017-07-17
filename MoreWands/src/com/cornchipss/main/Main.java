@@ -16,7 +16,6 @@ public class Main extends JavaPlugin
 	@Override
 	public void onEnable()
 	{
-		log("Hola");
 		PluginManager pm = getServer().getPluginManager();
 		PluginListener listener = new PluginListener(this);
 		pm.registerEvents(listener, this);
