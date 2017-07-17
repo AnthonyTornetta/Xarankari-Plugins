@@ -11,6 +11,7 @@ import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -26,6 +27,7 @@ public class BuildBattle extends JavaPlugin
 {
 	private HashMap<Player, String> plotsAssigned = new HashMap<>();
 	private ArrayList<Player> players = new ArrayList<>();
+	private HashMap<Player, Inventory> playerInventories = new HashMap<>();
 	private String theme = "Anything";
 	private int durationSeconds = 1 * 60; // 15 min
 	private boolean running = false;
@@ -579,6 +581,8 @@ public class BuildBattle extends JavaPlugin
 				String[] loc = getConfig().get(plotsAssigned.get(p)).toString().split(",");
 				p.teleport(new Location(Bukkit.getWorld(loc[3]), Double.parseDouble(loc[0]), Double.parseDouble(loc[1]), Double.parseDouble(loc[2])));
 				p.sendMessage(ChatColor.GREEN + "Build battle beginning!");
+				playerInventories.put(p, p.getInventory());
+				p.getInventory().clear();
 				p.setGameMode(GameMode.CREATIVE);
 			}
 			else
@@ -661,10 +665,13 @@ public class BuildBattle extends JavaPlugin
 				p.setGameMode(GameMode.SURVIVAL);
 				p.playSound(p.getLocation(), Sound.ENTITY_ENDERDRAGON_GROWL, 1, 1);
 				p.getInventory().clear();
+				p.getInventory().setStorageContents(playerInventories.get(p).getStorageContents());
+				p.getInventory().setArmorContents(playerInventories.get(p).
 				p.sendTitle(ChatColor.DARK_RED + "BUILD BATTLE OVER!", "", 20, 40, 20);
 			}
 		}
 		players.clear();
+		playerInventories.clear();
 		plotsAssigned.clear();
 	}
 	
@@ -675,6 +682,8 @@ public class BuildBattle extends JavaPlugin
 		p.sendMessage(ChatColor.RED + "Invalid permissions to perform this command!");
 		return false;
 	}
+	
+	public HashMap<Player, Inventory> getPlayerInventories() { return playerInventories; }
 	
 	public boolean isRunning()
 	{

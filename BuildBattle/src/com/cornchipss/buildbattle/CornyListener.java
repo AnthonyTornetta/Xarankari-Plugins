@@ -1,6 +1,7 @@
 package com.cornchipss.buildbattle;
 
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -16,6 +17,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 public class CornyListener implements Listener
 {
@@ -30,6 +32,16 @@ public class CornyListener implements Listener
 	Material storageBlocks[] =
 		{
 			Material.CHEST,
+			Material.FURNACE,
+			Material.WORKBENCH, // The clear thing doesn't apply to this
+			Material.ANVIL,
+			Material.DROPPER,
+			Material.DISPENSER,
+			Material.HOPPER,
+			Material.STORAGE_MINECART,
+			Material.HOPPER_MINECART,
+			Material.BREWING_STAND,
+			Material.BEACON,
 			Material.ENDER_CHEST,
 			Material.BLACK_SHULKER_BOX,
 			Material.BLUE_SHULKER_BOX,
@@ -52,6 +64,21 @@ public class CornyListener implements Listener
 	public CornyListener(BuildBattle bb)
 	{
 		this.bb = bb;
+	}
+	
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void onPlayerLeave(PlayerQuitEvent e)
+	{
+		if(bb.getPlayers().contains(e.getPlayer()))
+		{
+			Player p = e.getPlayer();
+			p.setGameMode(GameMode.SURVIVAL);
+			p.getInventory().clear();
+			p.getInventory().setStorageContents(bb.getPlayerInventories().get(p).getStorageContents());
+			
+			bb.getPlayers().remove(p);
+			bb.getPlayerInventories().remove(p);
+		}
 	}
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
@@ -88,6 +115,13 @@ public class CornyListener implements Listener
 		if(bb.isRunning())
 		{
 			Action a = e.getAction();
+			
+			if(e.getItem().getType().equals(Material.ENDER_PEARL))
+			{
+				e.getPlayer().sendMessage(ChatColor.GOLD + "Corn" + ChatColor.YELLOW + "chip" + ChatColor.DARK_PURPLE + " has asked the ender dragon to not let you teleport until this build battle is over :)");
+				e.setCancelled(true);
+			}
+			
 			if(a.equals(Action.RIGHT_CLICK_BLOCK))
 			{
 				Material bm = e.getClickedBlock().getType();
