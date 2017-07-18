@@ -1,6 +1,6 @@
 name: BuildBattle
 main: com.cornchipss.buildbattle.BuildBattle
-version: 1.5
+version: 1.6
 commands:
     bb:
         description: Gateway to all build battle commands
