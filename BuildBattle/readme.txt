@@ -1,7 +1,7 @@
 To get started with this plugin, do /bb
 Explore the plugin from there, and you should understand how to use it quickly
 
-Permission Nodes:
+Permission Nodes (As of version 1.6):
 
 List Permissions:
 bb.list.player       : Permission to list all the players participating in the build battle
