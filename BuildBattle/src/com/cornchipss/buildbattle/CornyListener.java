@@ -376,7 +376,7 @@ public class CornyListener implements Listener
 			
 			if(bb.getPlayers().contains(p))
 			{
-				if(!p.hasPermission("bb.break.blacklisted"))
+				if(!p.hasPermission("bb.place.blacklisted"))
 				{
 					p.sendMessage(ChatColor.RED + "You cannot place that block during a build battle");
 					e.setCancelled(true);

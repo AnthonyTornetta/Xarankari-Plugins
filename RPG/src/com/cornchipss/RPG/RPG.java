@@ -4,6 +4,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import net.citizensnpcs.api.CitizensAPI;
+
 public class RPG extends JavaPlugin
 {
 	CornyListener cl;
@@ -13,7 +15,7 @@ public class RPG extends JavaPlugin
 		cl = new CornyListener(this);
 		loadConfig();
 		
-		getServer().getPluginManager().registerEvents(cl, this);
+		CitizensAPI.registerEvents(cl);
 	}
 	
 	@Override

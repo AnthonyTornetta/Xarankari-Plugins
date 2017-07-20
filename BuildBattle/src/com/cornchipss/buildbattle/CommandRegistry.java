@@ -19,7 +19,7 @@ public class CommandRegistry
 		ChatColor.GREEN + "Del : Deletes a specified value from the config file",
 		ChatColor.GREEN + "Invite : Invites a player to the build battle",
 		ChatColor.GREEN + "Assign : Assigns specified player(s) to the build battle forcibly",
-		ChatColor.GREEN + "Extend : Extends the build time by a specified amount",
+		ChatColor.GREEN + "Extend : Extends the build time during a build battle by a specified amount",
 		ChatColor.GREEN + "List : Lists specified values",
 		ChatColor.GREEN + "Version : Tells you the version of this plugin"
 	};
@@ -29,7 +29,7 @@ public class CommandRegistry
 	{
 		ChatColor.YELLOW  + "Set Sub Commands",
 		ChatColor.YELLOW  + "================",
-		ChatColor.GREEN + "Plotpos plotId : Sets a plot position to a specified name",
+		ChatColor.GREEN + "Plotpos [plotId] : Sets a plot position to a specified name",
 		ChatColor.GREEN + "Duration [seconds] : Sets the build battle duration to a specified amount of seconds",
 		ChatColor.GREEN + "Theme [theme] : Sets the build battle theme to a specified theme"
 	};
@@ -160,7 +160,7 @@ public class CommandRegistry
 							return true;
 						if(bb.getPlayers().size() < 1)
 						{
-							p.sendMessage(ChatColor.RED + "Not enough bb.getPlayers() participating ;(");
+							p.sendMessage(ChatColor.RED + "Not enough players participating ;(");
 							break;
 						}
 						else
@@ -193,28 +193,10 @@ public class CommandRegistry
 									return true;
 								if(args.length < 3)
 								{
-									sender.sendMessage(ChatColor.RED + "You must specify the plot id or use 'list' to list the plot ids!");
+									sender.sendMessage(ChatColor.RED + "You must specify the plot id!");
 									return true;
 								}
 								args[2] = args[2].toLowerCase();
-								if(args[2].equals("list"))
-								{
-									if(!bb.perm(p, "bb.set.plotpos.list"))
-										return true;
-									if(bb.getConfig().get("plotids") == null)
-									{
-										sender.sendMessage(ChatColor.GREEN + "There are none yet ;(");
-										return true;
-									}
-									String[] plotids = bb.getConfig().get("plotids").toString().split(",");
-									for(int i = 0; i < plotids.length; i++)
-									{
-										if(plotids[i] == null)
-											continue;
-										sender.sendMessage(ChatColor.GREEN + plotids[i]);
-									}
-									return true;
-								}
 								if(args[2].equals("all"))
 								{
 									sender.sendMessage(ChatColor.RED + "You cannot name a plotid 'all'");
@@ -299,9 +281,11 @@ public class CommandRegistry
 							}
 							return true;
 						}
+						
 						switch(args[1].toLowerCase())
 						{
 							case "plotid":
+							{
 								if(!bb.perm(p, "bb.del.plotid"))
 									return true;
 								if(args.length < 3)
@@ -354,17 +338,20 @@ public class CommandRegistry
 									bb.getConfig().set(args[2], null);
 									bb.saveConfig();
 									sender.sendMessage(ChatColor.GREEN + "The plot id '" + args[2] + "' has been deleted.");
-									break;
+									return true;
 								}
 								sender.sendMessage(ChatColor.RED + "The plot id '" + args[2] + "' doesn't exist!");
-								break;
+								return true;
+							}
 								
 							default:
+							{
 								for(int i = 0; i < delSubCmds.length; i++)
 								{
 									sender.sendMessage(delSubCmds[i]);
 								}
 								return true;
+							}
 						}
 						break;
 					}
@@ -507,7 +494,7 @@ public class CommandRegistry
 						}
 						catch(Exception ex) // When you do it before the actual timer starts...
 						{
-							p.sendMessage(ChatColor.RED + "Wait untill the building phase begins before doing this :)");
+							p.sendMessage(ChatColor.RED + "Wait until the building phase begins before doing this :)");
 						}
 						break;
 					}
@@ -516,7 +503,8 @@ public class CommandRegistry
 					{
 						if(!bb.perm(p, "bb.version"))
 							return true;
-						sender.sendMessage(Reference.VERSION);
+						sender.sendMessage(ChatColor.GREEN + Reference.NAME + " V" + Reference.VERSION + " by " + Reference.AUTHOR);
+						break;
 					}
 					
 					default:
@@ -533,6 +521,7 @@ public class CommandRegistry
 		}
 		else
 		{
+			// Almost all build battle commands are player-only so I just made sure only players can use them
 			sender.sendMessage("You must be a player to use build battle commands");
 		}
 		return true;

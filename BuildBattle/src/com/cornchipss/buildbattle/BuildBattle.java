@@ -77,11 +77,6 @@ public class BuildBattle extends JavaPlugin
 				p.sendMessage(ChatColor.GREEN + "Build battle beginning!");
 				playerInventories.put(p, p.getInventory().getContents());
 				
-				for(int i = 0; i < p.getInventory().getContents().length; i++)
-				{
-					System.out.println(playerInventories.get(p)[i]);
-				}
-				
 				p.getInventory().clear();
 				p.setGameMode(GameMode.CREATIVE);
 			}

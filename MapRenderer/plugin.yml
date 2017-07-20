@@ -1,0 +1,5 @@
+name: MapHack
+main: com.cornchipss.maprenderer.AutoRenderer
+version: 1.0
+commands:
+    

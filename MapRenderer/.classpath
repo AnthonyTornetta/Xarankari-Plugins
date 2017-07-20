@@ -3,6 +3,5 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="C:/Users/Cornchip/Desktop/mc test server/1.12/spigot.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Cornchip/Desktop/mc test server/1.12/plugins/apis/citizensapi-2.0.22-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
