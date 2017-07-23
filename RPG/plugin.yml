@@ -5,3 +5,6 @@ commands:
     create:
         description: Creates a specified thing
         usage: /create <list creatable things here>
+    asdf:
+        description: This is a test
+        usage: /asdf
