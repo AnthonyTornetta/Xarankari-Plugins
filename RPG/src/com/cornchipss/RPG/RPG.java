@@ -11,8 +11,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import net.citizensnpcs.api.CitizensAPI;
-
 public class RPG extends JavaPlugin
 {
 	CornyListener cl;
@@ -21,15 +19,14 @@ public class RPG extends JavaPlugin
 	{
 		cl = new CornyListener(this);
 		loadConfig();
-		
-		CitizensAPI.registerEvents(cl);
+		getServer().getPluginManager().registerEvents(new CornyListener(this), this);
 	}
 	
 	@Override
 	public void onDisable()
 	{
-		// Make sure no exploded blocks are left exploded before turning off (Not working atm so I just cancel the explode event)
-		cl.regenAllBlocks();
+		// TODO: Make sure no exploded blocks are left exploded before turning off (Not working atm so I just cancel the explode event)
+		
 	}
 	
 	private void loadConfig()

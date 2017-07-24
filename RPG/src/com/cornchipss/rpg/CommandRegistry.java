@@ -27,53 +27,6 @@ public class CommandRegistry
 		String cmd = command.getLabel().toLowerCase();
 		switch(cmd)
 		{
-			case "create":
-			{
-				if(!(sender instanceof Player))
-				{
-					sender.sendMessage(ChatColor.RED + "This is a player-only command!");
-					return true;
-				}
-				Player p = (Player)sender;
-				
-				
-				if(args.length < 1)
-				{
-					p.sendMessage(Reference.DEFAULT_CC + "Create sub commands");
-					p.sendMessage(Reference.DEFAULT_CC + "+=================+");
-					for(int i = 0; i < CREATE_SUB_CMDS.length; i++)
-					{
-						p.sendMessage(CREATE_SUB_CMDS[i]);
-					}
-					break;
-				}
-				
-				String createWhat = args[0].toLowerCase();
-				switch(createWhat)
-				{
-					case "npc":
-					{
-						NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.VILLAGER, "Big man Al");
-				        npc.spawn(p.getLocation());
-				        npc.setProtected(true);
-				        npc.setFlyable(true);
-				        p.sendMessage(ChatColor.GREEN + "An npc was created");
-				        break;
-					}
-					default:
-					{
-						p.sendMessage(Reference.DEFAULT_CC + "Create sub commands");
-						p.sendMessage(Reference.DEFAULT_CC + "+=================+");
-						for(int i = 0; i < CREATE_SUB_CMDS.length; i++)
-						{
-							p.sendMessage(CREATE_SUB_CMDS[i]);
-						}
-						break;
-					}
-				}
-				
-				break;
-			}
 			case "asdf":
 			{
 				if(!(sender instanceof Player))
@@ -118,7 +71,7 @@ public class CommandRegistry
 						searchBlocks.addAll(toSearch);
 						toSearch.clear();
 						
-						if(found.size() > 1000)
+						if(found.size() > 3000)
 						{
 							rpg.getLogger().info("Too many blocks - stopping the transformation");
 							break;

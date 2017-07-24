@@ -14,25 +14,28 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.material.Sign;
 
 import com.cornchipss.rpg.events.EntityMoveEvent;
+import com.cornchipss.rpg.helper.Helper;
+import com.cornchipss.rpg.helper.Vector3;
 
 import net.citizensnpcs.api.CitizensAPI;
-import net.citizensnpcs.api.ai.speech.SpeechContext;
 import net.citizensnpcs.api.npc.NPC;
-import net.citizensnpcs.api.trait.Trait;
 
 public class CornyListener implements Listener
 {
@@ -81,7 +84,7 @@ public class CornyListener implements Listener
 	 * @throws ConfigurationException If the configuration file is not formatted correctly
 	 */
 	@EventHandler(priority = EventPriority.HIGH)
-	public void onPlayerInteract(PlayerInteractEntityEvent e) throws ConfigurationException
+	public void onPlayerInteractEntity(PlayerInteractEntityEvent e) throws ConfigurationException
 	{
 		Player p = e.getPlayer();
 		Entity entity = e.getRightClicked();
@@ -91,6 +94,66 @@ public class CornyListener implements Listener
 			p.sendMessage(ChatColor.GREEN + npc.getName() + ChatColor.GREEN + "> " + "MURMCA");
 			if(entity.getType().equals(EntityType.VILLAGER))
 				entity.playEffect(EntityEffect.VILLAGER_HAPPY); // Happy villager :)
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.NORMAL)
+	public void onPlayerIneract(PlayerInteractEvent e)
+	{
+		if(e.getAction() != Action.RIGHT_CLICK_BLOCK)
+			return;
+		
+		Block b = e.getClickedBlock();
+		if(blockIsSign(b))
+		{
+			if(Helper.bridgeMats.contains(b.getRelative(BlockFace.UP).getType()))
+			{
+				Location l = b.getLocation();
+				if(!(b.getType() == Material.SIGN))
+					return;
+				Sign sign = (Sign)(b);
+				BlockFace facing = sign.getFacing();
+				BlockFace inverted = facing.getOppositeFace();
+				Vector3 dir = Helper.getBlockFaceDirection(inverted);
+				
+				ArrayList<Block> blocks = new ArrayList<Block>();
+				
+				boolean foundSign = false;
+				
+				for(int i = 0; i < Helper.MAX_BLOCKS; i++)
+				{
+					System.out.println("Looking...");
+					Location tempLoc = l.add(dir.getX() * i, dir.getY() * i, dir.getZ() * i);
+					Block tempBlock = tempLoc.getBlock();
+					
+					if(!Helper.bridgeMats.contains(tempBlock.getType()))
+					{
+						i--;
+						break;
+					}
+					
+					if(Helper.bridgeMats.contains(tempBlock.getRelative(BlockFace.WEST).getType()))
+					{
+						blocks.add(tempBlock.getRelative(BlockFace.WEST));
+					}
+					if(Helper.bridgeMats.contains(tempBlock.getRelative(BlockFace.EAST).getType()))
+					{
+						blocks.add(tempBlock.getRelative(BlockFace.EAST));
+					}
+					blocks.add(tempBlock);
+					if(blockIsSign(tempBlock.getRelative(BlockFace.DOWN)))
+					{
+						System.out.println("Found");
+						foundSign = true;
+						break;
+					}
+				}
+				if(!foundSign)
+				{
+					e.getPlayer().sendMessage(ChatColor.RED + "Unable to find end sign!");
+					return;
+				}
+			}
 		}
 	}
 	
@@ -336,7 +399,10 @@ public class CornyListener implements Listener
 	
 	
 	
-	
+	private boolean blockIsSign(Block b)
+	{
+		return b.getType() == Material.WALL_SIGN || b.getType() == Material.SIGN_POST;
+	}
 	
 	
 	/*
