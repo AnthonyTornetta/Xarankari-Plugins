@@ -32,6 +32,7 @@ import org.bukkit.material.Sign;
 
 import com.cornchipss.rpg.events.EntityMoveEvent;
 import com.cornchipss.rpg.helper.Helper;
+import com.cornchipss.rpg.helper.Reference;
 import com.cornchipss.rpg.helper.Vector3;
 
 import net.citizensnpcs.api.CitizensAPI;
@@ -256,6 +257,7 @@ public class CornyListener implements Listener
 	public void onPlayerChat(AsyncPlayerChatEvent e)
 	{
 		Player p = e.getPlayer();
+		Location l = p.getLocation();
 		String message = e.getMessage();
 		
 		// Make it a fancy golden color
@@ -276,6 +278,8 @@ public class CornyListener implements Listener
 			// If they don't have perms for this they will just look stupid and nothing will happen :)
 		}
 		
+		///// Server Silence Checking
+		
 		// Unmute everyone if the chat message contains an unmute string
 		if(strContains(message, unmuteMsgs))
 		{
@@ -291,9 +295,24 @@ public class CornyListener implements Listener
 		{
 			p.sendMessage(ChatColor.GRAY + "You seem to be at a loss for words");
 			e.setCancelled(true);
+			return;
 		}
 		
+		///// End Server Silence Checking
 		
+		///// Checking if the player is in the correct location for the chat to be sent
+		
+		if(!(message.substring(0, 12).toLowerCase().contains("global") && p.hasPermission("chat.global")))
+		{
+			for(Player recip : e.getRecipients())
+			{
+				double dist = Helper.getDistance(p.getLocation(), recip.getLocation(), true);
+				if(dist > Reference.DEFAULT_CHAT_BLOCKS || dist == -1)
+					e.getRecipients().remove(recip);
+			}
+		}
+		
+		///// End checking if the player is within range for the chat
 	}
 	
 	/**
