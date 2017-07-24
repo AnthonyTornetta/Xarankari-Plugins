@@ -48,12 +48,12 @@ public class Helper
 		double xx = l2.getX(), yy = l2.getY(), zz = l2.getZ();
 		
 		// Get the distance between 2 points
-		double xDist = (x + xx) / 2;
-		double yDist = (y + yy) / 2;
-		double zDist = (z + zz) / 2;
+		double xDist = Math.pow((x - xx), 2);
+		double yDist = Math.pow((y - yy), 2);
+		double zDist = Math.pow((z - zz), 2);
 		
 		// Pythag's fancy theorum
-		double distSquared = xDist * xDist + yDist * yDist + zDist * zDist;
+		double distSquared = xDist + yDist + zDist;
 		
 		return Math.abs(Math.sqrt(distSquared));
 	}

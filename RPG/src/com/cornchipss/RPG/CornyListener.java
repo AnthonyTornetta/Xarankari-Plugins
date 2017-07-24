@@ -100,7 +100,7 @@ public class CornyListener implements Listener
 	
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void onPlayerIneract(PlayerInteractEvent e)
-	{
+	{/*
 		if(e.getAction() != Action.RIGHT_CLICK_BLOCK)
 			return;
 		
@@ -155,7 +155,7 @@ public class CornyListener implements Listener
 					return;
 				}
 			}
-		}
+		}*/
 	}
 	
 	/**
@@ -302,11 +302,11 @@ public class CornyListener implements Listener
 		
 		///// Checking if the player is in the correct location for the chat to be sent
 		
-		if(!(message.substring(0, 12).toLowerCase().contains("global") && p.hasPermission("chat.global")))
+		if(!(message.length() >= 12 && message.substring(0, 12).toLowerCase().contains("global") && p.hasPermission("chat.global")))
 		{
 			for(Player recip : e.getRecipients())
 			{
-				double dist = Helper.getDistance(p.getLocation(), recip.getLocation(), true);
+				double dist =  Helper.getDistance(p.getLocation(), recip.getLocation(), true);
 				if(dist > Reference.DEFAULT_CHAT_BLOCKS || dist == -1)
 					e.getRecipients().remove(recip);
 			}
