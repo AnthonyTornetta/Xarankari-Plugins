@@ -2,19 +2,15 @@ package com.cornchipss.rpg;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Random;
-import java.util.UUID;
 
 import javax.naming.ConfigurationException;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.EntityEffect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -23,19 +19,18 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockExplodeEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.material.Sign;
 
 import com.cornchipss.rpg.events.EntityMoveEvent;
 import com.cornchipss.rpg.helper.Helper;
 import com.cornchipss.rpg.helper.Reference;
-import com.cornchipss.rpg.helper.Vector3;
 
 import net.citizensnpcs.api.CitizensAPI;
+import net.citizensnpcs.api.event.NPCDamageEvent;
+import net.citizensnpcs.api.event.NPCDeathEvent;
 import net.citizensnpcs.api.npc.NPC;
 
 public class CornyListener implements Listener
@@ -66,14 +61,6 @@ public class CornyListener implements Listener
 		"everyone can speek"
 	};
 	
-	String[] npcRetort =
-	{
-		"Ouch! Stop that.",
-		"Insert Generic 'don't attack me' here",
-		"Insert Generic 'don't attack me' here",
-		"Insert Generic 'don't attack me' here"
-	};
-	
 	public CornyListener(RPG rpg)
 	{
 		this.rpg = rpg;
@@ -100,62 +87,10 @@ public class CornyListener implements Listener
 	
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void onPlayerIneract(PlayerInteractEvent e)
-	{/*
-		if(e.getAction() != Action.RIGHT_CLICK_BLOCK)
-			return;
+	{
+		Action a = e.getAction();
+		Player p = e.getPlayer();
 		
-		Block b = e.getClickedBlock();
-		if(blockIsSign(b))
-		{
-			if(Helper.bridgeMats.contains(b.getRelative(BlockFace.UP).getType()))
-			{
-				Location l = b.getLocation();
-				if(!(b.getType() == Material.SIGN))
-					return;
-				Sign sign = (Sign)(b);
-				BlockFace facing = sign.getFacing();
-				BlockFace inverted = facing.getOppositeFace();
-				Vector3 dir = Helper.getBlockFaceDirection(inverted);
-				
-				ArrayList<Block> blocks = new ArrayList<Block>();
-				
-				boolean foundSign = false;
-				
-				for(int i = 0; i < Helper.MAX_BLOCKS; i++)
-				{
-					System.out.println("Looking...");
-					Location tempLoc = l.add(dir.getX() * i, dir.getY() * i, dir.getZ() * i);
-					Block tempBlock = tempLoc.getBlock();
-					
-					if(!Helper.bridgeMats.contains(tempBlock.getType()))
-					{
-						i--;
-						break;
-					}
-					
-					if(Helper.bridgeMats.contains(tempBlock.getRelative(BlockFace.WEST).getType()))
-					{
-						blocks.add(tempBlock.getRelative(BlockFace.WEST));
-					}
-					if(Helper.bridgeMats.contains(tempBlock.getRelative(BlockFace.EAST).getType()))
-					{
-						blocks.add(tempBlock.getRelative(BlockFace.EAST));
-					}
-					blocks.add(tempBlock);
-					if(blockIsSign(tempBlock.getRelative(BlockFace.DOWN)))
-					{
-						System.out.println("Found");
-						foundSign = true;
-						break;
-					}
-				}
-				if(!foundSign)
-				{
-					e.getPlayer().sendMessage(ChatColor.RED + "Unable to find end sign!");
-					return;
-				}
-			}
-		}*/
 	}
 	
 	/**
@@ -174,79 +109,13 @@ public class CornyListener implements Listener
 		System.out.println("FPLKMASDL:ADS");
 	}
 	
-	/**
-	 * 
-	 * @param e
-	 */
 	@EventHandler(priority = EventPriority.HIGH)
-	public void onEntityDeath(EntityDeathEvent e)
+	public void onNpcDeath(NPCDeathEvent e)
 	{
-		if(rpg.getConfig().contains(e.getEntity().getUniqueId().toString()))
+		if(rpg.getConfig().contains(e.getNPC().getUniqueId().toString()))
 		{
-			rpg.getConfig().set(e.getEntity().getUniqueId().toString(), null); // Since they died there is no point in storing their value
+			rpg.getConfig().set(e.getNPC().getUniqueId().toString(), null); // Since they died there is no point in storing their value
 		}
-	}
-	
-	/**
-	 * Whenever an entity takes damage do this
-	 * @param e The entity that took damage
-	 * @throws ConfigurationException If the configuration file is incorrect
-	 */
-	@EventHandler(priority = EventPriority.HIGH)
-	public void onEntityDamage(EntityDamageByEntityEvent e) throws ConfigurationException
-	{
-		Entity attacker = e.getDamager();
-		Entity target = e.getEntity();
-		UUID uuid = target.getUniqueId();
-		
-		// If the entity is a specific NPC we want to cancel all damage
-		if(rpg.getConfig().contains(uuid.toString()))
-		{
-			if(attacker instanceof Player)
-			{
-				Player p = (Player)attacker;
-				String[] split = rpg.getConfig().get(uuid.toString()).toString().split(Reference.SPLIT_KEYWORD);
-				
-				if(split.length < 2)
-				{
-					throw new ConfigurationException("Invalid format in the configuration file for the npc with a UUID of " + uuid.toString());
-				}
-				
-				String name = split[1];
-				Random rdm = new Random();
-				// Get a random retort from the array above to shout at the player
-				String retort = npcRetort[rdm.nextInt(npcRetort.length)];
-				
-				p.sendMessage(ChatColor.GOLD + name + ChatColor.RED + "> " + retort);
-			}
-			e.setCancelled(true);
-		}
-		
-		// TODO: Do a sweeping edge attack type thing
-		/*
-		// This isn't working atm
-		if(e.getCause() == DamageCause.ENTITY_ATTACK)
-		{
-			if(attacker instanceof Player)
-			{
-				ArrayList<Entity> nearbyEntities = (ArrayList<Entity>) attacker.getNearbyEntities(5, 2, 5);
-				if(e.getFinalDamage() - 1 >= 1)
-				{
-					for(int i = 0; i < nearbyEntities.size(); i++)
-					{
-						EntityDamageByEntityEvent dmgEvent = e; 
-					}
-				}
-			}
-		}
-		*/
-		
-	}
-	
-	@EventHandler(priority = EventPriority.MONITOR)
-	public void onEntityMove(EntityMoveEvent e)
-	{
-		// TODO: Use barriers
 	}
 	
 	/**
@@ -257,7 +126,6 @@ public class CornyListener implements Listener
 	public void onPlayerChat(AsyncPlayerChatEvent e)
 	{
 		Player p = e.getPlayer();
-		Location l = p.getLocation();
 		String message = e.getMessage();
 		
 		// Make it a fancy golden color
@@ -352,7 +220,7 @@ public class CornyListener implements Listener
 	}
 	
 	// TODO make this a fancy regen animation type thingy
-	public void regenBlocks()
+	/*public void regenBlocks()
 	{
 		ArrayList<Block> blocksToRegen = explodedBlocks;
 		for(int i = 0; i < explodedBlocks.size() / 4; i++)
@@ -384,6 +252,7 @@ public class CornyListener implements Listener
             }
         }, 20L);
 	}
+	*/
 	
 	
 	
@@ -416,13 +285,12 @@ public class CornyListener implements Listener
 	
 	
 	
-	
-	
+	/*
 	private boolean blockIsSign(Block b)
 	{
 		return b.getType() == Material.WALL_SIGN || b.getType() == Material.SIGN_POST;
 	}
-	
+	*/
 	
 	/*
 	 * 

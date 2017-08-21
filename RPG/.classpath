@@ -4,5 +4,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="C:/Users/Cornchip/Desktop/mc test server/1.12/spigot.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Cornchip/Desktop/mc test server/1.12/plugins/apis/citizensapi-2.0.22-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="D:/Xarankari/Java Plugins/libs/ParticleAPI_v2.1.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
