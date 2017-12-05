@@ -1,0 +1,10 @@
+name: BuildBattle
+main: com.cornchipss.buildbattlesmini.BuildBattleMini
+version: 1.6
+commands:
+    bb:
+        description: Gateway to all build battle commands
+        usage: /bb
+    buildbattle:
+        description: Gateway to all build battle commands
+        usage: /buildbattle

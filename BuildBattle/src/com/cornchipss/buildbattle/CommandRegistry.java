@@ -39,7 +39,8 @@ public class CommandRegistry
 	{
 		ChatColor.YELLOW  + "Del Sub Commands",
 		ChatColor.YELLOW  + "================",
-		ChatColor.GREEN + "Plotid : Deletes a specified plot id & location from the config file",
+		ChatColor.GREEN + "Plotid : Deletes a specified plot id & location",
+		ChatColor.GREEN + "Plot: Deletes the plot you are standing in"
 	};
 	
 	// A list of list sub commands for the player to see ;)
@@ -50,8 +51,15 @@ public class CommandRegistry
 		ChatColor.GREEN + "Players : Lists all the players participating",
 		ChatColor.GREEN + "Plotids : Lists all the plot ids with their positions",
 		ChatColor.GREEN + "Theme : Lists the theme",
-		ChatColor.GREEN + "Duration : Lists the duration",
-		
+		ChatColor.GREEN + "Duration : Lists the duration"
+	};
+	
+	// A list of list sub commands for the player to see ;)
+	public static final String[] createSubCmds =
+	{
+		ChatColor.YELLOW + "Create Sub Commands",
+		ChatColor.YELLOW + "=================",
+		ChatColor.GREEN + "Plot: Creates a build battle plot"
 	};
 	
 	/**
@@ -82,6 +90,19 @@ public class CommandRegistry
 				
 				switch(args[0].toLowerCase())
 				{
+					case "create":
+					{
+						if(args.length < 2)
+						{
+							if(!bb.perm(p, "bb.list.create"))
+							for(int i = 0; i < listSubCmds.length; i++)
+							{
+								sender.sendMessage(listSubCmds[i]);
+							}
+							if(args[1].toLowerCase() == "")
+							break;
+						}
+					}
 					case "list":
 					{
 						if(args.length < 2)

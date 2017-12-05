@@ -1,0 +1,13 @@
+name: Guilds
+main: com.cornchipss.guilds.Guilds
+version: 1.0
+commands:
+    guilds:
+        description: Gateway to all guilds commands
+        usage: /guilds
+    guildchat:
+        description: Guild Chat
+        usage: /guildchat
+    gc:
+        description: Guild Chat
+        usage: /gc

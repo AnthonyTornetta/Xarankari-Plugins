@@ -29,7 +29,7 @@ public class BuildBattle extends JavaPlugin
 	private ArrayList<Player> players = new ArrayList<>();
 	private HashMap<Player, ItemStack[]> playerInventories = new HashMap<>();
 	private String theme = "Anything";
-	private int durationSeconds = 1 * 60; // 15 min
+	private int durationSeconds = 15 * 60; // 15 min
 	private boolean running = false;
 	private Timer timer;
 	private int plotIndex = 0;
