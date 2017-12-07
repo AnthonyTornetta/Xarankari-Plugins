@@ -12,9 +12,6 @@ public class Reference
 	public static final String CFG_GUILD_PREFIX = "guild-";
 	
 	
-	
-	
-	
 	public static boolean isInt(String possibleNumber)
 	{
 		boolean validNumber = false; // We use this to see if the last number checked was a number too

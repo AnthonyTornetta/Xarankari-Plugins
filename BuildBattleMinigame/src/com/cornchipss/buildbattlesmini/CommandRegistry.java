@@ -99,7 +99,7 @@ public class CommandRegistry
 					String cmd = args[0].toLowerCase();
 					if(cmd.equals("help") || cmd.equals("?"))
 					{
-						
+						p.sendMessage(commands);
 					}
 				}
 			}
@@ -112,7 +112,7 @@ public class CommandRegistry
 		return true;
 	}
 	
-	public static void openCmdGUI(Player p)
+	public static void openCmdGUI(final Player p)
 	{
 		Inventory inv = Bukkit.createInventory(null, 9 * ROWS, ChatColor.DARK_GREEN + "Build Battle Commands");
 		
@@ -164,7 +164,7 @@ public class CommandRegistry
 		p.openInventory(inv);
 	}
 
-	public static void openSetGUI(Player p) 
+	public static void openSetGUI(final Player p) 
 	{
 		Inventory inv = Bukkit.createInventory(null, 9 * ROWS, Reference.BB_CMD_SET_WINDOW_TITLE);
 		
@@ -199,28 +199,28 @@ public class CommandRegistry
 		p.openInventory(inv);
 	}
 
-	public static void openDelGUI(Player p) 
+	public static void openDelGUI(final Player p) 
 	{
 		Inventory inv = Bukkit.createInventory(null, 9 * ROWS, Reference.BB_CMD_SET_WINDOW_TITLE);
 		genBorders(ROWS, inv);
 		p.openInventory(inv);
 	}
 	
-	public static void openAssignGUI(Player p) 
+	public static void openAssignGUI(final Player p) 
 	{
 		Inventory inv = Bukkit.createInventory(null, 9 * ROWS, Reference.BB_CMD_SET_WINDOW_TITLE);
 		genBorders(ROWS, inv);
 		p.openInventory(inv);
 	}
 
-	public static void openListGUI(Player p) 
+	public static void openListGUI(final Player p) 
 	{
 		Inventory inv = Bukkit.createInventory(null, 9 * ROWS, Reference.BB_CMD_SET_WINDOW_TITLE);
 		genBorders(ROWS, inv);
 		p.openInventory(inv);
 	}
 	
-	public static void setPlotCorner(Player p) 
+	public static void setPlotCorner(final Player p) 
 	{
 		if(plotSettingCoords.containsKey(p))
 		{
@@ -239,21 +239,14 @@ public class CommandRegistry
 		}
 	}
 
-	public static void openDurationGUI(Player p) 
-	{
-		Inventory inv = Bukkit.createInventory(null, 9 * ROWS, Reference.BB_CMD_SET_WINDOW_TITLE);
-		genBorders(ROWS, inv);
-		p.openInventory(inv);
-	}
-
-	public static void openThemeGUI(Player p) 
+	public static void openDurationGUI(final Player p) 
 	{
 		Inventory inv = Bukkit.createInventory(null, 9 * ROWS, Reference.BB_CMD_SET_WINDOW_TITLE);
 		genBorders(ROWS, inv);
 		p.openInventory(inv);
 	}
 	
-	private static void genBorders(final int ROWS, Inventory inv)
+	private static void genBorders(final int ROWS, final Inventory inv)
 	{
 		ItemStack greenGlass = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short)13);
 		ItemMeta greenGlassMeta = greenGlass.getItemMeta();

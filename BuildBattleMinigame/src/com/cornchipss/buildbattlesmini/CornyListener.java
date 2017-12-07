@@ -1,5 +1,6 @@
 package com.cornchipss.buildbattlesmini;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
@@ -23,6 +24,8 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -39,6 +42,7 @@ import com.cornchipss.buildbattlesmini.arenas.Arena;
 public class CornyListener implements Listener
 {
 	BuildBattleMini bb;
+	ArrayList<Player> playersSettingTheme = new ArrayList<>();
 	
 	Color[] colors = 
 		{
@@ -215,6 +219,20 @@ public class CornyListener implements Listener
 		{
 			if(a.playerLeave(p))
 				break;
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.NORMAL)
+	public void onPlayerChat(AsyncPlayerChatEvent e)
+	{
+		String msg = e.getMessage();
+		Player p = e.getPlayer();
+		if(playersSettingTheme.contains(p))
+		{
+			bb.setTheme(msg);
+			p.sendMessage(ChatColor.GREEN + "Theme set to " + msg);
+			playersSettingTheme.remove(p);
+			e.setCancelled(true);
 		}
 	}
 	
@@ -425,7 +443,14 @@ public class CornyListener implements Listener
 				break;
 			case PAPER:
 				p.closeInventory();
-				CommandRegistry.openThemeGUI(p);
+				if(playersSettingTheme.contains(p))
+				{
+					p.sendMessage(ChatColor.RED + "You are already setting the theme");
+					break;
+				}
+				p.sendMessage(ChatColor.GOLD + "Type the theme to set it :)");
+
+				playersSettingTheme.add(p);
 				break;
 			case BARRIER:
 				p.closeInventory();
