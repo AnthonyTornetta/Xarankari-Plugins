@@ -1,0 +1,9 @@
+name: OreGenerator
+main: com.cornchipss.oregenerator.OreGeneratorPlugin
+version: 1.0
+commands:
+    oregenerator:
+        description: Gives you a specified generator
+        usage: /oregenerator
+        
+        
