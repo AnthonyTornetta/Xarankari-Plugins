@@ -17,6 +17,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.cornchipss.oregenerator.commands.CommandManager;
 import com.cornchipss.oregenerator.config.Config;
 import com.cornchipss.oregenerator.generators.GeneratorHandler;
+import com.cornchipss.oregenerator.generators.GeneratorUtils;
+import com.cornchipss.oregenerator.generators.types.CoalGenerator;
 import com.cornchipss.oregenerator.listeners.CornyListener;
 import com.cornchipss.oregenerator.ref.Reference;
 import com.google.gson.Gson;
@@ -49,7 +51,7 @@ public class OreGeneratorPlugin extends JavaPlugin
 		}
 		
 		cl = new CornyListener(this);
-		
+				
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvents(cl, this);
 	}
@@ -111,27 +113,16 @@ public class OreGeneratorPlugin extends JavaPlugin
 			e.printStackTrace();
 			return "CRITICAL ERROR: Could not save config file!";
 		}
-		
-		try 
-		{
-			cfg.save();
-		} 
-		catch (IOException e) 
-		{
-			getLogger().info("Error saving config file!");
-			e.printStackTrace();
-		}
 		return "Config File Successfully read";
 	}
 	
 	private void saveGenerators() throws IOException
 	{
 		BufferedWriter genCfg = new BufferedWriter(new FileWriter(new File(this.getDataFolder() + "\\generator-storage.yml")));
-		Gson gson = new Gson();
 		
 		for(int i = 0; i < genHandler.generatorAmount(); i++)
 		{
-			genCfg.write(gson.toJson(genHandler.getGenerator(i)));
+			genCfg.write(GeneratorUtils.serialize(genHandler.getGenerator(i)));
 			genCfg.newLine();
 		}
 		genCfg.close();

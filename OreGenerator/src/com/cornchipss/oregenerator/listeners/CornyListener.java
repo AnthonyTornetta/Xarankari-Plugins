@@ -17,7 +17,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.cornchipss.oregenerator.OreGeneratorPlugin;
 import com.cornchipss.oregenerator.generators.Generator;
-import com.cornchipss.oregenerator.generators.GeneratorItemForge;
+import com.cornchipss.oregenerator.generators.GeneratorUtils;
 import com.cornchipss.oregenerator.generators.types.CoalGenerator;
 import com.cornchipss.oregenerator.generators.types.DiamondGenerator;
 import com.cornchipss.oregenerator.generators.types.EmeraldGenerator;
@@ -26,6 +26,7 @@ import com.cornchipss.oregenerator.generators.types.IronGenerator;
 import com.cornchipss.oregenerator.generators.types.LapisGenerator;
 import com.cornchipss.oregenerator.generators.types.RedstoneGenerator;
 import com.cornchipss.oregenerator.ref.Reference;
+import com.cornchipss.oregenerator.upgrades.types.SpeedUpgrade;
 
 public class CornyListener implements Listener
 {	
@@ -63,31 +64,31 @@ public class CornyListener implements Listener
 		if(e.isCancelled())
 			return;
 		
-		int genId = GeneratorItemForge.getGeneratorType(itemPlaced.getItemMeta());
+		int genId = GeneratorUtils.getGeneratorType(itemPlaced.getItemMeta());
 		
 		Generator gen = null;
 		
 		switch(genId)
 		{
-		case GeneratorItemForge.GENERATOR_COAL_ID:
+		case GeneratorUtils.GENERATOR_COAL_ID:
 			gen = new CoalGenerator(b, plugin);
 			break;
-		case GeneratorItemForge.GENERATOR_IRON_ID:
+		case GeneratorUtils.GENERATOR_IRON_ID:
 			gen = new IronGenerator(b, plugin);
 			break;
-		case GeneratorItemForge.GENERATOR_REDSTONE_ID:
+		case GeneratorUtils.GENERATOR_REDSTONE_ID:
 			gen = new RedstoneGenerator(b, plugin);
 			break;
-		case GeneratorItemForge.GENERATOR_LAPIS_ID:
+		case GeneratorUtils.GENERATOR_LAPIS_ID:
 			gen = new LapisGenerator(b, plugin);
 			break;
-		case GeneratorItemForge.GENERATOR_GOLD_ID:
+		case GeneratorUtils.GENERATOR_GOLD_ID:
 			gen = new GoldGenerator(b, plugin);
 			break;
-		case GeneratorItemForge.GENERATOR_DIAMOND_ID:
+		case GeneratorUtils.GENERATOR_DIAMOND_ID:
 			gen = new DiamondGenerator(b, plugin);
 			break;
-		case GeneratorItemForge.GENERATOR_EMERALD_ID:
+		case GeneratorUtils.GENERATOR_EMERALD_ID:
 			gen = new EmeraldGenerator(b, plugin);
 			break;	
 		default:
@@ -98,6 +99,9 @@ public class CornyListener implements Listener
 		if(gen != null)
 		{
 			plugin.getGeneratorHandler().addGenerator(gen);
+			gen.addUpgrade(new SpeedUpgrade());
+			gen.addUpgrade(new SpeedUpgrade());
+			GeneratorUtils.serialize(gen);
 		}
 	}
 	
@@ -118,11 +122,7 @@ public class CornyListener implements Listener
 		{
 			if(plugin.getGeneratorHandler().getGenerator(i).getGeneratorBlock().equals(b))
 			{
-				Generator gen = plugin.getGeneratorHandler().getGenerator(i);
-				plugin.getGeneratorHandler().removeGenerator(i);
-				e.setCancelled(true); // Because 1.8 doesn't have setDropItems
-			    b.setType(Material.AIR);
-			    b.getWorld().dropItemNaturally(b.getLocation().add(0.5, 0.5, 0.5), GeneratorItemForge.createGenerator(gen));
+				e.setCancelled(true);
 			}
 		}
 	}
@@ -144,11 +144,7 @@ public class CornyListener implements Listener
 		{
 			if(plugin.getGeneratorHandler().getGenerator(i).getGeneratorBlock().equals(b))
 			{
-				Generator gen = plugin.getGeneratorHandler().getGenerator(i);
-				plugin.getGeneratorHandler().removeGenerator(i);
-				e.setCancelled(true); // Because 1.8 doesn't have setDropItems
-			    b.setType(Material.AIR);
-			    b.getWorld().dropItemNaturally(b.getLocation().add(0.5, 0.5, 0.5), GeneratorItemForge.createGenerator(gen));
+				e.setCancelled(true);
 			}
 		}
 	}
@@ -169,25 +165,25 @@ public class CornyListener implements Listener
 			switch(e.getCurrentItem().getType())
 			{
 			case COAL_ORE:
-				giveGenerator(p, GeneratorItemForge.GENERATOR_COAL_ID);
+				giveGenerator(p, GeneratorUtils.GENERATOR_COAL_ID);
 				break;
 			case IRON_ORE:
-				giveGenerator(p, GeneratorItemForge.GENERATOR_IRON_ID);
+				giveGenerator(p, GeneratorUtils.GENERATOR_IRON_ID);
 				break;
 			case REDSTONE_ORE:
-				giveGenerator(p, GeneratorItemForge.GENERATOR_REDSTONE_ID);
+				giveGenerator(p, GeneratorUtils.GENERATOR_REDSTONE_ID);
 				break;
 			case LAPIS_ORE:
-				giveGenerator(p, GeneratorItemForge.GENERATOR_LAPIS_ID);
+				giveGenerator(p, GeneratorUtils.GENERATOR_LAPIS_ID);
 				break;
 			case GOLD_ORE:
-				giveGenerator(p, GeneratorItemForge.GENERATOR_GOLD_ID);
+				giveGenerator(p, GeneratorUtils.GENERATOR_GOLD_ID);
 				break;
 			case DIAMOND_ORE:
-				giveGenerator(p, GeneratorItemForge.GENERATOR_DIAMOND_ID);
+				giveGenerator(p, GeneratorUtils.GENERATOR_DIAMOND_ID);
 				break;
 			case EMERALD_ORE:
-				giveGenerator(p, GeneratorItemForge.GENERATOR_EMERALD_ID);
+				giveGenerator(p, GeneratorUtils.GENERATOR_EMERALD_ID);
 				break;
 			case BARRIER:
 				p.closeInventory();
@@ -200,7 +196,7 @@ public class CornyListener implements Listener
 	
 	private void giveGenerator(Player p, int type)
 	{
-		ItemStack is = GeneratorItemForge.createGenerator(type, plugin.getGeneratorMaterial(type));
+		ItemStack is = GeneratorUtils.createGeneratorItemStack(type, plugin.getGeneratorMaterial(type));
 		p.getInventory().addItem(is);
 	}
 }

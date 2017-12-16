@@ -20,6 +20,7 @@ public abstract class Generator
 	private Block generatorBlock;
 	
 	private Vector3 range;
+	
 	private int genId, time, timeRemaining;
 	private int timeDecreaseAmount = 1;
 	private int chance;
@@ -92,10 +93,9 @@ public abstract class Generator
 		return rdm.nextInt(chance) == 0;
 	}
 	
-	public int getUpgradesSize() { return upgrades.size(); }
 	public boolean addUpgrade(GeneratorUpgrade upgrade)
 	{
-		if(maxUpgrades <= getUpgradesSize())
+		if(maxUpgrades <= getUpgradesAmount())
 			return false;
 		
 		upgrade.applyUpgrade(this);

@@ -7,7 +7,7 @@ import org.bukkit.block.Block;
 
 import com.cornchipss.oregenerator.OreGeneratorPlugin;
 import com.cornchipss.oregenerator.generators.Generator;
-import com.cornchipss.oregenerator.generators.GeneratorItemForge;
+import com.cornchipss.oregenerator.generators.GeneratorUtils;
 import com.cornchipss.oregenerator.ref.Vector3;
 import com.cornchipss.oregenerator.upgrades.GeneratorUpgrade;
 
@@ -15,12 +15,12 @@ public class LapisGenerator extends Generator
 {
 	public LapisGenerator(Block generatorBlock, OreGeneratorPlugin plugin, ArrayList<GeneratorUpgrade> upgrades) 
 	{
-		super(new Vector3(3, 3, 3), 4, GeneratorItemForge.GENERATOR_LAPIS_ID, generatorBlock, plugin, upgrades);
+		super(new Vector3(3, 3, 3), 4, GeneratorUtils.GENERATOR_LAPIS_ID, generatorBlock, plugin, upgrades);
 	}
 	
 	public LapisGenerator(Block generatorBlock, OreGeneratorPlugin plugin) 
 	{
-		super(new Vector3(3, 3, 3), 4, GeneratorItemForge.GENERATOR_LAPIS_ID, generatorBlock, plugin);
+		super(new Vector3(3, 3, 3), 4, GeneratorUtils.GENERATOR_LAPIS_ID, generatorBlock, plugin);
 	}
 
 	@Override

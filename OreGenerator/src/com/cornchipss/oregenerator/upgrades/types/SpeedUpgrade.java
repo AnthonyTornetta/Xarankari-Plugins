@@ -7,13 +7,14 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import com.cornchipss.oregenerator.generators.Generator;
 import com.cornchipss.oregenerator.upgrades.GeneratorUpgrade;
+import com.cornchipss.oregenerator.upgrades.UpgradeUtils;
 
 
 public class SpeedUpgrade extends GeneratorUpgrade
 {
 	public SpeedUpgrade() 
 	{
-		super(forgeSymbol());
+		super(forgeSymbol(), UpgradeUtils.UPGRADE_SPEED_ID);
 	}
 
 	@Override

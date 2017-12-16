@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.cornchipss.oregenerator.OreGeneratorPlugin;
-import com.cornchipss.oregenerator.generators.GeneratorItemForge;
+import com.cornchipss.oregenerator.generators.GeneratorUtils;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -38,25 +38,25 @@ public class CommandManager
 			switch(args[0])
 			{
 			case "coal":
-				is = GeneratorItemForge.createGenerator(GeneratorItemForge.GENERATOR_COAL_ID, plugin.getGeneratorMaterial(GeneratorItemForge.GENERATOR_COAL_ID));
+				is = GeneratorUtils.createGeneratorItemStack(GeneratorUtils.GENERATOR_COAL_ID, plugin.getGeneratorMaterial(GeneratorUtils.GENERATOR_COAL_ID));
 				break;
 			case "iron":
-				is = GeneratorItemForge.createGenerator(GeneratorItemForge.GENERATOR_IRON_ID, plugin.getGeneratorMaterial(GeneratorItemForge.GENERATOR_IRON_ID));
+				is = GeneratorUtils.createGeneratorItemStack(GeneratorUtils.GENERATOR_IRON_ID, plugin.getGeneratorMaterial(GeneratorUtils.GENERATOR_IRON_ID));
 				break;
 			case "redstone":
-				is = GeneratorItemForge.createGenerator(GeneratorItemForge.GENERATOR_REDSTONE_ID, plugin.getGeneratorMaterial(GeneratorItemForge.GENERATOR_REDSTONE_ID));
+				is = GeneratorUtils.createGeneratorItemStack(GeneratorUtils.GENERATOR_REDSTONE_ID, plugin.getGeneratorMaterial(GeneratorUtils.GENERATOR_REDSTONE_ID));
 				break;
 			case "lapis":
-				is = GeneratorItemForge.createGenerator(GeneratorItemForge.GENERATOR_LAPIS_ID, plugin.getGeneratorMaterial(GeneratorItemForge.GENERATOR_LAPIS_ID));
+				is = GeneratorUtils.createGeneratorItemStack(GeneratorUtils.GENERATOR_LAPIS_ID, plugin.getGeneratorMaterial(GeneratorUtils.GENERATOR_LAPIS_ID));
 				break;
 			case "gold":
-				is = GeneratorItemForge.createGenerator(GeneratorItemForge.GENERATOR_GOLD_ID, plugin.getGeneratorMaterial(GeneratorItemForge.GENERATOR_GOLD_ID));
+				is = GeneratorUtils.createGeneratorItemStack(GeneratorUtils.GENERATOR_GOLD_ID, plugin.getGeneratorMaterial(GeneratorUtils.GENERATOR_GOLD_ID));
 				break;
 			case "diamond":
-				is = GeneratorItemForge.createGenerator(GeneratorItemForge.GENERATOR_DIAMOND_ID, plugin.getGeneratorMaterial(GeneratorItemForge.GENERATOR_DIAMOND_ID));
+				is = GeneratorUtils.createGeneratorItemStack(GeneratorUtils.GENERATOR_DIAMOND_ID, plugin.getGeneratorMaterial(GeneratorUtils.GENERATOR_DIAMOND_ID));
 				break;
 			case "emerald":
-				is = GeneratorItemForge.createGenerator(GeneratorItemForge.GENERATOR_EMERALD_ID, plugin.getGeneratorMaterial(GeneratorItemForge.GENERATOR_EMERALD_ID));
+				is = GeneratorUtils.createGeneratorItemStack(GeneratorUtils.GENERATOR_EMERALD_ID, plugin.getGeneratorMaterial(GeneratorUtils.GENERATOR_EMERALD_ID));
 			default:
 				p.sendMessage(ChatColor.RED + "Invalid generator: " + args[0]);
 			}
