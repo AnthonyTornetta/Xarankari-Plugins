@@ -111,10 +111,11 @@ public class OreGeneratorPlugin extends JavaPlugin
 			e.printStackTrace();
 			return "CRITICAL ERROR: Could not save config file!";
 		}
+		
+		saveConfig();
 		return "Config File Successfully read";
 	}
 	
-	@SuppressWarnings("unused")
 	private void saveGenerators() throws IOException
 	{
 		BufferedWriter genCfg = new BufferedWriter(new FileWriter(new File(this.getDataFolder() + "\\generator-storage.yml")));
