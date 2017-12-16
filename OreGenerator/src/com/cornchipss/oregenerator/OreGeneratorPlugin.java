@@ -34,6 +34,7 @@ public class OreGeneratorPlugin extends JavaPlugin
 	// Generator blocks 'n stuff
 	private Material transmutableBlock;
 	private Material[] generatorMaterials;
+	private int[] secondsBetweenTransmutes;
 	
 	@Override
 	public void onEnable()
@@ -78,6 +79,9 @@ public class OreGeneratorPlugin extends JavaPlugin
 		generatorBlocks = generatorBlocks.replaceAll(" ", "");
 		String[] splitBlocks = generatorBlocks.split(",");
 		
+		int[] defaultSplitTimes = {10, 20, 30, 40, 50, 60, 70};
+		int[] splitTimes = cfg.getOrSetIntArray(Reference.CFG_DEFAULT_TIME_BETWEEN_TRANSMUTES, defaultSplitTimes);
+		
 		generatorMaterials = new Material[7];
 		
 		if(splitBlocks.length < generatorMaterials.length)
@@ -86,6 +90,7 @@ public class OreGeneratorPlugin extends JavaPlugin
 		for(int i = 0; i < splitBlocks.length; i++)
 		{
 			generatorMaterials[i] = Material.getMaterial(splitBlocks[i]);
+			secondsBetweenTransmutes[i] = splitTimes[i];
 			if(generatorMaterials[i] == null)
 			{
 				return "CRITICAL ERROR: Invalid material: '" + splitBlocks[i] + "'.  Make sure everything is written correctly; for example for coal ore: COAL_ORE";

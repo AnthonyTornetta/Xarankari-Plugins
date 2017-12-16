@@ -77,6 +77,17 @@ public class Config
 		return getInt(key);
 	}
 	
+
+	public int[] getOrSetIntArray(String key, int[] defaultValue) 
+	{
+		if(!this.containsKey(key) || getIntArray(key) == null)
+		{
+			setIntArray(key, defaultValue);
+		}
+		
+		return getIntArray(key);
+	}
+
 	/**
 	 * Gets a specified value based off the key, or if the value doesn't exist sets it to a specified default value and returns that value
 	 * @param key The key to get the value of
@@ -91,6 +102,16 @@ public class Config
 		}
 		
 		return getDouble(key);
+	}
+	
+	public double[] getOrSetDoubleArray(String key, double[] defaultValue) 
+	{
+		if(!this.containsKey(key) || getDoubleArray(key) == null)
+		{
+			setDoubleArray(key, defaultValue);
+		}
+		
+		return getDoubleArray(key);
 	}
 	
 	/**
@@ -109,6 +130,16 @@ public class Config
 		return getString(key);
 	}
 	
+	public String[] getOrSetIntArray(String key, String[] defaultValue) 
+	{
+		if(!this.containsKey(key) || getStringArray(key) == null)
+		{
+			setStringArray(key, defaultValue);
+		}
+		
+		return getStringArray(key);
+	}
+	
 	/**
 	 * Sets a integer value at a given key
 	 * @param key The key to set the value at
@@ -117,6 +148,29 @@ public class Config
 	public void setInt(String key, int integer)
 	{
 		String newValue = key + ": " + integer;
+		for(int i = 0; i < lines.size(); i++)
+		{
+			String[] split = lines.get(i).split(": ");
+			if(split[0].equalsIgnoreCase(key))
+			{
+				lines.set(i, newValue);
+				return;
+			}
+		}
+		lines.add(newValue);
+	}
+	
+	public void setIntArray(String key, int[] intArr) 
+	{
+		String newValue = key + ": ";
+		for(int i = 0; i < intArr.length; i++)
+		{
+			if(i == intArr.length - 1)
+				newValue += intArr[i] + "";
+			else
+				newValue += intArr[i] + ", ";
+		}
+		
 		for(int i = 0; i < lines.size(); i++)
 		{
 			String[] split = lines.get(i).split(": ");
@@ -149,6 +203,29 @@ public class Config
 		lines.add(newValue);
 	}
 	
+	public void setDoubleArray(String key, double[] doubleArr) 
+	{
+		String newValue = key + ": ";
+		for(int i = 0; i < doubleArr.length; i++)
+		{
+			if(i == doubleArr.length - 1)
+				newValue += doubleArr[i] + "";
+			else
+				newValue += doubleArr[i] + ", ";
+		}
+		
+		for(int i = 0; i < lines.size(); i++)
+		{
+			String[] split = lines.get(i).split(": ");
+			if(split[0].equalsIgnoreCase(key))
+			{
+				lines.set(i, newValue);
+				return;
+			}
+		}
+		lines.add(newValue);
+	}
+	
 	/**
 	 * Sets a String value at a given key
 	 * @param key The key to set the value at
@@ -161,6 +238,29 @@ public class Config
 			newValue = key + ": null";
 		else
 			newValue = key + ": " + str;
+		
+		for(int i = 0; i < lines.size(); i++)
+		{
+			String[] split = lines.get(i).split(": ");
+			if(split[0].equalsIgnoreCase(key))
+			{
+				lines.set(i, newValue);
+				return;
+			}
+		}
+		lines.add(newValue);
+	}
+
+	public void setStringArray(String key, String[] strArr) 
+	{
+		String newValue = key + ": ";
+		for(int i = 0; i < strArr.length; i++)
+		{
+			if(i == strArr.length - 1)
+				newValue += strArr[i] + "";
+			else
+				newValue += strArr[i] + ", ";
+		}
 		
 		for(int i = 0; i < lines.size(); i++)
 		{
@@ -216,6 +316,26 @@ public class Config
 		return null;
 	}
 	
+	public String[] getStringArray(String key) 
+	{
+		for(int i = 0; i < lines.size(); i++)
+		{
+			String[] split = lines.get(i).split(": ");
+			if(split[0].equalsIgnoreCase(key))
+			{
+				if(split.length > 1)
+				{
+					String possibleDoubles = split[1];
+					possibleDoubles.replaceAll(" ", "");
+					String[] stringsSplit = possibleDoubles.split(",");
+					return stringsSplit;
+				}
+			}
+		}
+		return null;
+	}
+	
+	
 	/**
 	 * Gets a integer value from the config file<br>Returns BAD_VALUE if the key isn't found
 	 * @param key The key the value is stored at
@@ -241,6 +361,33 @@ public class Config
 		return BAD_VALUE;
 	}
 	
+	public int[] getIntArray(String key) 
+	{
+		lineSearch:
+		for(int i = 0; i < lines.size(); i++)
+		{
+			String[] split = lines.get(i).split(": ");
+			if(split[0].equalsIgnoreCase(key))
+			{
+				if(split.length > 1)
+				{
+					String possibleInts = split[1];
+					possibleInts.replaceAll(" ", "");
+					String[] intsSplit = possibleInts.split(",");
+					int[] intArray = new int[intsSplit.length];
+					for(int j = 0; j < intsSplit.length; j++)
+					{
+						if(!Helper.isInt(intsSplit[j]))
+							continue lineSearch;
+						intArray[j] = Integer.parseInt(intsSplit[j]);
+					}
+					return intArray;
+				}
+			}
+		}
+		return null;
+	}
+	
 	/**
 	 * Gets a double value from the config file<br>Returns BAD_VALUE if the key isn't found
 	 * @param key The key the value is stored at
@@ -264,6 +411,33 @@ public class Config
 			}
 		}
 		return BAD_VALUE;
+	}
+	
+	public double[] getDoubleArray(String key) 
+	{
+		lineSearch:
+		for(int i = 0; i < lines.size(); i++)
+		{
+			String[] split = lines.get(i).split(": ");
+			if(split[0].equalsIgnoreCase(key))
+			{
+				if(split.length > 1)
+				{
+					String possibleDoubles = split[1];
+					possibleDoubles.replaceAll(" ", "");
+					String[] dsSplit = possibleDoubles.split(",");
+					double[] dArray = new double[dsSplit.length];
+					for(int j = 0; j < dsSplit.length; j++)
+					{
+						if(!Helper.isDouble(dsSplit[j]))
+							continue lineSearch;
+						dArray[j] = Double.parseDouble(dsSplit[j]);
+					}
+					return dArray;
+				}
+			}
+		}
+		return null;
 	}
 	
 	/**

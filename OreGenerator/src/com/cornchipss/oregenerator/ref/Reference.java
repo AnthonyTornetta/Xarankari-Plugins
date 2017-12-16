@@ -10,6 +10,8 @@ public class Reference
 	
 	public static final String CFG_TRANSMUTABLE_BLOCK_KEY = "transmutable-block";
 	public static final String CFG_GENERATOR_MATERIALS_KEY = "generator-blocks";
+	public static final String CFG_DEFAULT_TIME_BETWEEN_TRANSMUTES = "default-time-between-transmutes";
+
 	public static final String CFG_VERSION_KEY = "version";
 	
 	public static final String CMD_WINDOW_GET_GENERATOR_TITLE = ChatColor.DARK_GREEN + "Give Generator";
