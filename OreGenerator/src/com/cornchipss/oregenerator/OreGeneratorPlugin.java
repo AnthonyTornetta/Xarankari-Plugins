@@ -112,7 +112,15 @@ public class OreGeneratorPlugin extends JavaPlugin
 			return "CRITICAL ERROR: Could not save config file!";
 		}
 		
-		cfg.save();
+		try 
+		{
+			cfg.save();
+		} 
+		catch (IOException e) 
+		{
+			getLogger().info("Error saving config file!");
+			e.printStackTrace();
+		}
 		return "Config File Successfully read";
 	}
 	
