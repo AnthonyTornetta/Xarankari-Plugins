@@ -17,7 +17,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.cornchipss.oregenerator.commands.CommandManager;
 import com.cornchipss.oregenerator.config.Config;
 import com.cornchipss.oregenerator.generators.GeneratorHandler;
-import com.cornchipss.oregenerator.generators.GeneratorItemForge;
 import com.cornchipss.oregenerator.listeners.CornyListener;
 import com.cornchipss.oregenerator.ref.Reference;
 import com.google.gson.Gson;
@@ -34,7 +33,7 @@ public class OreGeneratorPlugin extends JavaPlugin
 	// Generator blocks 'n stuff
 	private Material transmutableBlock;
 	private Material[] generatorMaterials;
-	private int[] secondsBetweenTransmutes;
+	private int[] timesBetween;
 	
 	@Override
 	public void onEnable()
@@ -58,15 +57,15 @@ public class OreGeneratorPlugin extends JavaPlugin
 	@Override
 	public void onDisable()
 	{
-		try
-		{
-			saveGenerators();
-		}
-		catch(IOException ex)
-		{
-			getLogger().info("Error saving generators! This is REALLY bad!");
-			ex.printStackTrace();
-		}
+//		try
+//		{
+//			saveGenerators();
+//		}
+//		catch(IOException ex)
+//		{
+//			getLogger().info("Error saving generators! This is REALLY bad!");
+//			ex.printStackTrace();
+//		}
 	}
 	
 	private String initConfig()
@@ -75,25 +74,25 @@ public class OreGeneratorPlugin extends JavaPlugin
 		
 		cfg.setString(Reference.CFG_VERSION_KEY, Reference.PLUGIN_VERSION); // make sure the version is up to date (can be used in case we change the way we store things in later versions and want to convert the file to the new format)
 		
-		String generatorBlocks = cfg.getOrSetString(Reference.CFG_GENERATOR_MATERIALS_KEY, "COAL_BLOCK, IRON_BLOCK, REDSTONE_BLOCK, LAPIS_BLOCK, GOLD_BLOCK, DIAMOND_BLOCK, EMERALD_BLOCK");
-		generatorBlocks = generatorBlocks.replaceAll(" ", "");
-		String[] splitBlocks = generatorBlocks.split(",");
+		String[] defualtMaterials = { "COAL_BLOCK", "IRON_BLOCK", "REDSTONE_BLOCK", "LAPIS_BLOCK", "GOLD_BLOCK", "DIAMOND_BLOCK", "EMERALD_BLOCK" };
+		String[] generatorBlocks = cfg.getOrSetStringArray(Reference.CFG_GENERATOR_MATERIALS_KEY, defualtMaterials);
 		
-		int[] defaultSplitTimes = {10, 20, 30, 40, 50, 60, 70};
-		int[] splitTimes = cfg.getOrSetIntArray(Reference.CFG_DEFAULT_TIME_BETWEEN_TRANSMUTES, defaultSplitTimes);
+		int[] defaultTimes = {10, 20, 30, 40, 50, 60, 70};
+		timesBetween = cfg.getOrSetIntArray(Reference.CFG_DEFAULT_TIME_BETWEEN_TRANSMUTES, defaultTimes);
 		
 		generatorMaterials = new Material[7];
 		
-		if(splitBlocks.length < generatorMaterials.length)
+		if(generatorBlocks.length < generatorMaterials.length)
 			return "CRITICAL ERROR: Generator Materials don't store 6 values! (" + cfg.getString(Reference.CFG_GENERATOR_MATERIALS_KEY) + ")";
+		if(timesBetween.length != generatorBlocks.length)
+			return "CRITICAL ERROR: The times between each transmutation per generator is not equal to the amount of generators!";
 		
-		for(int i = 0; i < splitBlocks.length; i++)
+		for(int i = 0; i < generatorBlocks.length; i++)
 		{
-			generatorMaterials[i] = Material.getMaterial(splitBlocks[i]);
-			secondsBetweenTransmutes[i] = splitTimes[i];
+			generatorMaterials[i] = Material.getMaterial(generatorBlocks[i]);
 			if(generatorMaterials[i] == null)
 			{
-				return "CRITICAL ERROR: Invalid material: '" + splitBlocks[i] + "'.  Make sure everything is written correctly; for example for coal ore: COAL_ORE";
+				return "CRITICAL ERROR: Invalid material: '" + generatorBlocks[i] + "'.  Make sure everything is written correctly; for example for coal ore: COAL_ORE";
 			}
 		}
 		
@@ -115,6 +114,7 @@ public class OreGeneratorPlugin extends JavaPlugin
 		return "Config File Successfully read";
 	}
 	
+	@SuppressWarnings("unused")
 	private void saveGenerators() throws IOException
 	{
 		BufferedWriter genCfg = new BufferedWriter(new FileWriter(new File(this.getDataFolder() + "\\generator-storage.yml")));
@@ -134,28 +134,8 @@ public class OreGeneratorPlugin extends JavaPlugin
 		return CommandManager.runThroughCommands(command, sender, args, this);	
 	}
 	
-	public Material getGeneratorMaterial(int genId) 
-	{ 
-		switch(genId)
-		{
-			case GeneratorItemForge.GENERATOR_COAL_ID:
-				return generatorMaterials[0];
-			case GeneratorItemForge.GENERATOR_IRON_ID:
-				return generatorMaterials[1];
-			case GeneratorItemForge.GENERATOR_REDSTONE_ID:
-				return generatorMaterials[2];
-			case GeneratorItemForge.GENERATOR_LAPIS_ID:
-				return generatorMaterials[3];
-			case GeneratorItemForge.GENERATOR_GOLD_ID:
-				return generatorMaterials[4];
-			case GeneratorItemForge.GENERATOR_DIAMOND_ID:
-				return generatorMaterials[5];
-			case GeneratorItemForge.GENERATOR_EMERALD_ID:
-				return generatorMaterials[6];
-			default:
-				return null;
-		}
-	}
+	public Material getGeneratorMaterial(int genId) { return generatorMaterials[genId]; }
+	public int getGeneratorTimeBetween(int genId) { return timesBetween[genId]; }
 	
 	public List<Material> getGeneratorMaterials()
 	{

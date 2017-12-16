@@ -15,12 +15,12 @@ public class DiamondGenerator extends Generator
 {
 	public DiamondGenerator(Block generatorBlock, OreGeneratorPlugin plugin, ArrayList<GeneratorUpgrade> upgrades) 
 	{
-		super(new Vector3(3, 3, 3), 6, GeneratorItemForge.GENERATOR_DIAMOND_ID, 5, generatorBlock, plugin, upgrades);
+		super(new Vector3(3, 3, 3), 6, GeneratorItemForge.GENERATOR_DIAMOND_ID, generatorBlock, plugin, upgrades);
 	}
 	
 	public DiamondGenerator(Block generatorBlock, OreGeneratorPlugin plugin) 
 	{
-		super(new Vector3(3, 3, 3), 6, GeneratorItemForge.GENERATOR_DIAMOND_ID, 5, generatorBlock, plugin);
+		super(new Vector3(3, 3, 3), 6, GeneratorItemForge.GENERATOR_DIAMOND_ID, generatorBlock, plugin);
 	}
 
 	@Override

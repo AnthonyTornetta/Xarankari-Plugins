@@ -1,8 +1,5 @@
 package com.cornchipss.oregenerator.listeners;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -11,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -103,8 +101,34 @@ public class CornyListener implements Listener
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void onPlayerBreakBlock(BlockBreakEvent e)
+	{
+		Block b = e.getBlock();
+		
+		if(!plugin.getGeneratorMaterials().contains(b.getType()))
+			return;
+		
+		if(e.isCancelled())
+			return;
+		
+		//Generator gen = plugin.getGeneratorHandler().getGenerator(i);
+
+		for(int i = 0; i < plugin.getGeneratorHandler().generatorAmount(); i++)
+		{
+			if(plugin.getGeneratorHandler().getGenerator(i).getGeneratorBlock().equals(b))
+			{
+				Generator gen = plugin.getGeneratorHandler().getGenerator(i);
+				plugin.getGeneratorHandler().removeGenerator(i);
+				e.setCancelled(true); // Because 1.8 doesn't have setDropItems
+			    b.setType(Material.AIR);
+			    b.getWorld().dropItemNaturally(b.getLocation().add(0.5, 0.5, 0.5), GeneratorItemForge.createGenerator(gen));
+			}
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void onBlockExplode(BlockExplodeEvent e)
 	{
 		Block b = e.getBlock();
 		

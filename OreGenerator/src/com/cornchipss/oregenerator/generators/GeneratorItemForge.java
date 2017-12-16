@@ -83,6 +83,6 @@ public class GeneratorItemForge
 
 	public static ItemStack createGenerator(Generator gen) 
 	{
-		return createGenerator(gen.getType(), gen.getPlugin().getGeneratorMaterial(gen.getType()));
+		return createGenerator(gen.getGeneratorId(), gen.getPlugin().getGeneratorMaterial(gen.getGeneratorId()));
 	}
 }

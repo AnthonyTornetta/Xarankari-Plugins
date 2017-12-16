@@ -15,12 +15,12 @@ public class RedstoneGenerator extends Generator
 {
 	public RedstoneGenerator(Block generatorBlock, OreGeneratorPlugin plugin, ArrayList<GeneratorUpgrade> upgrades) 
 	{
-		super(new Vector3(3, 3, 3), 3, GeneratorItemForge.GENERATOR_REDSTONE_ID, 5, generatorBlock, plugin, upgrades);
+		super(new Vector3(3, 3, 3), 3, GeneratorItemForge.GENERATOR_REDSTONE_ID, generatorBlock, plugin, upgrades);
 	}
 	
 	public RedstoneGenerator(Block generatorBlock, OreGeneratorPlugin plugin) 
 	{
-		super(new Vector3(3, 3, 3), 3, GeneratorItemForge.GENERATOR_REDSTONE_ID, 5, generatorBlock, plugin);
+		super(new Vector3(3, 3, 3), 3, GeneratorItemForge.GENERATOR_REDSTONE_ID, generatorBlock, plugin);
 	}
 
 	@Override

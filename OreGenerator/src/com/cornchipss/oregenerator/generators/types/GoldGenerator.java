@@ -15,12 +15,12 @@ public class GoldGenerator extends Generator
 {
 	public GoldGenerator(Block generatorBlock, OreGeneratorPlugin plugin, ArrayList<GeneratorUpgrade> upgrades) 
 	{
-		super(new Vector3(3, 3, 3), 5, GeneratorItemForge.GENERATOR_GOLD_ID, 5, generatorBlock, plugin, upgrades);
+		super(new Vector3(3, 3, 3), 5, GeneratorItemForge.GENERATOR_GOLD_ID, generatorBlock, plugin, upgrades);
 	}
 	
 	public GoldGenerator(Block generatorBlock, OreGeneratorPlugin plugin) 
 	{
-		super(new Vector3(3, 3, 3), 5, GeneratorItemForge.GENERATOR_GOLD_ID, 5, generatorBlock, plugin);
+		super(new Vector3(3, 3, 3), 5, GeneratorItemForge.GENERATOR_GOLD_ID, generatorBlock, plugin);
 	}
 
 	@Override

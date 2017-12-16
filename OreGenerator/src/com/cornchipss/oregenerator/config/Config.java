@@ -147,7 +147,7 @@ public class Config
 	 * @param defaultValue The value to set it to if it doesn't exist
 	 * @return The value at the given key or the default value if the key doesn't exist
 	 */
-	public String[] getOrSetIntArray(String key, String[] defaultValue) 
+	public String[] getOrSetStringArray(String key, String[] defaultValue) 
 	{
 		if(!this.containsKey(key) || getStringArray(key) == null)
 		{
@@ -362,9 +362,9 @@ public class Config
 			{
 				if(split.length > 1)
 				{
-					String possibleDoubles = split[1];
-					possibleDoubles.replaceAll(" ", "");
-					String[] stringsSplit = possibleDoubles.split(",");
+					String possibleStrings = split[1];
+					possibleStrings = possibleStrings.replaceAll(" ", "");
+					String[] stringsSplit = possibleStrings.split(",");
 					return stringsSplit;
 				}
 			}
@@ -410,11 +410,11 @@ public class Config
 		{
 			String[] split = lines.get(i).split(": ");
 			if(split[0].equalsIgnoreCase(key))
-			{
+			{   
 				if(split.length > 1)
 				{
 					String possibleInts = split[1];
-					possibleInts.replaceAll(" ", "");
+					possibleInts = possibleInts.replaceAll(" ", "");
 					String[] intsSplit = possibleInts.split(",");
 					int[] intArray = new int[intsSplit.length];
 					for(int j = 0; j < intsSplit.length; j++)
@@ -471,7 +471,7 @@ public class Config
 				if(split.length > 1)
 				{
 					String possibleDoubles = split[1];
-					possibleDoubles.replaceAll(" ", "");
+					possibleDoubles = possibleDoubles.replaceAll(" ", "");
 					String[] dsSplit = possibleDoubles.split(",");
 					double[] dArray = new double[dsSplit.length];
 					for(int j = 0; j < dsSplit.length; j++)
@@ -502,7 +502,6 @@ public class Config
 		for(int i = 0; i < lines.size(); i++)
 		{
 			String curLine = lines.get(i);
-			System.out.println(curLine);
 			pw.append(curLine);
 			
 			pw.append('\n');

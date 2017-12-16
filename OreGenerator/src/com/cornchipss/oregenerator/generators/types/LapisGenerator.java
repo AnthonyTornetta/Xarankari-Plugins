@@ -15,12 +15,12 @@ public class LapisGenerator extends Generator
 {
 	public LapisGenerator(Block generatorBlock, OreGeneratorPlugin plugin, ArrayList<GeneratorUpgrade> upgrades) 
 	{
-		super(new Vector3(3, 3, 3), 4, GeneratorItemForge.GENERATOR_LAPIS_ID, 5, generatorBlock, plugin, upgrades);
+		super(new Vector3(3, 3, 3), 4, GeneratorItemForge.GENERATOR_LAPIS_ID, generatorBlock, plugin, upgrades);
 	}
 	
 	public LapisGenerator(Block generatorBlock, OreGeneratorPlugin plugin) 
 	{
-		super(new Vector3(3, 3, 3), 4, GeneratorItemForge.GENERATOR_LAPIS_ID, 5, generatorBlock, plugin);
+		super(new Vector3(3, 3, 3), 4, GeneratorItemForge.GENERATOR_LAPIS_ID, generatorBlock, plugin);
 	}
 
 	@Override

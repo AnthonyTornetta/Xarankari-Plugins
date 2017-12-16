@@ -20,31 +20,31 @@ public abstract class Generator
 	private Block generatorBlock;
 	
 	private Vector3 range;
-	private int type, time, timeRemaining;
+	private int genId, time, timeRemaining;
 	private int timeDecreaseAmount = 1;
 	private int chance;
 	
-	public Generator(Vector3 defaultRange, int chance, int type, int time, Block generatorBlock, OreGeneratorPlugin plugin, ArrayList<GeneratorUpgrade> upgrades)
+	public Generator(Vector3 defaultRange, int chance, int genId, Block generatorBlock, OreGeneratorPlugin plugin, ArrayList<GeneratorUpgrade> upgrades)
 	{
 		setRange(defaultRange);
 		setChance(chance);
-		setType(type);
+		setGeneratorId(genId);
 		setGeneratorBlock(generatorBlock);
-		setTimeBetweenRun(time);
-		setTimeRemaining(time);
+		setTimeBetweenRun(plugin.getGeneratorTimeBetween(getGeneratorId()));
+		setTimeRemaining(plugin.getGeneratorTimeBetween(getGeneratorId()));
 		
 		this.plugin = plugin;
 		this.upgrades = upgrades;
 	}
 	
-	public Generator(Vector3 defaultRange, int chance, int type, int time, Block generatorBlock, OreGeneratorPlugin plugin)
+	public Generator(Vector3 defaultRange, int chance, int genId, Block generatorBlock, OreGeneratorPlugin plugin)
 	{
 		setRange(defaultRange);
 		setChance(chance);
-		setType(type);
+		setGeneratorId(genId);
 		setGeneratorBlock(generatorBlock);
-		setTimeBetweenRun(time);
-		setTimeRemaining(time);
+		setTimeBetweenRun(plugin.getGeneratorTimeBetween(getGeneratorId()));
+		setTimeRemaining(plugin.getGeneratorTimeBetween(getGeneratorId()));
 		
 		this.plugin = plugin;
 	}
@@ -69,8 +69,8 @@ public abstract class Generator
 	public int getChance() { return chance; }
 	public void setChance(int c) { this.chance = c; }
 	
-	public int getType() { return type; }
-	private void setType(int t) { this.type = t; }
+	public int getGeneratorId() { return genId; }
+	private void setGeneratorId(int t) { this.genId = t; }
 	
 	public int getTimeBetweenRuns() { return time; }
 	public void setTimeBetweenRun(int t) { this.time = t; }
@@ -114,6 +114,6 @@ public abstract class Generator
 	@Override
 	public String toString() 
 	{
-		return "Generator: Type: " + getType() + "; Range: " + getRange() + "; chance per block: " + getChance() + "; Location: " + generatorBlock.getLocation();
+		return "Generator: Type: " + getGeneratorId() + "; Range: " + getRange() + "; chance per block: " + getChance() + "; Location: " + generatorBlock.getLocation();
 	}
 }

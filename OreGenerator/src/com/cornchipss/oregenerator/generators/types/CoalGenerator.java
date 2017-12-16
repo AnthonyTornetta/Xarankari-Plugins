@@ -13,14 +13,15 @@ import com.cornchipss.oregenerator.upgrades.GeneratorUpgrade;
 
 public class CoalGenerator extends Generator
 {
+	//Vector3 defaultRange, int chance, int genId, Block generatorBlock, OreGeneratorPlugin plugin, ArrayList<GeneratorUpgrade> upgrades
 	public CoalGenerator(Block generatorBlock, OreGeneratorPlugin plugin, ArrayList<GeneratorUpgrade> upgrades) 
 	{
-		super(new Vector3(3, 3, 3), 1, GeneratorItemForge.GENERATOR_COAL_ID, 1, generatorBlock, plugin, upgrades);
+		super(new Vector3(3, 3, 3), 1, GeneratorItemForge.GENERATOR_COAL_ID, generatorBlock, plugin, upgrades);
 	}
 	
 	public CoalGenerator(Block generatorBlock, OreGeneratorPlugin plugin) 
 	{
-		super(new Vector3(3, 3, 3), 1, GeneratorItemForge.GENERATOR_COAL_ID, 1, generatorBlock, plugin);
+		super(new Vector3(3, 3, 3), 1, GeneratorItemForge.GENERATOR_COAL_ID, generatorBlock, plugin);
 	}
 
 	@Override

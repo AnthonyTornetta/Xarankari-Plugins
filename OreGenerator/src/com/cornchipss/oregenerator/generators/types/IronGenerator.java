@@ -15,12 +15,12 @@ public class IronGenerator extends Generator
 {	
 	public IronGenerator(Block generatorBlock, OreGeneratorPlugin plugin, ArrayList<GeneratorUpgrade> upgrades) 
 	{
-		super(new Vector3(3, 3, 3), 2, GeneratorItemForge.GENERATOR_IRON_ID, 5, generatorBlock, plugin, upgrades);
+		super(new Vector3(3, 3, 3), 2, GeneratorItemForge.GENERATOR_IRON_ID, generatorBlock, plugin, upgrades);
 	}
 	
 	public IronGenerator(Block generatorBlock, OreGeneratorPlugin plugin) 
 	{
-		super(new Vector3(3, 3, 3), 2, GeneratorItemForge.GENERATOR_IRON_ID, 5, generatorBlock, plugin);
+		super(new Vector3(3, 3, 3), 2, GeneratorItemForge.GENERATOR_IRON_ID, generatorBlock, plugin);
 	}
 
 	@Override
