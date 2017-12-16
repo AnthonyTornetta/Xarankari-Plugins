@@ -65,7 +65,7 @@ public class Config
 	 * Gets a specified value based off the key, or if the value doesn't exist sets it to a specified default value and returns that value
 	 * @param key The key to get the value of
 	 * @param defaultValue The value to set it to if it doesn't exist
-	 * @return Returns the value at the given key or the default value if the key doesn' exist
+	 * @return The value at the given key or the default value if the key doesn't exist
 	 */
 	public int getOrSetInt(String key, int defaultValue)
 	{
@@ -77,7 +77,12 @@ public class Config
 		return getInt(key);
 	}
 	
-
+	/**
+	 * Gets a specified value based off the key, or if the value doesn't exist sets it to a specified default value and returns that value
+	 * @param key The key to get the value of
+	 * @param defaultValue The value to set it to if it doesn't exist
+	 * @return The value at the given key or the default value if the key doesn't exist
+	 */
 	public int[] getOrSetIntArray(String key, int[] defaultValue) 
 	{
 		if(!this.containsKey(key) || getIntArray(key) == null)
@@ -92,7 +97,7 @@ public class Config
 	 * Gets a specified value based off the key, or if the value doesn't exist sets it to a specified default value and returns that value
 	 * @param key The key to get the value of
 	 * @param defaultValue The value to set it to if it doesn't exist
-	 * @return Returns the value at the given key or the default value if the key doesn' exist
+	 * @return The value at the given key or the default value if the key doesn't exist
 	 */
 	public double getOrSetDouble(String key, double defaultValue)
 	{
@@ -104,6 +109,12 @@ public class Config
 		return getDouble(key);
 	}
 	
+	/**
+	 * Gets a specified value based off the key, or if the value doesn't exist sets it to a specified default value and returns that value
+	 * @param key The key to get the value of
+	 * @param defaultValue The value to set it to if it doesn't exist
+	 * @return The value at the given key or the default value if the key doesn't exist
+	 */
 	public double[] getOrSetDoubleArray(String key, double[] defaultValue) 
 	{
 		if(!this.containsKey(key) || getDoubleArray(key) == null)
@@ -118,7 +129,7 @@ public class Config
 	 * Gets a specified value based off the key, or if the value doesn't exist sets it to a specified default value and returns that value
 	 * @param key The key to get the value of
 	 * @param defaultValue The value to set it to if it doesn't exist
-	 * @return Returns the value at the given key or the default value if the key doesn' exist
+	 * @return The value at the given key or the default value if the key doesn't exist
 	 */
 	public String getOrSetString(String key, String defaultValue)
 	{
@@ -130,6 +141,12 @@ public class Config
 		return getString(key);
 	}
 	
+	/**
+	 * Gets a specified value based off the key, or if the value doesn't exist sets it to a specified default value and returns that value
+	 * @param key The key to get the value of
+	 * @param defaultValue The value to set it to if it doesn't exist
+	 * @return The value at the given key or the default value if the key doesn't exist
+	 */
 	public String[] getOrSetIntArray(String key, String[] defaultValue) 
 	{
 		if(!this.containsKey(key) || getStringArray(key) == null)
@@ -141,7 +158,7 @@ public class Config
 	}
 	
 	/**
-	 * Sets a integer value at a given key
+	 * Sets an integer value at a given key
 	 * @param key The key to set the value at
 	 * @param integer The value the integer will have
 	 */
@@ -160,15 +177,20 @@ public class Config
 		lines.add(newValue);
 	}
 	
-	public void setIntArray(String key, int[] intArr) 
+	/**
+	 * Sets an integer array value at a given key
+	 * @param key The key to set the value at
+	 * @param arr The values the integer array will have
+	 */
+	public void setIntArray(String key, int[] arr) 
 	{
 		String newValue = key + ": ";
-		for(int i = 0; i < intArr.length; i++)
+		for(int i = 0; i < arr.length; i++)
 		{
-			if(i == intArr.length - 1)
-				newValue += intArr[i] + "";
+			if(i == arr.length - 1)
+				newValue += arr[i] + "";
 			else
-				newValue += intArr[i] + ", ";
+				newValue += arr[i] + ", ";
 		}
 		
 		for(int i = 0; i < lines.size(); i++)
@@ -203,15 +225,20 @@ public class Config
 		lines.add(newValue);
 	}
 	
-	public void setDoubleArray(String key, double[] doubleArr) 
+	/**
+	 * Sets a double array value at a given key
+	 * @param key The key to set the value at
+	 * @param arr The values the double array will have
+	 */
+	public void setDoubleArray(String key, double[] arr) 
 	{
 		String newValue = key + ": ";
-		for(int i = 0; i < doubleArr.length; i++)
+		for(int i = 0; i < arr.length; i++)
 		{
-			if(i == doubleArr.length - 1)
-				newValue += doubleArr[i] + "";
+			if(i == arr.length - 1)
+				newValue += arr[i] + "";
 			else
-				newValue += doubleArr[i] + ", ";
+				newValue += arr[i] + ", ";
 		}
 		
 		for(int i = 0; i < lines.size(); i++)
@@ -251,15 +278,20 @@ public class Config
 		lines.add(newValue);
 	}
 
-	public void setStringArray(String key, String[] strArr) 
+	/**
+	 * Sets a String array value at a given key
+	 * @param key The key to set the value at
+	 * @param arr The values the String array will have
+	 */
+	public void setStringArray(String key, String[] arr) 
 	{
 		String newValue = key + ": ";
-		for(int i = 0; i < strArr.length; i++)
+		for(int i = 0; i < arr.length; i++)
 		{
-			if(i == strArr.length - 1)
-				newValue += strArr[i] + "";
+			if(i == arr.length - 1)
+				newValue += arr[i] + "";
 			else
-				newValue += strArr[i] + ", ";
+				newValue += arr[i] + ", ";
 		}
 		
 		for(int i = 0; i < lines.size(); i++)
@@ -316,6 +348,11 @@ public class Config
 		return null;
 	}
 	
+	/**
+	 * Gets a String array value from the config file<br>Returns null if the key isn't found
+	 * @param key The key the value is stored at
+	 * @return The String that was found or null if it wasn't found
+	 */
 	public String[] getStringArray(String key) 
 	{
 		for(int i = 0; i < lines.size(); i++)
@@ -361,6 +398,11 @@ public class Config
 		return BAD_VALUE;
 	}
 	
+	/**
+	 * Gets an integer array value from the config file<br>Returns null if the key isn't found
+	 * @param key The key the value is stored at
+	 * @return The integer that was found or null if it wasn't found
+	 */
 	public int[] getIntArray(String key) 
 	{
 		lineSearch:
@@ -413,6 +455,11 @@ public class Config
 		return BAD_VALUE;
 	}
 	
+	/**
+	 * Gets a double array value from the config file<br>Returns null if the key isn't found
+	 * @param key The key the value is stored at
+	 * @return The double that was found or null if it wasn't found
+	 */
 	public double[] getDoubleArray(String key) 
 	{
 		lineSearch:
