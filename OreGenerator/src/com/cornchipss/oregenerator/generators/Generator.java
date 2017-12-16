@@ -1,83 +1,119 @@
 package com.cornchipss.oregenerator.generators;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Random;
 
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.block.Block;
 
-import com.cornchipss.oregenerator.ref.Helper;
+import com.cornchipss.oregenerator.OreGeneratorPlugin;
+import com.cornchipss.oregenerator.ref.Vector3;
+import com.cornchipss.oregenerator.upgrades.GeneratorUpgrade;
 
-
-public class Generator 
+public abstract class Generator 
 {
-	public static final int GENERATOR_COAL_ID     = 0;
-	public static final int GENERATOR_IRON_ID     = 1;
-	public static final int GENERATOR_REDSTONE_ID = 2;
-	public static final int GENERATOR_LAPIS_ID    = 3;
-	public static final int GENERATOR_GOLD_ID     = 4;
-	public static final int GENERATOR_DIAMOND_ID  = 5;
-	public static final int GENERATOR_EMERALD_ID  = 6;
+	private int maxUpgrades = 10; // TODO: Change from config or somethin, idk what to make this
 	
-	public static int getGeneratorType(ItemMeta im)
+	private OreGeneratorPlugin plugin;
+	
+	private ArrayList<GeneratorUpgrade> upgrades = new ArrayList<>();
+	
+	private Block generatorBlock;
+	
+	private Vector3 range;
+	private int type, time, timeRemaining;
+	private int timeDecreaseAmount = 1;
+	private int chance;
+	
+	public Generator(Vector3 defaultRange, int chance, int type, int time, Block generatorBlock, OreGeneratorPlugin plugin, ArrayList<GeneratorUpgrade> upgrades)
 	{
-		List<String> lore = im.getLore();
-		if (lore == null)
-			return -1;
+		setRange(defaultRange);
+		setChance(chance);
+		setType(type);
+		setGeneratorBlock(generatorBlock);
+		setTimeBetweenRun(time);
+		setTimeRemaining(time);
 		
-		String lastLine = lore.get(lore.size() - 1);
-		if(Helper.isInt(lastLine.charAt(0) + ""))
-		{
-			return Integer.parseInt(lastLine.charAt(0) + "");
-		}
-		return -1;
+		this.plugin = plugin;
+		this.upgrades = upgrades;
 	}
 	
-	public static ItemStack createGenerator(int type, Material oreGenMat)
+	public Generator(Vector3 defaultRange, int chance, int type, int time, Block generatorBlock, OreGeneratorPlugin plugin)
 	{
-		if(type < 0 || type > GENERATOR_EMERALD_ID)
-		{
-			System.out.println("WARNING: Generator ID out of range");
-			return null; // Not a valid type
-		}
-		System.out.println(oreGenMat);
-		ItemStack is = new ItemStack(oreGenMat);
-		System.out.println(is);
-		ItemMeta im = is.getItemMeta();
-		List<String> lore = im.getLore();
-		if(lore == null)
-			lore = new ArrayList<>();
-		lore.add(type + "");
-		im.setLore(lore);
+		setRange(defaultRange);
+		setChance(chance);
+		setType(type);
+		setGeneratorBlock(generatorBlock);
+		setTimeBetweenRun(time);
+		setTimeRemaining(time);
 		
-		switch(type)
-		{
-		case GENERATOR_COAL_ID:
-			im.setDisplayName(ChatColor.DARK_GRAY + "Coal Transmutator");
-			break;
-		case GENERATOR_IRON_ID:
-			im.setDisplayName(ChatColor.GRAY + "Iron Transmutator");
-			break;
-		case GENERATOR_REDSTONE_ID:
-			im.setDisplayName(ChatColor.RED + "Redstone Transmutator");
-			break;
-		case GENERATOR_LAPIS_ID:
-			im.setDisplayName(ChatColor.BLUE + "Lapis Transmutator");
-			break;
-		case GENERATOR_GOLD_ID:
-			im.setDisplayName(ChatColor.GOLD + "Gold Transmutator");
-			break;
-		case GENERATOR_DIAMOND_ID:
-			im.setDisplayName(ChatColor.AQUA + "Diamond Transmutator");
-			break;
-		case GENERATOR_EMERALD_ID:
-			im.setDisplayName(ChatColor.GREEN + "Emerald Transmutator");
-			break;
-		}
+		this.plugin = plugin;
+	}
+	
+	public void tick()
+	{
+		setTimeRemaining(getTimeRemaining() - getTimeDecreaseAmount());
 		
-		is.setItemMeta(im);
-		return is;
+		if(getTimeRemaining() < 0)
+		{
+			run();
+			setTimeRemaining(this.getTimeBetweenRuns());
+		}
+	}
+	
+	
+	public abstract void run();
+	
+	public Vector3 getRange() { return range; }
+	public void setRange(Vector3 r) { this.range = r; }
+
+	public int getChance() { return chance; }
+	public void setChance(int c) { this.chance = c; }
+	
+	public int getType() { return type; }
+	private void setType(int t) { this.type = t; }
+	
+	public int getTimeBetweenRuns() { return time; }
+	public void setTimeBetweenRun(int t) { this.time = t; }
+	
+	public int getTimeRemaining() { return this.timeRemaining; }
+	public void setTimeRemaining(int t) { this.timeRemaining = t; }
+	
+	public int getTimeDecreaseAmount() { return timeDecreaseAmount; }
+	public void setTimeDecreaseAmount(int amt) { this.timeDecreaseAmount = amt; } 
+	
+	public Block getGeneratorBlock() { return generatorBlock; }
+	public void setGeneratorBlock(Block b) { this.generatorBlock = b; }
+	
+	public OreGeneratorPlugin getPlugin() { return this.plugin; }
+	
+	protected boolean shouldTransmute()
+	{
+		Random rdm = new Random();
+		return rdm.nextInt(chance) == 0;
+	}
+	
+	public int getUpgradesSize() { return upgrades.size(); }
+	public boolean addUpgrade(GeneratorUpgrade upgrade)
+	{
+		if(maxUpgrades <= getUpgradesSize())
+			return false;
+		
+		upgrade.applyUpgrade(this);
+		upgrades.add(upgrade);
+		return true;
+	}
+	protected void removeUpgrade(int i)
+	{
+		GeneratorUpgrade upgrade = upgrades.get(i);
+		upgrade.removeUpgrade(this);
+		upgrades.remove(upgrade);
+	}
+	public GeneratorUpgrade getUpgrade(int index) { return upgrades.get(index); }
+	public int getUpgradesAmount() { return upgrades.size(); }
+	
+	@Override
+	public String toString() 
+	{
+		return "Generator: Type: " + getType() + "; Range: " + getRange() + "; chance per block: " + getChance() + "; Location: " + generatorBlock.getLocation();
 	}
 }

@@ -62,6 +62,54 @@ public class Config
 	}
 	
 	/**
+	 * Gets a specified value based off the key, or if the value doesn't exist sets it to a specified default value and returns that value
+	 * @param key The key to get the value of
+	 * @param defaultValue The value to set it to if it doesn't exist
+	 * @return Returns the value at the given key or the default value if the key doesn' exist
+	 */
+	public int getOrSetInt(String key, int defaultValue)
+	{
+		if(!this.containsKey(key) || getInt(key) == BAD_VALUE)
+		{
+			setInt(key, defaultValue);
+		}
+		
+		return getInt(key);
+	}
+	
+	/**
+	 * Gets a specified value based off the key, or if the value doesn't exist sets it to a specified default value and returns that value
+	 * @param key The key to get the value of
+	 * @param defaultValue The value to set it to if it doesn't exist
+	 * @return Returns the value at the given key or the default value if the key doesn' exist
+	 */
+	public double getOrSetDouble(String key, double defaultValue)
+	{
+		if(!this.containsKey(key) || getDouble(key) == BAD_VALUE)
+		{
+			setDouble(key, defaultValue);
+		}
+		
+		return getDouble(key);
+	}
+	
+	/**
+	 * Gets a specified value based off the key, or if the value doesn't exist sets it to a specified default value and returns that value
+	 * @param key The key to get the value of
+	 * @param defaultValue The value to set it to if it doesn't exist
+	 * @return Returns the value at the given key or the default value if the key doesn' exist
+	 */
+	public String getOrSetString(String key, String defaultValue)
+	{
+		if(!this.containsKey(key) || getString(key) == null)
+		{
+			setString(key, defaultValue);
+		}
+		
+		return getString(key);
+	}
+	
+	/**
 	 * Sets a integer value at a given key
 	 * @param key The key to set the value at
 	 * @param integer The value the integer will have

@@ -9,7 +9,11 @@ public class Helper
 	
 	public static int sign(double num)
 	{
-		return (int) (num / Math.abs(num));
+		if (num > 0)
+			return 1;
+		if (num < 0)
+			return -1;
+		return 0;
 	}
 	
 	public static double clamp(double val, double min, double max)
