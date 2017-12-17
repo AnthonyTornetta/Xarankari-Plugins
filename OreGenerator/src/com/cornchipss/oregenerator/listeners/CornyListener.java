@@ -1,8 +1,10 @@
 package com.cornchipss.oregenerator.listeners;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -115,7 +117,33 @@ public class CornyListener implements Listener
 		if(e.isCancelled())
 			return;
 		
-		// idk what to do here yet
+		List<Block> blocks = e.blockList();
+		
+		List<Generator> gens = new ArrayList<>();
+		
+		for(Block b : blocks)
+		{
+			for(int i = 0; i < plugin.getGeneratorHandler().generatorAmount(); i++)
+			{
+				if(plugin.getGeneratorHandler().getGenerator(i).getGeneratorBlock().equals(b))
+				{
+					gens.add(plugin.getGeneratorHandler().getGenerator(i));
+					gens.get(gens.size() - 1).getGeneratorBlock().setType(Material.AIR);
+				}
+			}
+		}
+		
+		for(Generator g : gens)
+		{
+			Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					g.getGeneratorBlock().setType(plugin.getGeneratorMaterial(g.getGeneratorId()));
+				}
+			}, 1L);
+		}
 	}
 	
 	// For use with the command invenotries

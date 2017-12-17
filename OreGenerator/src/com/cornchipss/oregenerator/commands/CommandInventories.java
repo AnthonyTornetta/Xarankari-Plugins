@@ -70,7 +70,7 @@ public class CommandInventories
 	{
 		ItemStack greenGlass = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short)13);
 		ItemMeta greenGlassMeta = greenGlass.getItemMeta();
-		greenGlassMeta.setDisplayName("-=-");
+		greenGlassMeta.setDisplayName(" ");
 		greenGlass.setItemMeta(greenGlassMeta);
 		
 		ItemStack close = new ItemStack(Material.BARRIER);

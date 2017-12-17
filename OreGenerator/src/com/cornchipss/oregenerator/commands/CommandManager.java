@@ -24,7 +24,7 @@ public class CommandManager
 		Player p = (Player)sender;
 		String cmd = command.getName().toLowerCase();
 		
-		if(cmd.equalsIgnoreCase("oregenerator"))
+		if(cmd.equalsIgnoreCase("oregenerator") || cmd.equalsIgnoreCase("oregen") || cmd.equals("gen"))
 		{
 			if(args.length == 0)
 			{
@@ -35,31 +35,37 @@ public class CommandManager
 			ItemStack is = new ItemStack(Material.AIR);
 			
 			args[0] = args[0].toLowerCase();
+			
+			int genId = 0;
+			
 			switch(args[0])
 			{
 			case "coal":
-				is = GeneratorUtils.createGeneratorItemStack(GeneratorUtils.GENERATOR_COAL_ID, plugin.getGeneratorMaterial(GeneratorUtils.GENERATOR_COAL_ID));
+				genId = GeneratorUtils.GENERATOR_COAL_ID;
 				break;
 			case "iron":
-				is = GeneratorUtils.createGeneratorItemStack(GeneratorUtils.GENERATOR_IRON_ID, plugin.getGeneratorMaterial(GeneratorUtils.GENERATOR_IRON_ID));
+				genId = GeneratorUtils.GENERATOR_IRON_ID;
 				break;
 			case "redstone":
-				is = GeneratorUtils.createGeneratorItemStack(GeneratorUtils.GENERATOR_REDSTONE_ID, plugin.getGeneratorMaterial(GeneratorUtils.GENERATOR_REDSTONE_ID));
+				genId = GeneratorUtils.GENERATOR_REDSTONE_ID;
 				break;
 			case "lapis":
-				is = GeneratorUtils.createGeneratorItemStack(GeneratorUtils.GENERATOR_LAPIS_ID, plugin.getGeneratorMaterial(GeneratorUtils.GENERATOR_LAPIS_ID));
+				genId = GeneratorUtils.GENERATOR_LAPIS_ID;
 				break;
 			case "gold":
-				is = GeneratorUtils.createGeneratorItemStack(GeneratorUtils.GENERATOR_GOLD_ID, plugin.getGeneratorMaterial(GeneratorUtils.GENERATOR_GOLD_ID));
+				genId = GeneratorUtils.GENERATOR_GOLD_ID;
 				break;
 			case "diamond":
-				is = GeneratorUtils.createGeneratorItemStack(GeneratorUtils.GENERATOR_DIAMOND_ID, plugin.getGeneratorMaterial(GeneratorUtils.GENERATOR_DIAMOND_ID));
+				genId = GeneratorUtils.GENERATOR_DIAMOND_ID;
 				break;
 			case "emerald":
-				is = GeneratorUtils.createGeneratorItemStack(GeneratorUtils.GENERATOR_EMERALD_ID, plugin.getGeneratorMaterial(GeneratorUtils.GENERATOR_EMERALD_ID));
+				genId = GeneratorUtils.GENERATOR_EMERALD_ID;
 			default:
 				p.sendMessage(ChatColor.RED + "Invalid generator: " + args[0]);
 			}
+			
+			GeneratorUtils.createGeneratorItemStack(GeneratorUtils.GENERATOR_COAL_ID, plugin.getGeneratorMaterial(genId));
+			
 			p.getInventory().addItem(is);
 			return true;
 		}

@@ -9,6 +9,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -57,15 +59,15 @@ public class GeneratorUtils
 			System.out.println("WARNING: Generator ID out of range");
 			return null; // Not a valid type
 		}
-		System.out.println(oreGenMat);
 		ItemStack is = new ItemStack(oreGenMat);
-		System.out.println(is);
 		ItemMeta im = is.getItemMeta();
 		List<String> lore = im.getLore();
 		if(lore == null)
 			lore = new ArrayList<>();
 		lore.add(type + "");
 		im.setLore(lore);
+		
+		im.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 		
 		switch(type)
 		{
@@ -93,6 +95,9 @@ public class GeneratorUtils
 		}
 		
 		is.setItemMeta(im);
+		
+		is.addUnsafeEnchantment(Enchantment.LURE, 1);
+		
 		return is;
 	}
 
@@ -172,8 +177,6 @@ public class GeneratorUtils
 				dealWith = thingsToParse[i].substring(cutOut + searchFor.length(), thingsToParse[i].length() - 1);
 				
 				// x:-285.0|y:68.0|z:249.0|w:world
-				System.out.println(dealWith);
-				System.out.println(dealWith);
 				String[] sections = dealWith.split("\\|");
 				double x, y, z;
 				World world;

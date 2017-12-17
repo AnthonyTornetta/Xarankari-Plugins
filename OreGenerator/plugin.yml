@@ -3,7 +3,11 @@ main: com.cornchipss.oregenerator.OreGeneratorPlugin
 version: 1.0
 commands:
     oregenerator:
-        description: Gives you a specified generator
+        description: Gives you a specified generator or opens up the generator selection menu
         usage: /oregenerator
-        
-        
+    oregen:
+        description: Gives you a specified generator or opens up the generator selection menu
+        usage: /oregen
+    gen:
+        description: Gives you a specified generator or opens up the generator selection menu
+        usage: /gen
