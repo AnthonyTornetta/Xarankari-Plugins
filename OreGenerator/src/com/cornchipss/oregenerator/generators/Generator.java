@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -14,6 +15,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import com.cornchipss.oregenerator.OreGeneratorPlugin;
 import com.cornchipss.oregenerator.ref.DoubleList;
 import com.cornchipss.oregenerator.ref.InventoryHelper;
+import com.cornchipss.oregenerator.ref.Reference;
 import com.cornchipss.oregenerator.ref.Vector3;
 import com.cornchipss.oregenerator.upgrades.GeneratorUpgrade;
 
@@ -73,12 +75,17 @@ public abstract class Generator
 	
 	public void openInventory(Player p)
 	{
-		final int ROWS = 5;
+		final int ROWS = 3;
 		
-		Inventory inv = Bukkit.createInventory(null, 9 * ROWS);
+		Inventory inv = Bukkit.createInventory(null, 9 * ROWS, Reference.GENERATOR_INVENTORY_NAME);
 		
-		System.out.println(getTimeBetweenRuns() - (double)getTimeRemaining() + "; timebe: " + getTimeBetweenRuns() + "; remaining: " + getTimeRemaining());
 		InventoryHelper.genBorders(ROWS, inv, ChatColor.GREEN + "" + (int)Math.round(((getTimeBetweenRuns() - (double)getTimeRemaining()) / getTimeBetweenRuns()) * 100) + "% Done");
+		
+		ItemStack destroy = new ItemStack(Material.TNT);
+		ItemMeta dm = destroy.getItemMeta();
+		dm.setDisplayName(ChatColor.RED + "Destroy Generator");
+		destroy.setItemMeta(dm);
+		inv.setItem(0, destroy);
 		
 		DoubleList<GeneratorUpgrade, Integer> upgrades = new DoubleList<>();
 		for(int i = 0; i < getUpgradesAmount(); i++)
@@ -99,6 +106,14 @@ public abstract class Generator
 		}
 		
 		p.openInventory(inv);
+	}
+	
+	public void breakGenerator() 
+	{
+		ItemStack drop = GeneratorUtils.createGeneratorItemStack(this);
+		this.getGeneratorBlock().setType(Material.AIR);
+		getGeneratorBlock().getWorld().dropItemNaturally(getGeneratorBlock().getLocation().add(0.5, 0.5, 0.5), drop);
+		plugin.getGeneratorHandler().removeGenerator(this);
 	}
 	
 	public abstract void run();

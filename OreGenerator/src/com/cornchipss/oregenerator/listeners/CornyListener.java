@@ -1,6 +1,7 @@
 package com.cornchipss.oregenerator.listeners;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -18,8 +19,10 @@ import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -29,7 +32,9 @@ import com.cornchipss.oregenerator.generators.GeneratorUtils;
 import com.cornchipss.oregenerator.ref.Reference;
 
 public class CornyListener implements Listener
-{	
+{
+	private HashMap<Player, Generator> playersOpeningGeneratorInv = new HashMap<>();
+	
 	private OreGeneratorPlugin plugin;
 	
 	public CornyListener(OreGeneratorPlugin plugin) 
@@ -105,6 +110,7 @@ public class CornyListener implements Listener
 				if(plugin.getGeneratorHandler().getGenerator(i).getGeneratorBlock().equals(b))
 				{
 					plugin.getGeneratorHandler().getGenerator(i).openInventory(p);
+					playersOpeningGeneratorInv.put(p, plugin.getGeneratorHandler().getGenerator(i));
 					e.setCancelled(true);
 				}
 			}
@@ -229,6 +235,47 @@ public class CornyListener implements Listener
 				break;
 			}
 		}
+		
+		if(i.getName().equals(Reference.GENERATOR_INVENTORY_NAME))
+		{
+			e.setCancelled(true); // Don't want them taking my blocks
+			if(e.getCurrentItem() == null)
+				return;
+			
+			switch(e.getCurrentItem().getType())
+			{
+			case TNT:
+				playersOpeningGeneratorInv.get(p).breakGenerator();
+				p.closeInventory();
+				playersOpeningGeneratorInv.remove(p);
+				break;
+			case BARRIER:
+				p.closeInventory();
+				playersOpeningGeneratorInv.remove(p);
+				break;
+			default:
+				break;
+			}
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void onPlayerCloseInventory(InventoryCloseEvent e)
+	{
+		Inventory inv = e.getInventory();
+		
+		if(inv.getName().equals(Reference.GENERATOR_INVENTORY_NAME))
+		{
+			Player p = (Player)e.getPlayer();
+			playersOpeningGeneratorInv.remove(p);
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void onPlayerLeave(PlayerQuitEvent e)
+	{
+		if(playersOpeningGeneratorInv.containsKey(e.getPlayer()))
+			playersOpeningGeneratorInv.remove(e.getPlayer());
 	}
 	
 	// I don't want pistons moving my generators and messing everything up!

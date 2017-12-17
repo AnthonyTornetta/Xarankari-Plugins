@@ -12,9 +12,9 @@ public class GeneratorHandler
         generators.add(g);
 	}
 	
-	public void removeGenerator(int i)
+	public void removeGenerator(Generator generator)
 	{
-		generators.remove(i);
+		generators.remove(generator);
 	}
 	
 	public void tickGenerators()

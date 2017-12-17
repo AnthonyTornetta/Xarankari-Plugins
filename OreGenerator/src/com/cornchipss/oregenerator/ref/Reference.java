@@ -44,8 +44,8 @@ public class Reference
 
 	public static final String CFG_VERSION_KEY = "version";
 	
-	public static final String CMD_WINDOW_GET_GENERATOR_TITLE = ChatColor.DARK_GREEN + "Give Generator";
-	
+	public static final String CMD_WINDOW_GET_GENERATOR_TITLE = ChatColor.DARK_GREEN + "Give Generator";	
+	public static final String GENERATOR_INVENTORY_NAME = ChatColor.DARK_GREEN + "Generator";
 	
 	public static void fanfare(Player p)
 	{		
