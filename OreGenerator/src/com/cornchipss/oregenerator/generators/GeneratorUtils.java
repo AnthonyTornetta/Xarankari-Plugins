@@ -1,20 +1,29 @@
 package com.cornchipss.oregenerator.generators;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import com.cornchipss.oregenerator.OreGeneratorPlugin;
+import com.cornchipss.oregenerator.generators.types.CoalGenerator;
+import com.cornchipss.oregenerator.generators.types.DiamondGenerator;
+import com.cornchipss.oregenerator.generators.types.EmeraldGenerator;
+import com.cornchipss.oregenerator.generators.types.GoldGenerator;
+import com.cornchipss.oregenerator.generators.types.IronGenerator;
+import com.cornchipss.oregenerator.generators.types.LapisGenerator;
+import com.cornchipss.oregenerator.generators.types.RedstoneGenerator;
 import com.cornchipss.oregenerator.ref.Helper;
 import com.cornchipss.oregenerator.upgrades.GeneratorUpgrade;
+import com.cornchipss.oregenerator.upgrades.UpgradeUtils;
+import com.cornchipss.oregenerator.upgrades.types.SpeedUpgrade;
 
 
 public class GeneratorUtils 
@@ -118,7 +127,10 @@ public class GeneratorUtils
 		String upgradesStr = "upgrades:{";
 		for(int i = 0; i < upgrades.size(); i++)
 		{
-			upgradesStr += upgrades.get(i);
+			if(i == upgrades.size() - 1)
+				upgradesStr += upgrades.get(i);
+			else
+				upgradesStr += upgrades.get(i) + "|";
 		}
 		upgradesStr += "}";
 		
@@ -127,30 +139,166 @@ public class GeneratorUtils
 		String extraInfo = "extra:{time:" + generator.getTimeRemaining() + "}";
 		
 		String serialized = generator.getGeneratorId() + ":{" + locationStr + "," + extraInfo + "," + upgradesStr + "}";
-		System.out.println(serialized);
 		return serialized;
 	}
 	
-//	public static Generator deserialize(String serialized)
-//	{
-//		//3:{location:{x:-285.0|y:68.0|z:249.0|w:world},extra:{time:40},upgrades:{}}
-//	}
-	
-	public Map<String, Object> serializeLocation(Location l) 
+	public static Generator deserialize(String serialized, OreGeneratorPlugin plugin)
 	{
-		Map<String, Object> m = new HashMap<String, Object>();
-		m.put("world", l.getWorld().getName());
-		m.put("x", l.getX());
-		m.put("y", l.getY());
-		m.put("z", l.getZ());
-		return m;
-	}
-		 
-		public static Location deserializeLocation(Map<String, Object> m) 
+		serialized = serialized.replaceAll(" ", "").toLowerCase();
+		// 3:{location:{x:-285.0|y:68.0|z:249.0|w:world},extra:{time:40},upgrades:{0:2|1:4}}
+		String searchFor = ":";
+		int cutOut = serialized.indexOf(searchFor);
+		
+		int genId = Integer.parseInt(serialized.substring(0, cutOut + searchFor.length() - 1));
+		
+		Location loc = null;
+		
+		int timeRemaining = 0;
+		
+		List<GeneratorUpgrade> upgrades = null;
+		
+		searchFor = ":{";
+		cutOut = serialized.indexOf(":{");
+		String dealWith = serialized.substring(cutOut + searchFor.length() - 1, serialized.length() - 1);
+		 // location:{x:-285.0|y:68.0|z:249.0|w:world},extra:{time:40},upgrades:{0:2|1:4}
+		
+		String[] thingsToParse = dealWith.split(",");
+		for(int i = 0; i < thingsToParse.length; i++)
 		{
-		    World w = Bukkit.getServer().getWorld((String) m.get("world"));
-		    if (w == null) 
-		    	throw new IllegalArgumentException("non-existent world");
-		    return new Location(w, (Double) m.get("x"), (Double) m.get("y"), (Double) m.get("z"));
+			if(thingsToParse[i].contains("location"))
+			{
+				searchFor = ":{";
+				cutOut = thingsToParse[i].indexOf(":{");
+				dealWith = thingsToParse[i].substring(cutOut + searchFor.length(), thingsToParse[i].length() - 1);
+				
+				// x:-285.0|y:68.0|z:249.0|w:world
+				System.out.println(dealWith);
+				System.out.println(dealWith);
+				String[] sections = dealWith.split("\\|");
+				double x, y, z;
+				World world;
+				
+				{ String[] splitSection = sections[0].split(":");
+				  x = Double.parseDouble(splitSection[1]); }
+				
+				{ String[] splitSection = sections[1].split(":");
+				  y = Double.parseDouble(splitSection[1]); }
+				
+				{ String[] splitSection = sections[2].split(":");
+				  z = Double.parseDouble(splitSection[1]); }
+				
+				{ String[] splitSection = sections[3].split(":");
+				  world = Bukkit.getServer().getWorld(splitSection[1]); }
+				
+				loc = new Location(world, x, y, z);
+			}
+			else if(thingsToParse[i].contains("upgrades"))
+			{
+				searchFor = ":{";
+				cutOut = thingsToParse[i].indexOf(":{");
+				dealWith = thingsToParse[i].substring(cutOut + searchFor.length(), thingsToParse[i].length() - 1);
+				
+				if(dealWith.isEmpty())
+					continue; // There are no upgrades
+				
+				// 0:2|1:4
+				String[] sections = dealWith.split("\\|");
+				for(int j = 0; j < sections.length; j++)
+				{
+					// Because if there are upgrades to add, make it not null; but if there are no upgrades, keep it null to make the generator creator handle it the way it should
+					if(upgrades == null)
+						upgrades = new ArrayList<>();
+					
+					// 0:2
+					String[] split = sections[j].split(":");
+					int upgradeType = Integer.parseInt(split[0]);
+					
+					GeneratorUpgrade upgrade = null;
+					
+					switch(upgradeType)
+					{
+						case UpgradeUtils.UPGRADE_SPEED_ID:
+							upgrade = new SpeedUpgrade();
+							break;
+					}
+					
+					for(int k = 0; k < Integer.parseInt(split[1]); k++)
+					{
+						if(upgrade != null)
+							upgrades.add(upgrade);
+					}
+				}
+			}
+			else if(thingsToParse[i].contains("extra"))
+			{
+				searchFor = ":{";
+				cutOut = thingsToParse[i].indexOf(":{");
+				dealWith = thingsToParse[i].substring(cutOut + searchFor.length(), thingsToParse[i].length() - 1);
+				
+				// time:40
+				timeRemaining = Integer.parseInt(dealWith.split(":")[1]);
+			}
 		}
+		
+		Generator generator = createGenerator(genId, loc.getBlock(), plugin, upgrades);
+		
+		generator.setTimeBetweenRun(timeRemaining);
+		
+		return generator;
+	}
+	
+	public static Generator createGenerator(int id, Block b, OreGeneratorPlugin plugin, List<GeneratorUpgrade> upgrades)
+	{
+		Generator gen = null;
+		
+		boolean addUpgrades = upgrades != null;
+		
+		switch(id)
+		{
+			case GENERATOR_COAL_ID:
+				if(addUpgrades)
+					gen = new CoalGenerator(b, plugin, upgrades);
+				else
+					gen = new CoalGenerator(b, plugin);
+				break;
+			case GENERATOR_IRON_ID:
+				if(addUpgrades)
+					gen = new IronGenerator(b, plugin, upgrades);
+				else
+					gen = new IronGenerator(b, plugin);
+				break;
+			case GENERATOR_REDSTONE_ID:
+				if(addUpgrades)
+					gen = new RedstoneGenerator(b, plugin, upgrades);
+				else
+					gen = new RedstoneGenerator(b, plugin);
+				break;
+			case GENERATOR_LAPIS_ID:
+				if(addUpgrades)
+					gen = new LapisGenerator(b, plugin, upgrades);
+				else
+					gen = new LapisGenerator(b, plugin);
+				break;
+			case GENERATOR_GOLD_ID:
+				if(addUpgrades)
+					gen = new GoldGenerator(b, plugin, upgrades);
+				else
+					gen = new GoldGenerator(b, plugin);
+				break;
+			case GENERATOR_DIAMOND_ID:
+				if(addUpgrades)
+					gen = new DiamondGenerator(b, plugin, upgrades);
+				else
+					gen = new DiamondGenerator(b, plugin);
+				break;
+			case GENERATOR_EMERALD_ID:
+				if(addUpgrades)
+					gen = new EmeraldGenerator(b, plugin, upgrades);
+				else
+					gen = new EmeraldGenerator(b, plugin);
+				break;
+		}
+		
+		return gen;
+	}
 }

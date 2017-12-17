@@ -1,6 +1,6 @@
 package com.cornchipss.oregenerator.generators.types;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -13,7 +13,7 @@ import com.cornchipss.oregenerator.upgrades.GeneratorUpgrade;
 
 public class RedstoneGenerator extends Generator
 {
-	public RedstoneGenerator(Block generatorBlock, OreGeneratorPlugin plugin, ArrayList<GeneratorUpgrade> upgrades) 
+	public RedstoneGenerator(Block generatorBlock, OreGeneratorPlugin plugin, List<GeneratorUpgrade> upgrades) 
 	{
 		super(new Vector3(3, 3, 3), 3, GeneratorUtils.GENERATOR_REDSTONE_ID, generatorBlock, plugin, upgrades);
 	}

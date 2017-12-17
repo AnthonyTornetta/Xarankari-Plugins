@@ -1,6 +1,7 @@
 package com.cornchipss.oregenerator.generators;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import org.bukkit.block.Block;
@@ -15,7 +16,7 @@ public abstract class Generator
 	
 	private OreGeneratorPlugin plugin;
 	
-	private ArrayList<GeneratorUpgrade> upgrades = new ArrayList<>();
+	private List<GeneratorUpgrade> upgrades = new ArrayList<>();
 	
 	private Block generatorBlock;
 	
@@ -25,7 +26,7 @@ public abstract class Generator
 	private int timeDecreaseAmount = 1;
 	private int chance;
 	
-	public Generator(Vector3 defaultRange, int chance, int genId, Block generatorBlock, OreGeneratorPlugin plugin, ArrayList<GeneratorUpgrade> upgrades)
+	public Generator(Vector3 defaultRange, int chance, int genId, Block generatorBlock, OreGeneratorPlugin plugin, List<GeneratorUpgrade> upgrades)
 	{
 		setRange(defaultRange);
 		setChance(chance);

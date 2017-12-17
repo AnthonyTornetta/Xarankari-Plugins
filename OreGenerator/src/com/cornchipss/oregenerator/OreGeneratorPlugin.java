@@ -1,13 +1,14 @@
 package com.cornchipss.oregenerator;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -18,10 +19,8 @@ import com.cornchipss.oregenerator.commands.CommandManager;
 import com.cornchipss.oregenerator.config.Config;
 import com.cornchipss.oregenerator.generators.GeneratorHandler;
 import com.cornchipss.oregenerator.generators.GeneratorUtils;
-import com.cornchipss.oregenerator.generators.types.CoalGenerator;
 import com.cornchipss.oregenerator.listeners.CornyListener;
 import com.cornchipss.oregenerator.ref.Reference;
-import com.google.gson.Gson;
 
 
 public class OreGeneratorPlugin extends JavaPlugin
@@ -42,11 +41,27 @@ public class OreGeneratorPlugin extends JavaPlugin
 	{		
 		String logMe = initConfig();
 		
+		try
+		{
+			readGenerators(genHandler);
+		}
+		catch(IOException ex)
+		{
+			try
+			{
+				saveGenerators(); // Probs just hasn't been made yet, so write a blank file (since there are no generators to worry about)
+			}
+			catch(IOException exx)
+			{
+				getLogger().info("CRITICAL ERROR: Could not read generators storage file - Disabling!");
+			}
+		}
+		
 		getLogger().info(logMe);
 		
 		if(logMe.contains("CRITICAL ERROR"))
 		{
-			getLogger().info(ChatColor.RED + "Shutting down due to a critical error when reading the config!");
+			getLogger().info("Disabling due to a critical error when reading the config!");
 			return;
 		}
 		
@@ -59,15 +74,15 @@ public class OreGeneratorPlugin extends JavaPlugin
 	@Override
 	public void onDisable()
 	{
-//		try
-//		{
-//			saveGenerators();
-//		}
-//		catch(IOException ex)
-//		{
-//			getLogger().info("Error saving generators! This is REALLY bad!");
-//			ex.printStackTrace();
-//		}
+		try
+		{
+			saveGenerators();
+		}
+		catch(IOException ex)
+		{
+			getLogger().info("Error saving generators! This is REALLY bad!");
+			ex.printStackTrace();
+		}
 	}
 	
 	private String initConfig()
@@ -118,7 +133,7 @@ public class OreGeneratorPlugin extends JavaPlugin
 	
 	private void saveGenerators() throws IOException
 	{
-		BufferedWriter genCfg = new BufferedWriter(new FileWriter(new File(this.getDataFolder() + "\\generator-storage.yml")));
+		BufferedWriter genCfg = new BufferedWriter(new FileWriter(new File(this.getDataFolder() + "\\generator-storage.gen")));
 		
 		for(int i = 0; i < genHandler.generatorAmount(); i++)
 		{
@@ -126,6 +141,19 @@ public class OreGeneratorPlugin extends JavaPlugin
 			genCfg.newLine();
 		}
 		genCfg.close();
+	}
+	
+	private void readGenerators(GeneratorHandler genHandler) throws IOException
+	{
+		BufferedReader br = new BufferedReader(new FileReader(new File(this.getDataFolder() + "\\generator-storage.gen")));
+		for(String s = br.readLine(); s != null; s = br.readLine())
+		{
+			if(!s.isEmpty())
+			{
+				genHandler.addGenerator(GeneratorUtils.deserialize(s, this));
+			}
+		}
+		br.close();
 	}
 	
 	@Override

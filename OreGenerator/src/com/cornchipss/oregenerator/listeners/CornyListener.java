@@ -1,7 +1,8 @@
 package com.cornchipss.oregenerator.listeners;
 
+import java.util.List;
+
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -9,7 +10,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.Inventory;
@@ -18,15 +21,7 @@ import org.bukkit.inventory.ItemStack;
 import com.cornchipss.oregenerator.OreGeneratorPlugin;
 import com.cornchipss.oregenerator.generators.Generator;
 import com.cornchipss.oregenerator.generators.GeneratorUtils;
-import com.cornchipss.oregenerator.generators.types.CoalGenerator;
-import com.cornchipss.oregenerator.generators.types.DiamondGenerator;
-import com.cornchipss.oregenerator.generators.types.EmeraldGenerator;
-import com.cornchipss.oregenerator.generators.types.GoldGenerator;
-import com.cornchipss.oregenerator.generators.types.IronGenerator;
-import com.cornchipss.oregenerator.generators.types.LapisGenerator;
-import com.cornchipss.oregenerator.generators.types.RedstoneGenerator;
 import com.cornchipss.oregenerator.ref.Reference;
-import com.cornchipss.oregenerator.upgrades.types.SpeedUpgrade;
 
 public class CornyListener implements Listener
 {	
@@ -66,42 +61,11 @@ public class CornyListener implements Listener
 		
 		int genId = GeneratorUtils.getGeneratorType(itemPlaced.getItemMeta());
 		
-		Generator gen = null;
-		
-		switch(genId)
-		{
-		case GeneratorUtils.GENERATOR_COAL_ID:
-			gen = new CoalGenerator(b, plugin);
-			break;
-		case GeneratorUtils.GENERATOR_IRON_ID:
-			gen = new IronGenerator(b, plugin);
-			break;
-		case GeneratorUtils.GENERATOR_REDSTONE_ID:
-			gen = new RedstoneGenerator(b, plugin);
-			break;
-		case GeneratorUtils.GENERATOR_LAPIS_ID:
-			gen = new LapisGenerator(b, plugin);
-			break;
-		case GeneratorUtils.GENERATOR_GOLD_ID:
-			gen = new GoldGenerator(b, plugin);
-			break;
-		case GeneratorUtils.GENERATOR_DIAMOND_ID:
-			gen = new DiamondGenerator(b, plugin);
-			break;
-		case GeneratorUtils.GENERATOR_EMERALD_ID:
-			gen = new EmeraldGenerator(b, plugin);
-			break;	
-		default:
-			// not a valid generator
-			break;
-		}
+		Generator gen = GeneratorUtils.createGenerator(genId, b, plugin, null);
 		
 		if(gen != null)
 		{
 			plugin.getGeneratorHandler().addGenerator(gen);
-			gen.addUpgrade(new SpeedUpgrade());
-			gen.addUpgrade(new SpeedUpgrade());
-			GeneratorUtils.serialize(gen);
 		}
 	}
 	
@@ -116,8 +80,6 @@ public class CornyListener implements Listener
 		if(e.isCancelled())
 			return;
 		
-		//Generator gen = plugin.getGeneratorHandler().getGenerator(i);
-
 		for(int i = 0; i < plugin.getGeneratorHandler().generatorAmount(); i++)
 		{
 			if(plugin.getGeneratorHandler().getGenerator(i).getGeneratorBlock().equals(b))
@@ -138,8 +100,6 @@ public class CornyListener implements Listener
 		if(e.isCancelled())
 			return;
 		
-		//Generator gen = plugin.getGeneratorHandler().getGenerator(i);
-
 		for(int i = 0; i < plugin.getGeneratorHandler().generatorAmount(); i++)
 		{
 			if(plugin.getGeneratorHandler().getGenerator(i).getGeneratorBlock().equals(b))
@@ -147,6 +107,15 @@ public class CornyListener implements Listener
 				e.setCancelled(true);
 			}
 		}
+	}
+	
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void onEntityExplode(EntityExplodeEvent e)
+	{		
+		if(e.isCancelled())
+			return;
+		
+		// idk what to do here yet
 	}
 	
 	// For use with the command invenotries
@@ -190,6 +159,23 @@ public class CornyListener implements Listener
 				break;
 			default:
 				break;
+			}
+		}
+	}
+	
+	// I don't want pistons moving my generators and messing everything up!
+	@EventHandler(priority = EventPriority.HIGH)
+	public void onPistonMove(BlockPistonExtendEvent e)
+	{
+		List<Block> blocks = e.getBlocks();
+		for(Block b : blocks)
+		{
+			for(int i = 0; i < plugin.getGeneratorHandler().generatorAmount(); i++)
+			{
+				if(plugin.getGeneratorHandler().getGenerator(i).getGeneratorBlock().equals(b))
+				{
+					e.setCancelled(true);
+				}
 			}
 		}
 	}

@@ -1,6 +1,6 @@
 package com.cornchipss.oregenerator.generators.types;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -13,7 +13,7 @@ import com.cornchipss.oregenerator.upgrades.GeneratorUpgrade;
 
 public class GoldGenerator extends Generator
 {
-	public GoldGenerator(Block generatorBlock, OreGeneratorPlugin plugin, ArrayList<GeneratorUpgrade> upgrades) 
+	public GoldGenerator(Block generatorBlock, OreGeneratorPlugin plugin, List<GeneratorUpgrade> upgrades) 
 	{
 		super(new Vector3(3, 3, 3), 5, GeneratorUtils.GENERATOR_GOLD_ID, generatorBlock, plugin, upgrades);
 	}
