@@ -4,11 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import com.cornchipss.oregenerator.OreGeneratorPlugin;
+import com.cornchipss.oregenerator.ref.DoubleList;
+import com.cornchipss.oregenerator.ref.InventoryHelper;
 import com.cornchipss.oregenerator.ref.Vector3;
 import com.cornchipss.oregenerator.upgrades.GeneratorUpgrade;
+
+import net.md_5.bungee.api.ChatColor;
 
 public abstract class Generator 
 {
@@ -62,6 +71,35 @@ public abstract class Generator
 		}
 	}
 	
+	public void openInventory(Player p)
+	{
+		final int ROWS = 5;
+		
+		Inventory inv = Bukkit.createInventory(null, 9 * ROWS);
+		
+		System.out.println(getTimeBetweenRuns() - (double)getTimeRemaining() + "; timebe: " + getTimeBetweenRuns() + "; remaining: " + getTimeRemaining());
+		InventoryHelper.genBorders(ROWS, inv, ChatColor.GREEN + "" + (int)Math.round(((getTimeBetweenRuns() - (double)getTimeRemaining()) / getTimeBetweenRuns()) * 100) + "% Done");
+		
+		DoubleList<GeneratorUpgrade, Integer> upgrades = new DoubleList<>();
+		for(int i = 0; i < getUpgradesAmount(); i++)
+		{
+			upgrades.put(getUpgrade(i), upgrades.getOrDefaultVal(getUpgrade(i), 0) + 1);
+		}
+		
+		for(int i = 0; i < upgrades.size(); i++)
+		{
+			GeneratorUpgrade gu = upgrades.getKey(i);
+			ItemStack symbol = gu.getSymbol().clone();
+			ItemMeta im = symbol.getItemMeta();
+			im.setDisplayName(im.getDisplayName() + " x " + upgrades.getObjectAtIndex(i));
+			List<String> lore = im.getLore();
+			lore.add(ChatColor.ITALIC + "Click an upgrade in your inventory to add it.");
+			symbol.setItemMeta(im);
+			inv.setItem(9 + i + 1 + (upgrades.size() / 2 + (upgrades.size() % 2 == 0 ? 0 : 1)), symbol);
+		}
+		
+		p.openInventory(inv);
+	}
 	
 	public abstract void run();
 	

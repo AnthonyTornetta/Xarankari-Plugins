@@ -8,6 +8,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import com.cornchipss.oregenerator.ref.InventoryHelper;
 import com.cornchipss.oregenerator.ref.Reference;
 
 public class CommandInventories 
@@ -18,7 +19,7 @@ public class CommandInventories
 		
 		Inventory inv = Bukkit.createInventory(null, 9 * ROWS, Reference.CMD_WINDOW_GET_GENERATOR_TITLE);
 		
-		genBorders(ROWS, inv);
+		InventoryHelper.genBorders(ROWS, inv);
 		
 		ItemStack coalGen = new ItemStack(Material.COAL_ORE);
 		ItemMeta coalMeta = coalGen.getItemMeta();
@@ -66,26 +67,5 @@ public class CommandInventories
 		p.openInventory(inv);
 	}
 
-	private static void genBorders(final int ROWS, final Inventory inv)
-	{
-		ItemStack greenGlass = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short)13);
-		ItemMeta greenGlassMeta = greenGlass.getItemMeta();
-		greenGlassMeta.setDisplayName(" ");
-		greenGlass.setItemMeta(greenGlassMeta);
-		
-		ItemStack close = new ItemStack(Material.BARRIER);
-		ItemMeta closeMeta = close.getItemMeta();
-		closeMeta.setDisplayName(ChatColor.RED + "Close");
-		close.setItemMeta(closeMeta);
-		
-		// Give it a border
-		for(int i = 0; i < 9; i++)
-		{
-			if(i == 8)
-				inv.setItem(i, close);
-			else
-				inv.setItem(i, greenGlass);
-			inv.setItem(i + ((ROWS - 1) * 9), greenGlass);
-		}
-	}
+	
 }

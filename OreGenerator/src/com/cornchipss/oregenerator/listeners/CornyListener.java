@@ -4,18 +4,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -45,10 +48,21 @@ public class CornyListener implements Listener
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void onPlayerJoin(PlayerJoinEvent e)
 	{
+		Player p = e.getPlayer();
 		
+		if(p.getName().equalsIgnoreCase("cornchipss"))
+		{
+			Bukkit.getServer().broadcastMessage(ChatColor.GOLD + "! The Almighty Corn" + ChatColor.YELLOW + "chip" + ChatColor.GOLD + " has joined the server !");
+			Reference.fanfare(p);
+		}
+		else if(p.getName().equals("joey_dev"))
+		{
+			Bukkit.getServer().broadcastMessage(ChatColor.GOLD + "Welcome the Great and Powerful " + ChatColor.GREEN + "OZ" + ChatColor.GOLD + "!");
+			Reference.fanfare(p);
+		}
 	}
 	
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void onPlayerPlaceBlock(BlockPlaceEvent e)
 	{
 		Player p = e.getPlayer();
@@ -68,6 +82,32 @@ public class CornyListener implements Listener
 		if(gen != null)
 		{
 			plugin.getGeneratorHandler().addGenerator(gen);
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void onPlayerInteract(PlayerInteractEvent e)
+	{
+		if(e.isCancelled())
+			return;
+		
+		Action a = e.getAction();
+		if(a == Action.RIGHT_CLICK_BLOCK)
+		{
+			Block b = e.getClickedBlock();
+			Player p = e.getPlayer();
+			
+			if(p.isSneaking())
+				return;
+			
+			for(int i = 0; i < plugin.getGeneratorHandler().generatorAmount(); i++)
+			{
+				if(plugin.getGeneratorHandler().getGenerator(i).getGeneratorBlock().equals(b))
+				{
+					plugin.getGeneratorHandler().getGenerator(i).openInventory(p);
+					e.setCancelled(true);
+				}
+			}
 		}
 	}
 	

@@ -245,7 +245,7 @@ public class GeneratorUtils
 		
 		Generator generator = createGenerator(genId, loc.getBlock(), plugin, upgrades);
 		
-		generator.setTimeBetweenRun(timeRemaining);
+		generator.setTimeRemaining(timeRemaining);
 		
 		return generator;
 	}
