@@ -4,10 +4,16 @@ version: 1.0
 commands:
     oregenerator:
         description: Gives you a specified generator or opens up the generator selection menu
-        usage: /oregenerator
+        usage: /oregenerator (type)
     oregen:
         description: Gives you a specified generator or opens up the generator selection menu
-        usage: /oregen
+        usage: /oregen (type)
     gen:
         description: Gives you a specified generator or opens up the generator selection menu
-        usage: /gen
+        usage: /gen (type)
+    upgrades:
+        description: Gives you a specified generator upgrade or opens up the upgrade selection menu
+        usage: /upgrades (type)
+    upgrade:
+        description: Gives you a specified generator upgrade or opens up the upgrade selection menu
+        usage: /upgrades (type)

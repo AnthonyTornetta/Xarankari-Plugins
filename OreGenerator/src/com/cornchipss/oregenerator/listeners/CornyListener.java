@@ -30,6 +30,7 @@ import com.cornchipss.oregenerator.OreGeneratorPlugin;
 import com.cornchipss.oregenerator.generators.Generator;
 import com.cornchipss.oregenerator.generators.GeneratorUtils;
 import com.cornchipss.oregenerator.ref.Reference;
+import com.cornchipss.oregenerator.upgrades.UpgradeUtils;
 
 public class CornyListener implements Listener
 {
@@ -71,7 +72,7 @@ public class CornyListener implements Listener
 	public void onPlayerPlaceBlock(BlockPlaceEvent e)
 	{
 		Player p = e.getPlayer();
-		ItemStack itemPlaced = p.getItemInHand(); // Because it technically hasn't been placed yet
+		ItemStack itemPlaced = p.getItemInHand();
 		Block b = e.getBlock();
 		
 		if(!plugin.getGeneratorMaterials().contains(b.getType()))
@@ -101,17 +102,35 @@ public class CornyListener implements Listener
 		{
 			Block b = e.getClickedBlock();
 			Player p = e.getPlayer();
+			ItemStack is = p.getItemInHand();
 			
 			if(p.isSneaking())
 				return;
-			
+						
 			for(int i = 0; i < plugin.getGeneratorHandler().generatorAmount(); i++)
 			{
 				if(plugin.getGeneratorHandler().getGenerator(i).getGeneratorBlock().equals(b))
 				{
-					plugin.getGeneratorHandler().getGenerator(i).openInventory(p);
-					playersOpeningGeneratorInv.put(p, plugin.getGeneratorHandler().getGenerator(i));
-					e.setCancelled(true);
+					Generator g = plugin.getGeneratorHandler().getGenerator(i);
+					int upgradeId = UpgradeUtils.getItemStackUpgradeId(is);
+
+					if(upgradeId != -1)
+					{
+						if(g.addUpgrade(UpgradeUtils.createUpgradeFromId(upgradeId)))
+						{
+							Bukkit.broadcastMessage("YAY");
+						}
+						else
+						{
+							Bukkit.broadcastMessage("AWW");
+						}
+					}
+					else
+					{
+						g.openInventory(p);
+						playersOpeningGeneratorInv.put(p, plugin.getGeneratorHandler().getGenerator(i));
+						e.setCancelled(true);
+					}
 				}
 			}
 		}

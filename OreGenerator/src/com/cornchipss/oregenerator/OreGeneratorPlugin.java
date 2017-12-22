@@ -36,6 +36,9 @@ public class OreGeneratorPlugin extends JavaPlugin
 	private Material[] generatorMaterials;
 	private int[] timesBetween;
 	
+	// Upgrades
+	private Material[] upgradeMaterials;
+	
 	@Override
 	public void onEnable()
 	{		
@@ -91,25 +94,31 @@ public class OreGeneratorPlugin extends JavaPlugin
 		
 		cfg.setString(Reference.CFG_VERSION_KEY, Reference.PLUGIN_VERSION); // make sure the version is up to date (can be used in case we change the way we store things in later versions and want to convert the file to the new format)
 		
-		String[] defualtMaterials = { "COAL_BLOCK", "IRON_BLOCK", "REDSTONE_BLOCK", "LAPIS_BLOCK", "GOLD_BLOCK", "DIAMOND_BLOCK", "EMERALD_BLOCK" };
-		String[] generatorBlocks = cfg.getOrSetStringArray(Reference.CFG_GENERATOR_MATERIALS_KEY, defualtMaterials);
 		
-		int[] defaultTimes = {10, 20, 30, 40, 50, 60, 70};
-		timesBetween = cfg.getOrSetIntArray(Reference.CFG_DEFAULT_TIME_BETWEEN_TRANSMUTES, defaultTimes);
+		/////////////////////////
+		//// Generator Setup ////
+		/////////////////////////
+		
+		String[] defualtGeneratorMaterials = { "COAL_BLOCK", "IRON_BLOCK", "REDSTONE_BLOCK", "LAPIS_BLOCK", "GOLD_BLOCK", "DIAMOND_BLOCK", "EMERALD_BLOCK" };
+		String[] generatorMaterialsConfig = cfg.getOrSetStringArray(Reference.CFG_GENERATOR_MATERIALS_KEY, defualtGeneratorMaterials);
+		
+		int[] defaultTimesBetweenTransmutes = {10, 20, 30, 40, 50, 60, 70};
+		timesBetween = cfg.getOrSetIntArray(Reference.CFG_DEFAULT_TIME_BETWEEN_TRANSMUTES, defaultTimesBetweenTransmutes);
 		
 		generatorMaterials = new Material[7];
 		
-		if(generatorBlocks.length < generatorMaterials.length)
-			return "CRITICAL ERROR: Generator Materials don't store 6 values! (" + cfg.getString(Reference.CFG_GENERATOR_MATERIALS_KEY) + ")";
-		if(timesBetween.length != generatorBlocks.length)
-			return "CRITICAL ERROR: The times between each transmutation per generator is not equal to the amount of generators!";
+		if(generatorMaterialsConfig.length < generatorMaterials.length)
+			cfg.setStringArray(Reference.CFG_GENERATOR_MATERIALS_KEY, generatorMaterialsConfig); // Probs updated and have more gens now
+		if(timesBetween.length != generatorMaterialsConfig.length)
+			cfg.setStringArray(Reference.CFG_DEFAULT_TIME_BETWEEN_TRANSMUTES, defualtGeneratorMaterials); // Probs updated and have more gens now		
 		
-		for(int i = 0; i < generatorBlocks.length; i++)
+		// Parse each material read in and put it in the generator materials array
+		for(int i = 0; i < generatorMaterialsConfig.length; i++)
 		{
-			generatorMaterials[i] = Material.getMaterial(generatorBlocks[i]);
+			generatorMaterials[i] = Material.getMaterial(generatorMaterialsConfig[i]);
 			if(generatorMaterials[i] == null)
 			{
-				return "CRITICAL ERROR: Invalid material: '" + generatorBlocks[i] + "'.  Make sure everything is written correctly; for example for coal ore: COAL_ORE";
+				return "CRITICAL ERROR: Invalid material: '" + generatorMaterialsConfig[i] + "'.  Make sure everything is written correctly; for example for a coal block: COAL_BLOCK";
 			}
 		}
 		
@@ -119,7 +128,30 @@ public class OreGeneratorPlugin extends JavaPlugin
 			return "CRITICAL ERROR: Invalid transmutable block: '" + transmutableBlock + "'; must be a valid material, such as STONE";
 		}
 		
-		try 
+		////////////////////////
+		//// Upgrades Setup ////
+		////////////////////////
+		
+		String[] defaultUpgradeMaterials = { "SUGAR" };
+		String[] upgradeMaterialsConfig = cfg.getOrSetStringArray(Reference.CFG_UPGRADE_MATERIALS, defaultUpgradeMaterials);
+		
+		upgradeMaterials = new Material[7];
+		
+		if(upgradeMaterialsConfig.length != upgradeMaterials.length)
+		{
+			cfg.setStringArray(Reference.CFG_UPGRADE_MATERIALS, defaultUpgradeMaterials);
+		}
+		upgradeMaterials = new Material[upgradeMaterials.length];
+		for(int i = 0; i < upgradeMaterialsConfig.length; i++)
+		{
+			upgradeMaterials[i] = Material.getMaterial(upgradeMaterialsConfig[i]);
+			if(generatorMaterials[i] == null)
+			{
+				return "CRITICAL ERROR: Invalid material: '" + upgradeMaterials[i] + "'.  Make sure everything is written correctly; for example for a coal block: COAL_BLOCK";
+			}
+		}
+		
+		try
 		{
 			cfg.save();
 		} 
@@ -164,6 +196,8 @@ public class OreGeneratorPlugin extends JavaPlugin
 	
 	public Material getGeneratorMaterial(int genId) { return generatorMaterials[genId]; }
 	public int getGeneratorTimeBetween(int genId) { return timesBetween[genId]; }
+	
+	public Material getUpgradeMaterial(int upId) { return upgradeMaterials[upId]; }
 	
 	public List<Material> getGeneratorMaterials()
 	{

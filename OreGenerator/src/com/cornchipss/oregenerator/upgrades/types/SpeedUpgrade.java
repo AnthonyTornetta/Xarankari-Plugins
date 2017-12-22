@@ -9,10 +9,11 @@ import com.cornchipss.oregenerator.generators.Generator;
 import com.cornchipss.oregenerator.upgrades.GeneratorUpgrade;
 import com.cornchipss.oregenerator.upgrades.UpgradeUtils;
 
-
 public class SpeedUpgrade extends GeneratorUpgrade
 {
-	public SpeedUpgrade() 
+	private static final double DIF = 1.5;
+	
+	public SpeedUpgrade()
 	{
 		super(forgeSymbol(), UpgradeUtils.UPGRADE_SPEED_ID);
 	}
@@ -20,13 +21,18 @@ public class SpeedUpgrade extends GeneratorUpgrade
 	@Override
 	public void applyUpgrade(Generator g) 
 	{
-		g.setTimeBetweenRun((int)Math.round(g.getTimeBetweenRuns() / 1.1));
+		int shaved = (int)Math.round(g.getTimeBetweenRuns() - g.getTimeBetweenRuns() / DIF);
+		g.setTimeBetweenRun((int)Math.round(g.getTimeBetweenRuns() / DIF));
+		
+		int secsShaved = g.getTimeRemaining() - shaved;
+		g.setTimeRemaining(secsShaved > 0 ? secsShaved : 0);
+		System.out.println(g.getTimeBetweenRuns());
 	}
 	
 	@Override
 	public void removeUpgrade(Generator g) 
 	{
-		g.setTimeBetweenRun((int)Math.round(g.getTimeBetweenRuns() * 1.1));
+		g.setTimeBetweenRun((int)Math.round(g.getTimeBetweenRuns() * DIF));
 	}
 	
 	private static ItemStack forgeSymbol()

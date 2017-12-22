@@ -18,7 +18,7 @@ public abstract class GeneratorUpgrade
 	public abstract void applyUpgrade(Generator g);
 	public abstract void removeUpgrade(Generator g);
 	
-	public ItemStack getSymbol() { return this.symbol; }
+	public ItemStack getSymbol() { return this.symbol.clone(); }
 	protected void setSymbol(ItemStack s) { this.symbol = s; }
 	
 	public int getId() { return this.id; }

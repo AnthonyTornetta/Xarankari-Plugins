@@ -1,6 +1,7 @@
 package com.cornchipss.oregenerator.generators;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -13,11 +14,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.cornchipss.oregenerator.OreGeneratorPlugin;
-import com.cornchipss.oregenerator.ref.DoubleList;
 import com.cornchipss.oregenerator.ref.InventoryHelper;
 import com.cornchipss.oregenerator.ref.Reference;
 import com.cornchipss.oregenerator.ref.Vector3;
 import com.cornchipss.oregenerator.upgrades.GeneratorUpgrade;
+import com.cornchipss.oregenerator.upgrades.UpgradeUtils;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -87,22 +88,27 @@ public abstract class Generator
 		destroy.setItemMeta(dm);
 		inv.setItem(0, destroy);
 		
-		DoubleList<GeneratorUpgrade, Integer> upgrades = new DoubleList<>();
-		for(int i = 0; i < getUpgradesAmount(); i++)
+		HashMap<Integer, Integer> upgradeIdsAmount = new HashMap<>();
+		
+		for(GeneratorUpgrade g : upgrades)
 		{
-			upgrades.put(getUpgrade(i), upgrades.getOrDefaultVal(getUpgrade(i), 0) + 1);
+			upgradeIdsAmount.put(g.getId(), upgradeIdsAmount.getOrDefault(g.getId(), 0) + 1);
 		}
 		
-		for(int i = 0; i < upgrades.size(); i++)
+		for(int id = UpgradeUtils.MIN_UPGRADE_ID; id <= UpgradeUtils.MAX_UPGRADE_ID; id++) // THIS IS AN ARRAY LIST THEN YUO MADE A DOUBLELIST SOMEWHER YOU DUNCE
 		{
-			GeneratorUpgrade gu = upgrades.getKey(i);
-			ItemStack symbol = gu.getSymbol().clone();
+			GeneratorUpgrade gu = UpgradeUtils.createUpgradeFromId(id);
+			
+			ItemStack symbol = gu.getSymbol();
+			System.out.println(symbol);
 			ItemMeta im = symbol.getItemMeta();
-			im.setDisplayName(im.getDisplayName() + " x " + upgrades.getObjectAtIndex(i));
+			im.setDisplayName(im.getDisplayName() + " x " + upgradeIdsAmount.getOrDefault(gu.getId(), 0));
 			List<String> lore = im.getLore();
-			lore.add(ChatColor.ITALIC + "Click an upgrade in your inventory to add it.");
+			if(lore == null)
+				lore = new ArrayList<>();
+			lore.add(ChatColor.ITALIC + "Right Click then Generator with the desired upgrade to add it.");
 			symbol.setItemMeta(im);
-			inv.setItem(9 + i + 1 + (upgrades.size() / 2 + (upgrades.size() % 2 == 0 ? 0 : 1)), symbol);
+			inv.setItem(9 + id + 1, symbol);
 		}
 		
 		p.openInventory(inv);
@@ -152,8 +158,10 @@ public abstract class Generator
 		if(maxUpgrades <= getUpgradesAmount())
 			return false;
 		
-		upgrade.applyUpgrade(this);
 		upgrades.add(upgrade);
+		upgrade.applyUpgrade(this);
+		
+		System.out.println(this.getTimeBetweenRuns());
 		return true;
 	}
 	protected void removeUpgrade(int i)
