@@ -64,7 +64,9 @@ public class GeneratorUtils
 		List<String> lore = im.getLore();
 		if(lore == null)
 			lore = new ArrayList<>();
+		
 		lore.add(type + "");
+		
 		im.setLore(lore);
 		
 		im.addItemFlags(ItemFlag.HIDE_ENCHANTS);
@@ -105,7 +107,7 @@ public class GeneratorUtils
 	{
 		return createGeneratorItemStack(gen.getGeneratorId(), gen.getPlugin().getGeneratorMaterial(gen.getGeneratorId()));
 	}
-
+	
 	public static String serialize(Generator generator) 
 	{
 		List<String> upgrades = new ArrayList<>();

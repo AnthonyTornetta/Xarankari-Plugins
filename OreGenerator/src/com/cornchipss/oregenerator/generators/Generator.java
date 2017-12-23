@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -20,9 +21,7 @@ import com.cornchipss.oregenerator.ref.Vector3;
 import com.cornchipss.oregenerator.upgrades.GeneratorUpgrade;
 import com.cornchipss.oregenerator.upgrades.UpgradeUtils;
 
-import net.md_5.bungee.api.ChatColor;
-
-public abstract class Generator 
+public abstract class Generator
 {
 	private int maxUpgrades = 10; // TODO: Change from config or somethin, idk what to make this
 	
@@ -40,27 +39,27 @@ public abstract class Generator
 	
 	public Generator(Vector3 defaultRange, int chance, int genId, Block generatorBlock, OreGeneratorPlugin plugin, List<GeneratorUpgrade> upgrades)
 	{
+		this.plugin = plugin;
+		
 		setRange(defaultRange);
 		setChance(chance);
 		setGeneratorId(genId);
 		setGeneratorBlock(generatorBlock);
 		setTimeBetweenRun(plugin.getGeneratorTimeBetween(getGeneratorId()));
 		setTimeRemaining(plugin.getGeneratorTimeBetween(getGeneratorId()));
-		
-		this.plugin = plugin;
-		this.upgrades = upgrades;
+		setUpgrades(upgrades);
 	}
-	
+
 	public Generator(Vector3 defaultRange, int chance, int genId, Block generatorBlock, OreGeneratorPlugin plugin)
 	{
+		this.plugin = plugin;
+		
 		setRange(defaultRange);
 		setChance(chance);
 		setGeneratorId(genId);
 		setGeneratorBlock(generatorBlock);
 		setTimeBetweenRun(plugin.getGeneratorTimeBetween(getGeneratorId()));
 		setTimeRemaining(plugin.getGeneratorTimeBetween(getGeneratorId()));
-		
-		this.plugin = plugin;
 	}
 	
 	public void tick()
@@ -100,7 +99,6 @@ public abstract class Generator
 			GeneratorUpgrade gu = UpgradeUtils.createUpgradeFromId(id);
 			
 			ItemStack symbol = gu.getSymbol();
-			System.out.println(symbol);
 			ItemMeta im = symbol.getItemMeta();
 			im.setDisplayName(im.getDisplayName() + " x " + upgradeIdsAmount.getOrDefault(gu.getId(), 0));
 			List<String> lore = im.getLore();
@@ -114,12 +112,30 @@ public abstract class Generator
 		p.openInventory(inv);
 	}
 	
+	public void dropAllUpgrades() 
+	{
+		while(upgrades.size() > 0)
+		{
+			ItemStack drop = UpgradeUtils.createUpgradeItemStack(upgrades.get(0));
+			getGeneratorBlock().getWorld().dropItemNaturally(getGeneratorBlock().getLocation().add(0.5, 0.5, 0.5), drop);
+			upgrades.remove(0);
+		}
+	}
+	
 	public void breakGenerator() 
 	{
 		ItemStack drop = GeneratorUtils.createGeneratorItemStack(this);
-		this.getGeneratorBlock().setType(Material.AIR);
+		dropAllUpgrades();
+		getGeneratorBlock().setType(Material.AIR);
 		getGeneratorBlock().getWorld().dropItemNaturally(getGeneratorBlock().getLocation().add(0.5, 0.5, 0.5), drop);
 		plugin.getGeneratorHandler().removeGenerator(this);
+	}
+	
+
+	public void setUpgrades(List<GeneratorUpgrade> upgrades) 
+	{
+		for(GeneratorUpgrade up : upgrades)
+			addUpgrade(up);
 	}
 	
 	public abstract void run();
