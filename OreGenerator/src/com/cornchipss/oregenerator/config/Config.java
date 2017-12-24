@@ -10,16 +10,20 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.cornchipss.oregenerator.ref.Helper;
 
 public class Config 
 {
+	// A bad value used if a key is not found in a get call
 	public static final int BAD_VALUE = -9999;
 	
+	// The file to read and write to
 	private File configFile;
 	
-	ArrayList<String> lines = new ArrayList<>();
+	// Stores each line in the file; use this to store changes and this will be saved to the actual file once save() is called
+	List<String> lines = new ArrayList<>();
 	
 	/**
 	 * Reads and rights to a config file using the following format:
@@ -59,6 +63,80 @@ public class Config
 		{
 			ex.printStackTrace();
 		}
+	}
+	
+	/**
+	 * Checks if the configuration file contains any text
+	 * @return True if all lines are empty (using String.isEmpty()) or false if one of the lines is not empty
+	 */
+	public boolean isEmpty()
+	{
+		for(String s : lines)
+			if(!s.isEmpty())
+				return false;
+		return true;
+	}
+	
+	/**
+	 * Sets all the text in the configuration file to a specified List
+	 * @param text The text to set it to; each row is equivilant to a new line
+	 */
+	public void setText(List<String> text)
+	{
+		this.lines = text;
+	}
+	
+	/**
+	 * Gets the comment out of the specified string
+	 * @param line String to extract comment from
+	 * @return The comment found
+	 */
+	public String getComment(String line)
+	{
+		boolean marking = false;
+		String comment = "";
+		for(char c : line.toCharArray())
+		{
+			if(c == '#')
+				marking = true;
+			if(marking)
+				comment += c;
+		}
+		
+		return comment;
+	}
+	
+	/**
+	 * If the String contains a space at the end, it cuts it off
+	 * @param txt The String to check for the space
+	 * @return The String without a space at the end
+	 */
+	public String removeTrailingSpace(final String txt)
+	{
+		if(txt == null)
+			return null;
+		if(txt.length() >= 1)
+		{
+			if(txt.substring(txt.length() - 1).equals(" "))
+				return txt.substring(0, txt.length() - 1);
+			return txt;
+		}
+		return "";
+	}
+	
+	/**
+	 * Removes the comment (marked by a starting '#') from a String
+	 * @param txt The text to remove the comment from
+	 * @return The String with no comments
+	 */
+	public String stripComment(final String txt)
+	{
+		int indexOf = txt.indexOf("#");
+		if(indexOf == -1)
+			return txt;
+		String commentRemoved = txt.substring(0, indexOf);
+		commentRemoved = removeTrailingSpace(commentRemoved);
+		return commentRemoved;
 	}
 	
 	/**
@@ -147,7 +225,7 @@ public class Config
 	 * @param defaultValue The value to set it to if it doesn't exist
 	 * @return The value at the given key or the default value if the key doesn't exist
 	 */
-	public String[] getOrSetStringArray(String key, String[] defaultValue) 
+	public String[] getOrSetStringArray(final String key, final String[] defaultValue) 
 	{
 		if(!this.containsKey(key) || getStringArray(key) == null)
 		{
@@ -162,7 +240,7 @@ public class Config
 	 * @param key The key to set the value at
 	 * @param integer The value the integer will have
 	 */
-	public void setInt(String key, int integer)
+	public void setInt(final String key, final int integer)
 	{
 		String newValue = key + ": " + integer;
 		for(int i = 0; i < lines.size(); i++)
@@ -170,7 +248,11 @@ public class Config
 			String[] split = lines.get(i).split(": ");
 			if(split[0].equalsIgnoreCase(key))
 			{
-				lines.set(i, newValue);
+				String comment = "";
+				if(split.length > 1)
+					comment = getComment(split[1]);
+				
+				lines.set(i, newValue + " " + comment);
 				return;
 			}
 		}
@@ -182,7 +264,7 @@ public class Config
 	 * @param key The key to set the value at
 	 * @param arr The values the integer array will have
 	 */
-	public void setIntArray(String key, int[] arr) 
+	public void setIntArray(final String key, final int[] arr) 
 	{
 		String newValue = key + ": ";
 		for(int i = 0; i < arr.length; i++)
@@ -210,7 +292,7 @@ public class Config
 	 * @param key The key to set the value at
 	 * @param d The value the double will have
 	 */
-	public void setDouble(String key, double d)
+	public void setDouble(final String key, double d)
 	{
 		String newValue = key + ": " + d;
 		for(int i = 0; i < lines.size(); i++)
@@ -218,7 +300,8 @@ public class Config
 			String[] split = lines.get(i).split(": ");
 			if(split[0].equalsIgnoreCase(key))
 			{
-				lines.set(i, newValue);
+				String comment = getComment(lines.get(i));
+				lines.set(i, newValue + " " + comment);
 				return;
 			}
 		}
@@ -243,10 +326,14 @@ public class Config
 		
 		for(int i = 0; i < lines.size(); i++)
 		{
+			if(stripComment(lines.get(i)).isEmpty())
+				continue;
+			
 			String[] split = lines.get(i).split(": ");
 			if(split[0].equalsIgnoreCase(key))
 			{
-				lines.set(i, newValue);
+				String comment = getComment(lines.get(i));
+				lines.set(i, newValue + " " + comment);
 				return;
 			}
 		}
@@ -268,10 +355,14 @@ public class Config
 		
 		for(int i = 0; i < lines.size(); i++)
 		{
+			if(stripComment(lines.get(i)).isEmpty())
+				continue;
+			
 			String[] split = lines.get(i).split(": ");
 			if(split[0].equalsIgnoreCase(key))
 			{
-				lines.set(i, newValue);
+				String comment = getComment(lines.get(i));
+				lines.set(i, newValue + " " + comment);
 				return;
 			}
 		}
@@ -296,10 +387,14 @@ public class Config
 		
 		for(int i = 0; i < lines.size(); i++)
 		{
+			if(stripComment(lines.get(i)).isEmpty())
+				continue;
+			
 			String[] split = lines.get(i).split(": ");
 			if(split[0].equalsIgnoreCase(key))
 			{
-				lines.set(i, newValue);
+				String comment = getComment(lines.get(i));
+				lines.set(i, newValue + " " + comment);
 				return;
 			}
 		}
@@ -315,6 +410,9 @@ public class Config
 	{
 		for(int i = 0; i < lines.size(); i++)
 		{
+			if(stripComment(lines.get(i)).isEmpty())
+				continue;
+			
 			String[] split = lines.get(i).split(": ");
 			if(split[0].equalsIgnoreCase(key))
 				return true;
@@ -331,6 +429,9 @@ public class Config
 	{
 		for(int i = 0; i < lines.size(); i++)
 		{
+			if(stripComment(lines.get(i)).isEmpty())
+				continue;
+			
 			String[] split = lines.get(i).split(": ");
 			if(split[0].equalsIgnoreCase(key))
 			{
@@ -341,7 +442,7 @@ public class Config
 					{
 						strToReturn += split[j];
 					}
-					return strToReturn;
+					return stripComment(strToReturn);
 				}
 			}
 		}
@@ -357,14 +458,15 @@ public class Config
 	{
 		for(int i = 0; i < lines.size(); i++)
 		{
+			if(stripComment(lines.get(i)).isEmpty())
+				continue;
+			
 			String[] split = lines.get(i).split(": ");
 			if(split[0].equalsIgnoreCase(key))
 			{
 				if(split.length > 1)
 				{
-					String possibleStrings = split[1];
-					possibleStrings = possibleStrings.replaceAll(" ", "");
-					String[] stringsSplit = possibleStrings.split(",");
+					String[] stringsSplit = stripComment(split[1]).split(",");
 					return stringsSplit;
 				}
 			}
@@ -382,12 +484,15 @@ public class Config
 	{
 		for(int i = 0; i < lines.size(); i++)
 		{
+			if(stripComment(lines.get(i)).isEmpty())
+				continue;
+			
 			String[] split = lines.get(i).split(": ");
 			if(split[0].equalsIgnoreCase(key))
 			{
 				if(split.length > 1)
 				{
-					String possibleInt = split[1];
+					String possibleInt = stripComment(split[1]);
 					if(Helper.isInt(possibleInt))
 					{
 						return Integer.parseInt(possibleInt);
@@ -408,6 +513,9 @@ public class Config
 		lineSearch:
 		for(int i = 0; i < lines.size(); i++)
 		{
+			if(stripComment(lines.get(i)).isEmpty())
+				continue;
+			
 			String[] split = lines.get(i).split(": ");
 			if(split[0].equalsIgnoreCase(key))
 			{   
@@ -415,7 +523,7 @@ public class Config
 				{
 					String possibleInts = split[1];
 					possibleInts = possibleInts.replaceAll(" ", "");
-					String[] intsSplit = possibleInts.split(",");
+					String[] intsSplit = stripComment(possibleInts).split(",");
 					int[] intArray = new int[intsSplit.length];
 					for(int j = 0; j < intsSplit.length; j++)
 					{
@@ -439,12 +547,15 @@ public class Config
 	{
 		for(int i = 0; i < lines.size(); i++)
 		{
+			if(stripComment(lines.get(i)).isEmpty())
+				continue;
+			
 			String[] split = lines.get(i).split(": ");
 			if(split[0].equalsIgnoreCase(key))
 			{
 				if(split.length > 1)
 				{
-					String possibleInt = split[1];
+					String possibleInt = stripComment(split[1]);
 					if(Helper.isDouble(possibleInt))
 					{
 						return Double.parseDouble(possibleInt);
@@ -465,6 +576,9 @@ public class Config
 		lineSearch:
 		for(int i = 0; i < lines.size(); i++)
 		{
+			if(stripComment(lines.get(i)).isEmpty())
+				continue;
+			
 			String[] split = lines.get(i).split(": ");
 			if(split[0].equalsIgnoreCase(key))
 			{
@@ -472,7 +586,7 @@ public class Config
 				{
 					String possibleDoubles = split[1];
 					possibleDoubles = possibleDoubles.replaceAll(" ", "");
-					String[] dsSplit = possibleDoubles.split(",");
+					String[] dsSplit = stripComment(possibleDoubles).split(",");
 					double[] dArray = new double[dsSplit.length];
 					for(int j = 0; j < dsSplit.length; j++)
 					{

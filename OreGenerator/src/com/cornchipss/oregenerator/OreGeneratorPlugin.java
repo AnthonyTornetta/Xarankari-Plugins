@@ -51,7 +51,7 @@ public class OreGeneratorPlugin extends JavaPlugin
 	
 	@Override
 	public void onEnable()
-	{		
+	{
 		String logMe = initConfig();
 		
 		if (!setupEconomy()) 
@@ -109,6 +109,12 @@ public class OreGeneratorPlugin extends JavaPlugin
 	private String initConfig()
 	{
 		cfg = new Config(this.getDataFolder() + "\\oregen-config.yml");
+		
+		if(cfg.isEmpty())
+		{
+			List<String> txt = new ArrayList<>();
+			txt.add("# The version of the plugin");
+		}
 		
 		cfg.setString(Reference.CFG_VERSION_KEY, Reference.PLUGIN_VERSION); // make sure the version is up to date (can be used in case we change the way we store things in later versions and want to convert the file to the new format)
 		
