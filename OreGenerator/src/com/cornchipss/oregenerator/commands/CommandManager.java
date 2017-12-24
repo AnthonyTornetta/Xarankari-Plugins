@@ -16,7 +16,6 @@ public class CommandManager
 	@SuppressWarnings("deprecation")
 	public static boolean runThroughCommands(final Command command, final CommandSender sender, final String[] args, final OreGeneratorPlugin plugin) 
 	{
-		System.out.println("1");
 		if (!(sender instanceof Player))
 		{
 			sender.sendMessage("You must be a player!");
@@ -30,7 +29,6 @@ public class CommandManager
 		{
 			if(args.length == 0)
 			{
-				System.out.println("1");
 				CommandInventories.openGetGeneratorGUI(p, plugin);
 				return true;
 			}
@@ -98,7 +96,6 @@ public class CommandManager
 		{
 			if(args.length == 0)
 			{
-				System.out.println(plugin.getEco());
 				p.sendMessage("Current Balance: $" + plugin.getEco().getBalance(p.getName()));
 			}
 			else

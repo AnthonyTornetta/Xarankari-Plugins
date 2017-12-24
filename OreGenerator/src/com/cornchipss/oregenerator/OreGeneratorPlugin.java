@@ -22,6 +22,7 @@ import com.cornchipss.oregenerator.generators.GeneratorHandler;
 import com.cornchipss.oregenerator.generators.GeneratorUtils;
 import com.cornchipss.oregenerator.listeners.CornyListener;
 import com.cornchipss.oregenerator.ref.Reference;
+import com.cornchipss.oregenerator.upgrades.UpgradeUtils;
 
 import net.milkbowl.vault.economy.Economy;
 
@@ -45,7 +46,7 @@ public class OreGeneratorPlugin extends JavaPlugin
 	private double[] upgradePrices;
 	private int maxUpgrades;
 	
-	// Valut stuff
+	// Vault stuff
 	Economy eco = null;
 	
 	@Override
@@ -59,9 +60,7 @@ public class OreGeneratorPlugin extends JavaPlugin
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
-		
-		System.out.println(eco);
-		
+				
 		try
 		{
 			readGenerators(genHandler);
@@ -124,7 +123,7 @@ public class OreGeneratorPlugin extends JavaPlugin
 		int[] defaultTimesBetweenTransmutes = {10, 20, 30, 40, 50, 60, 70};
 		timesBetween = cfg.getOrSetIntArray(Reference.CFG_DEFAULT_TIME_BETWEEN_TRANSMUTES, defaultTimesBetweenTransmutes);
 		
-		generatorMaterials = new Material[7];
+		generatorMaterials = new Material[GeneratorUtils.MAX_GENERATOR_ID + 1];
 		
 		if(generatorMaterialsConfig.length < generatorMaterials.length)
 			cfg.setStringArray(Reference.CFG_GENERATOR_MATERIALS_KEY, generatorMaterialsConfig); // Probs updated and have more gens now
@@ -159,10 +158,10 @@ public class OreGeneratorPlugin extends JavaPlugin
 		//// Upgrades Setup ////
 		////////////////////////
 		
-		String[] defaultUpgradeMaterials = { "SUGAR, REDSTONE_TORCH_ON, REDSTONE_TORCH_OFF, RABBIT_FOOT" };
+		String[] defaultUpgradeMaterials = { "SUGAR, RECORD_10, RECORD_9, RECORD_8" };
 		String[] upgradeMaterialsConfig = cfg.getOrSetStringArray(Reference.CFG_UPGRADE_MATERIALS, defaultUpgradeMaterials);
-		
-		upgradeMaterials = new Material[7];
+
+		upgradeMaterials = new Material[UpgradeUtils.MAX_UPGRADE_ID + 1];
 		
 		if(upgradeMaterialsConfig.length != upgradeMaterials.length)
 		{
@@ -172,7 +171,7 @@ public class OreGeneratorPlugin extends JavaPlugin
 		for(int i = 0; i < upgradeMaterialsConfig.length; i++)
 		{
 			upgradeMaterials[i] = Material.getMaterial(upgradeMaterialsConfig[i]);
-			if(generatorMaterials[i] == null)
+			if(upgradeMaterials[i] == null)
 			{
 				return "CRITICAL ERROR: Invalid material: '" + upgradeMaterials[i] + "'.  Make sure everything is written correctly; for example for a coal block: COAL_BLOCK";
 			}

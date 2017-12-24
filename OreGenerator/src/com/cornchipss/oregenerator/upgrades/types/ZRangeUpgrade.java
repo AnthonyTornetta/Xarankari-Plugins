@@ -13,7 +13,7 @@ public class ZRangeUpgrade extends GeneratorUpgrade
 {
 	public ZRangeUpgrade(OreGeneratorPlugin plugin) 
 	{
-		super(forgeSymbol(plugin), UpgradeUtils.UPGRADE_X_RANGE_ID);
+		super(forgeSymbol(plugin), UpgradeUtils.UPGRADE_Z_RANGE_ID);
 	}
 	
 	@Override

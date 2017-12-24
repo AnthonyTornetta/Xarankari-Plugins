@@ -3,6 +3,7 @@ package com.cornchipss.oregenerator.upgrades;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -93,15 +94,13 @@ public class UpgradeUtils
 	{
 		if(id < MIN_UPGRADE_ID || id > MAX_UPGRADE_ID)
 		{
-			System.out.println("WARNING: Generator ID out of range");
+			Bukkit.getServer().getLogger().info("WARNING: Generator ID out of range");
 			return null; // Not a valid id
 		}
 		
 		ItemStack is = new ItemStack(material);
 		ItemMeta im = is.getItemMeta();
-		List<String> lore = im.getLore();
-		if(lore == null)
-			lore = new ArrayList<>();
+		List<String> lore = new ArrayList<>(); // You're former lore is worthless to me!!!
 		
 		String name = null;
 		
@@ -124,8 +123,10 @@ public class UpgradeUtils
 		if(name == null)
 			return null;
 		
-		lore.add(ChatColor.stripColor(name) + " Upgrade: " + id);
+		lore.add(ChatColor.GRAY + ChatColor.stripColor(name) + " Upgrade: " + id);
 		im.setLore(lore);
+		
+		im.setDisplayName(name + " Upgrade");
 		
 		is.addUnsafeEnchantment(Enchantment.LURE, 1);
 		im.addItemFlags(ItemFlag.HIDE_ENCHANTS);		

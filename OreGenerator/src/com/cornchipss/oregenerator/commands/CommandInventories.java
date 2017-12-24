@@ -100,14 +100,6 @@ public class CommandInventories
 		
 		InventoryHelper.genBorders(ROWS, inv);
 		
-//		ItemStack speedUpgrade = new ItemStack(plugin.getUpgradeMaterial(UpgradeUtils.UPGRADE_SPEED_ID));
-//		ItemMeta speedMeta = speedUpgrade.getItemMeta();
-//		speedMeta.setDisplayName(ChatColor.DARK_GRAY + "Speed Upgrade");
-//		List<String> speedLore = new ArrayList<>();
-//		speedLore.add(ChatColor.GREEN + "$" + plugin.getUpgradePrice(UpgradeUtils.UPGRADE_SPEED_ID));
-//		speedMeta.setLore(speedLore);
-//		speedUpgrade.setItemMeta(speedMeta);
-		
 		for(int i = UpgradeUtils.MIN_UPGRADE_ID; i <= UpgradeUtils.MAX_UPGRADE_ID; i++)
 		{
 			ItemStack akchewalUpgrade = UpgradeUtils.createUpgradeItemStack(i, plugin.getUpgradeMaterial(i));
