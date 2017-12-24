@@ -23,8 +23,6 @@ import com.cornchipss.oregenerator.upgrades.UpgradeUtils;
 
 public abstract class Generator
 {
-	private int maxUpgrades = 10; // TODO: Change from config or somethin, idk what to make this
-	
 	private OreGeneratorPlugin plugin;
 	
 	private List<GeneratorUpgrade> upgrades = new ArrayList<>();
@@ -35,6 +33,7 @@ public abstract class Generator
 	
 	private int genId, time, timeRemaining;
 	private int timeDecreaseAmount = 1;
+	private int maxUpgrades;
 	private int chance;
 	
 	public Generator(Vector3 defaultRange, int chance, int genId, Block generatorBlock, OreGeneratorPlugin plugin, List<GeneratorUpgrade> upgrades)
@@ -48,6 +47,8 @@ public abstract class Generator
 		setTimeBetweenRun(plugin.getGeneratorTimeBetween(getGeneratorId()));
 		setTimeRemaining(plugin.getGeneratorTimeBetween(getGeneratorId()));
 		setUpgrades(upgrades);
+		
+		maxUpgrades = plugin.getMaxUpgrades();
 	}
 
 	public Generator(Vector3 defaultRange, int chance, int genId, Block generatorBlock, OreGeneratorPlugin plugin)
@@ -60,6 +61,8 @@ public abstract class Generator
 		setGeneratorBlock(generatorBlock);
 		setTimeBetweenRun(plugin.getGeneratorTimeBetween(getGeneratorId()));
 		setTimeRemaining(plugin.getGeneratorTimeBetween(getGeneratorId()));
+		
+		maxUpgrades = plugin.getMaxUpgrades();
 	}
 	
 	public void tick()
@@ -163,6 +166,8 @@ public abstract class Generator
 	
 	public OreGeneratorPlugin getPlugin() { return this.plugin; }
 	
+	public int getMaxUpgradeAmount() { return maxUpgrades; }
+	
 	protected boolean shouldTransmute()
 	{
 		Random rdm = new Random();
@@ -171,7 +176,7 @@ public abstract class Generator
 	
 	public boolean addUpgrade(GeneratorUpgrade upgrade)
 	{
-		if(maxUpgrades <= getUpgradesAmount())
+		if(getMaxUpgradeAmount() <= getUpgradesAmount())
 			return false;
 		
 		upgrades.add(upgrade);

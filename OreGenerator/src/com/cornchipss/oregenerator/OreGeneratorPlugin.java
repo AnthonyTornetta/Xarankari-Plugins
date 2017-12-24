@@ -13,6 +13,7 @@ import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.cornchipss.oregenerator.commands.CommandManager;
@@ -21,6 +22,8 @@ import com.cornchipss.oregenerator.generators.GeneratorHandler;
 import com.cornchipss.oregenerator.generators.GeneratorUtils;
 import com.cornchipss.oregenerator.listeners.CornyListener;
 import com.cornchipss.oregenerator.ref.Reference;
+
+import net.milkbowl.vault.economy.Economy;
 
 
 public class OreGeneratorPlugin extends JavaPlugin
@@ -35,14 +38,28 @@ public class OreGeneratorPlugin extends JavaPlugin
 	private Material transmutableBlock;
 	private Material[] generatorMaterials;
 	private int[] timesBetween;
+	private double[] generatorPrices;
 	
 	// Upgrades
 	private Material[] upgradeMaterials;
+	private int maxUpgrades = 10;
+	
+	// Valut stuff
+	Economy eco = null;
 	
 	@Override
 	public void onEnable()
 	{		
 		String logMe = initConfig();
+		
+		if (!setupEconomy()) 
+		{
+            getLogger().severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+		
+		System.out.println(eco);
 		
 		try
 		{
@@ -65,7 +82,8 @@ public class OreGeneratorPlugin extends JavaPlugin
 		if(logMe.contains("CRITICAL ERROR"))
 		{
 			getLogger().info("Disabling due to a critical error when reading the config!");
-			return;
+            getServer().getPluginManager().disablePlugin(this);
+            return;
 		}
 		
 		cl = new CornyListener(this);
@@ -128,6 +146,14 @@ public class OreGeneratorPlugin extends JavaPlugin
 			return "CRITICAL ERROR: Invalid transmutable block: '" + transmutableBlock + "'; must be a valid material, such as STONE";
 		}
 		
+		double[] defaultGeneratorPrices = { 10000.0, 20000.0, 40000.0, 80000.0, 160000.0, 320000.0, 640000.0 };
+		double[] generatorPricesConfig = cfg.getOrSetDoubleArray(Reference.CFG_GENERATOR_PRICES_KEY, defaultGeneratorPrices);
+		generatorPrices = new double[generatorMaterials.length];
+		if(generatorPricesConfig.length != generatorPrices.length)
+			cfg.setDoubleArray(Reference.CFG_GENERATOR_PRICES_KEY, defaultGeneratorPrices);
+		
+		generatorPrices = cfg.getDoubleArray(Reference.CFG_GENERATOR_PRICES_KEY);
+		
 		////////////////////////
 		//// Upgrades Setup ////
 		////////////////////////
@@ -150,6 +176,8 @@ public class OreGeneratorPlugin extends JavaPlugin
 				return "CRITICAL ERROR: Invalid material: '" + upgradeMaterials[i] + "'.  Make sure everything is written correctly; for example for a coal block: COAL_BLOCK";
 			}
 		}
+		
+		maxUpgrades = cfg.getOrSetInt(Reference.CFG_MAX_UPGRADES_KEY, 10);
 		
 		try
 		{
@@ -188,6 +216,19 @@ public class OreGeneratorPlugin extends JavaPlugin
 		br.close();
 	}
 	
+	private boolean setupEconomy() 
+	{
+        if (getServer().getPluginManager().getPlugin("Vault") == null) {
+            return false;
+        }
+        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        if (rsp == null) {
+            return false;
+        }
+        eco = rsp.getProvider();
+        return eco != null;
+    }
+	
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args)
 	{
@@ -196,7 +237,7 @@ public class OreGeneratorPlugin extends JavaPlugin
 	
 	public Material getGeneratorMaterial(int genId) { return generatorMaterials[genId]; }
 	public int getGeneratorTimeBetween(int genId) { return timesBetween[genId]; }
-	
+	public double getGeneratorPrice(int genId) { return generatorPrices[genId]; }
 	public Material getUpgradeMaterial(int upId) { return upgradeMaterials[upId]; }
 	
 	public List<Material> getGeneratorMaterials()
@@ -206,7 +247,12 @@ public class OreGeneratorPlugin extends JavaPlugin
 			mats.add(generatorMaterials[i]);
 		return mats;
 	}
+	
 	public Material getTransmutableBlock() { return transmutableBlock; }
 	
 	public GeneratorHandler getGeneratorHandler() { return this.genHandler; }
+
+	public int getMaxUpgrades() { return maxUpgrades; }
+	
+	public Economy getEco() { return this.eco; }
 }

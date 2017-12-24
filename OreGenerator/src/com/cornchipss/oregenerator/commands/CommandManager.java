@@ -1,5 +1,7 @@
 package com.cornchipss.oregenerator.commands;
 
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -9,12 +11,12 @@ import com.cornchipss.oregenerator.OreGeneratorPlugin;
 import com.cornchipss.oregenerator.generators.GeneratorUtils;
 import com.cornchipss.oregenerator.upgrades.UpgradeUtils;
 
-import net.md_5.bungee.api.ChatColor;
-
 public class CommandManager 
 {
-	public static boolean runThroughCommands(Command command, CommandSender sender, String[] args, OreGeneratorPlugin plugin) 
+	@SuppressWarnings("deprecation")
+	public static boolean runThroughCommands(final Command command, final CommandSender sender, final String[] args, final OreGeneratorPlugin plugin) 
 	{
+		System.out.println("1");
 		if (!(sender instanceof Player))
 		{
 			sender.sendMessage("You must be a player!");
@@ -28,7 +30,8 @@ public class CommandManager
 		{
 			if(args.length == 0)
 			{
-				CommandInventories.openGetGeneratorGUI(p);
+				System.out.println("1");
+				CommandInventories.openGetGeneratorGUI(p, plugin);
 				return true;
 			}
 			
@@ -84,6 +87,33 @@ public class CommandManager
 			p.getInventory().addItem(is);
 		}
 		
-		return false;
+		if(cmd.equalsIgnoreCase("bal"))
+		{
+			if(args.length == 0)
+			{
+				System.out.println(plugin.getEco());
+				p.sendMessage("Current Balance: $" + plugin.getEco().getBalance(p.getName()));
+			}
+			else
+			{
+				p.sendMessage(args[0] + "'s Balance: $" + plugin.getEco().getBalance(Bukkit.getOfflinePlayer(args[0])));
+			}
+			
+			p.sendMessage(ChatColor.GREEN + "Cha Chang");
+		}
+		
+		if(cmd.equalsIgnoreCase("givemoney"))
+		{
+			double amt = 640000;
+			if(args.length > 0)
+			{
+				amt = Double.parseDouble(args[0]);
+			}
+			
+			plugin.getEco().depositPlayer(p.getName(), amt);
+			p.sendMessage(ChatColor.GREEN + "Cha Ching");
+		}
+		
+		return true;
 	}
 }

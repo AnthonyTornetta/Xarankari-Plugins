@@ -37,6 +37,8 @@ public class GeneratorUtils
 	public static final int GENERATOR_GOLD_ID     = 4;
 	public static final int GENERATOR_DIAMOND_ID  = 5;
 	public static final int GENERATOR_EMERALD_ID  = 6;
+	public static final int MIN_GENERATOR_ID = GENERATOR_COAL_ID;
+	public static final int MAX_GENERATOR_ID = GENERATOR_EMERALD_ID;
 	
 	public static int getGeneratorType(ItemMeta im)
 	{

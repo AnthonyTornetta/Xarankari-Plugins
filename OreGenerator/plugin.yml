@@ -1,6 +1,7 @@
 name: OreGenerator
 main: com.cornchipss.oregenerator.OreGeneratorPlugin
 version: 1.0
+depend: [Vault]
 commands:
     oregenerator:
         description: Gives you a specified generator or opens up the generator selection menu
@@ -17,3 +18,9 @@ commands:
     upgrade:
         description: Gives you a specified generator upgrade or opens up the upgrade selection menu
         usage: /upgrades (type)
+    bal:
+        description: Tells you your current balance
+        usage: /bal [player]
+    givemoney:
+        descriptions: gives player money
+        usage: /givemoney

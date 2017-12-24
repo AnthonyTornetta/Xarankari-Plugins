@@ -32,6 +32,8 @@ import com.cornchipss.oregenerator.generators.GeneratorUtils;
 import com.cornchipss.oregenerator.ref.Reference;
 import com.cornchipss.oregenerator.upgrades.UpgradeUtils;
 
+import net.milkbowl.vault.economy.EconomyResponse;
+
 public class CornyListener implements Listener
 {
 	private HashMap<Player, Generator> playersOpeningGeneratorInv = new HashMap<>();
@@ -118,11 +120,11 @@ public class CornyListener implements Listener
 					{
 						if(g.addUpgrade(UpgradeUtils.createUpgradeFromId(upgradeId)))
 						{
-							Bukkit.broadcastMessage("YAY");
+							p.sendMessage(ChatColor.AQUA + "Upgrade added (" + g.getUpgradesAmount() + "/" + g.getMaxUpgradeAmount() + ")");
 						}
 						else
 						{
-							Bukkit.broadcastMessage("AWW");
+							p.sendMessage(ChatColor.RED + "The generator is full of upgrades");
 						}
 					}
 					else
@@ -158,21 +160,36 @@ public class CornyListener implements Listener
 	
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onBlockExplode(BlockExplodeEvent e)
-	{
-		Block b = e.getBlock();
-		
-		if(!plugin.getGeneratorMaterials().contains(b.getType()))
-			return;
-		
+	{		
 		if(e.isCancelled())
 			return;
 		
-		for(int i = 0; i < plugin.getGeneratorHandler().generatorAmount(); i++)
+		List<Block> blocks = e.blockList();
+		
+		List<Generator> gens = new ArrayList<>();
+		
+		for(Block b : blocks)
 		{
-			if(plugin.getGeneratorHandler().getGenerator(i).getGeneratorBlock().equals(b))
+			for(int i = 0; i < plugin.getGeneratorHandler().generatorAmount(); i++)
 			{
-				e.setCancelled(true);
+				if(plugin.getGeneratorHandler().getGenerator(i).getGeneratorBlock().equals(b))
+				{
+					gens.add(plugin.getGeneratorHandler().getGenerator(i));
+					gens.get(gens.size() - 1).getGeneratorBlock().setType(Material.AIR);
+				}
 			}
+		}
+		
+		for(Generator g : gens)
+		{
+			Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					g.getGeneratorBlock().setType(plugin.getGeneratorMaterial(g.getGeneratorId()));
+				}
+			}, 1L);
 		}
 	}
 	
@@ -224,34 +241,46 @@ public class CornyListener implements Listener
 			if(e.getCurrentItem() == null)
 				return;
 			
+			int id = -1;
+			
 			switch(e.getCurrentItem().getType())
 			{
 			case COAL_ORE:
-				giveGenerator(p, GeneratorUtils.GENERATOR_COAL_ID);
+				id = GeneratorUtils.GENERATOR_COAL_ID;
 				break;
 			case IRON_ORE:
-				giveGenerator(p, GeneratorUtils.GENERATOR_IRON_ID);
+				id = GeneratorUtils.GENERATOR_IRON_ID;
 				break;
 			case REDSTONE_ORE:
-				giveGenerator(p, GeneratorUtils.GENERATOR_REDSTONE_ID);
+				id = GeneratorUtils.GENERATOR_REDSTONE_ID;
 				break;
 			case LAPIS_ORE:
-				giveGenerator(p, GeneratorUtils.GENERATOR_LAPIS_ID);
+				id = GeneratorUtils.GENERATOR_LAPIS_ID;
 				break;
 			case GOLD_ORE:
-				giveGenerator(p, GeneratorUtils.GENERATOR_GOLD_ID);
+				id = GeneratorUtils.GENERATOR_GOLD_ID;
 				break;
 			case DIAMOND_ORE:
-				giveGenerator(p, GeneratorUtils.GENERATOR_DIAMOND_ID);
+				id = GeneratorUtils.GENERATOR_DIAMOND_ID;
 				break;
 			case EMERALD_ORE:
-				giveGenerator(p, GeneratorUtils.GENERATOR_EMERALD_ID);
+				id = GeneratorUtils.GENERATOR_EMERALD_ID;
 				break;
 			case BARRIER:
 				p.closeInventory();
 				break;
 			default:
+				id = -1;
 				break;
+			}
+			
+			if(id >= GeneratorUtils.MIN_GENERATOR_ID && id <= GeneratorUtils.MAX_GENERATOR_ID);
+			{
+				EconomyResponse ecoResp = plugin.getEco().bankWithdraw(p.getName(), plugin.getGeneratorPrice(id));
+				if(ecoResp.transactionSuccess())
+					giveGenerator(p, id);
+				else
+					p.sendMessage(ChatColor.RED + ecoResp.errorMessage);
 			}
 		}
 		
