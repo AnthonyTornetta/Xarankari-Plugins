@@ -71,20 +71,27 @@ public class CommandManager
 		
 		if(cmd.equalsIgnoreCase("upgrades") || cmd.equalsIgnoreCase("upgrade"))
 		{
-			int upId = 0;
-			
-			switch(args[0].toLowerCase())
+			if(args.length == 0)
 			{
-			case "speed":
-				upId = UpgradeUtils.UPGRADE_SPEED_ID;
-				break;
-			default:
-				p.sendMessage(ChatColor.RED + "Invalid generator: " + args[0]);
-				return true;
+				CommandInventories.openGetUpgradesGUI(p, plugin);
 			}
-			
-			ItemStack is = UpgradeUtils.createUpgradeItemStack(upId, plugin.getUpgradeMaterial(upId));
-			p.getInventory().addItem(is);
+			else
+			{
+				int upId = 0;
+				
+				switch(args[0].toLowerCase())
+				{
+					case "speed":
+						upId = UpgradeUtils.UPGRADE_SPEED_ID;
+						break;
+					default:
+						p.sendMessage(ChatColor.RED + "Invalid generator: " + args[0]);
+						return true;
+					}
+					
+					ItemStack is = UpgradeUtils.createUpgradeItemStack(upId, plugin.getUpgradeMaterial(upId));
+					p.getInventory().addItem(is);
+				}
 		}
 		
 		if(cmd.equalsIgnoreCase("bal"))

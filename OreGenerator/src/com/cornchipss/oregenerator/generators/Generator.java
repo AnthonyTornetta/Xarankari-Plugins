@@ -99,7 +99,7 @@ public abstract class Generator
 		
 		for(int id = UpgradeUtils.MIN_UPGRADE_ID; id <= UpgradeUtils.MAX_UPGRADE_ID; id++) // THIS IS AN ARRAY LIST THEN YUO MADE A DOUBLELIST SOMEWHER YOU DUNCE
 		{
-			GeneratorUpgrade gu = UpgradeUtils.createUpgradeFromId(id);
+			GeneratorUpgrade gu = UpgradeUtils.createUpgradeFromId(plugin, id);
 			
 			ItemStack symbol = gu.getSymbol();
 			ItemMeta im = symbol.getItemMeta();
@@ -181,8 +181,6 @@ public abstract class Generator
 		
 		upgrades.add(upgrade);
 		upgrade.applyUpgrade(this);
-		
-		System.out.println(this.getTimeBetweenRuns());
 		return true;
 	}
 	protected void removeUpgrade(int i)

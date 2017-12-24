@@ -118,7 +118,7 @@ public class CornyListener implements Listener
 
 					if(upgradeId != -1)
 					{
-						if(g.addUpgrade(UpgradeUtils.createUpgradeFromId(upgradeId)))
+						if(g.addUpgrade(UpgradeUtils.createUpgradeFromId(plugin, upgradeId)))
 						{
 							p.sendMessage(ChatColor.AQUA + "Upgrade added (" + g.getUpgradesAmount() + "/" + g.getMaxUpgradeAmount() + ")");
 						}
@@ -305,8 +305,37 @@ public class CornyListener implements Listener
 				break;
 			}
 		}
+		
+		if(i.getName().equals(Reference.UPGRADE_INVENTORY_NAME))
+		{
+			e.setCancelled(true); // Don't want them taking my blocks
+			if(e.getCurrentItem() == null)
+				return;
+			
+			Material matClicked = e.getCurrentItem().getType();
+			int id = -1;
+			if(matClicked == plugin.getUpgradeMaterial(UpgradeUtils.UPGRADE_SPEED_ID))
+				id = UpgradeUtils.UPGRADE_SPEED_ID;
+			else if(matClicked == plugin.getUpgradeMaterial(UpgradeUtils.UPGRADE_X_RANGE_ID))
+				id = UpgradeUtils.UPGRADE_X_RANGE_ID;
+			else if(matClicked == plugin.getUpgradeMaterial(UpgradeUtils.UPGRADE_Z_RANGE_ID))
+				id = UpgradeUtils.UPGRADE_Z_RANGE_ID;
+			else if(matClicked == plugin.getUpgradeMaterial(UpgradeUtils.UPGRADE_Y_RANGE_ID))
+				id = UpgradeUtils.UPGRADE_Y_RANGE_ID;
+			else if(matClicked == Material.BARRIER)
+				p.closeInventory();
+			
+			if(id >= UpgradeUtils.MIN_UPGRADE_ID && id <= UpgradeUtils.MAX_UPGRADE_ID)
+			{
+				EconomyResponse ecoResp = plugin.getEco().bankWithdraw(p.getName(), plugin.getUpgradePrice(id));
+				if(ecoResp.transactionSuccess())
+					giveUpgrade(p, id);
+				else
+					p.sendMessage(ChatColor.RED + ecoResp.errorMessage);
+			}
+		}
 	}
-	
+
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onPlayerCloseInventory(InventoryCloseEvent e)
 	{
@@ -346,6 +375,12 @@ public class CornyListener implements Listener
 	private void giveGenerator(Player p, int type)
 	{
 		ItemStack is = GeneratorUtils.createGeneratorItemStack(type, plugin.getGeneratorMaterial(type));
+		p.getInventory().addItem(is);
+	}
+	
+	private void giveUpgrade(Player p, int id) 
+	{
+		ItemStack is = UpgradeUtils.createUpgradeItemStack(id, plugin.getUpgradeMaterial(id));
 		p.getInventory().addItem(is);
 	}
 }

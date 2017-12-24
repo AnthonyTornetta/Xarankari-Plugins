@@ -15,12 +15,12 @@ import com.cornchipss.oregenerator.OreGeneratorPlugin;
 import com.cornchipss.oregenerator.generators.GeneratorUtils;
 import com.cornchipss.oregenerator.ref.InventoryHelper;
 import com.cornchipss.oregenerator.ref.Reference;
+import com.cornchipss.oregenerator.upgrades.UpgradeUtils;
 
 public class CommandInventories 
 {
 	public static void openGetGeneratorGUI(final Player p, final OreGeneratorPlugin plugin)
 	{
-		System.out.println("2");
 		final int ROWS = 3;
 		Inventory inv = Bukkit.createInventory(null, 9 * ROWS, Reference.CMD_WINDOW_GET_GENERATOR_TITLE);
 		
@@ -33,9 +33,7 @@ public class CommandInventories
 		coalLore.add(ChatColor.GREEN + "$" + plugin.getGeneratorPrice(GeneratorUtils.GENERATOR_COAL_ID));
 		coalMeta.setLore(coalLore);
 		coalGen.setItemMeta(coalMeta);
-		
-		System.out.println(plugin.getGeneratorPrice(GeneratorUtils.GENERATOR_IRON_ID));
-		
+				
 		ItemStack ironGen = new ItemStack(Material.IRON_ORE);
 		ItemMeta ironMeta = ironGen.getItemMeta();
 		ironMeta.setDisplayName(ChatColor.GRAY + "Iron Ore Generator");
@@ -95,5 +93,34 @@ public class CommandInventories
 		p.openInventory(inv);
 	}
 
-	
+	public static void openGetUpgradesGUI(Player p, OreGeneratorPlugin plugin) 
+	{
+		final int ROWS = 3;
+		Inventory inv = Bukkit.createInventory(null, 9 * ROWS, Reference.UPGRADE_INVENTORY_NAME);
+		
+		InventoryHelper.genBorders(ROWS, inv);
+		
+//		ItemStack speedUpgrade = new ItemStack(plugin.getUpgradeMaterial(UpgradeUtils.UPGRADE_SPEED_ID));
+//		ItemMeta speedMeta = speedUpgrade.getItemMeta();
+//		speedMeta.setDisplayName(ChatColor.DARK_GRAY + "Speed Upgrade");
+//		List<String> speedLore = new ArrayList<>();
+//		speedLore.add(ChatColor.GREEN + "$" + plugin.getUpgradePrice(UpgradeUtils.UPGRADE_SPEED_ID));
+//		speedMeta.setLore(speedLore);
+//		speedUpgrade.setItemMeta(speedMeta);
+		
+		for(int i = UpgradeUtils.MIN_UPGRADE_ID; i <= UpgradeUtils.MAX_UPGRADE_ID; i++)
+		{
+			ItemStack akchewalUpgrade = UpgradeUtils.createUpgradeItemStack(i, plugin.getUpgradeMaterial(i));
+			ItemStack upgrade = new ItemStack(plugin.getUpgradeMaterial(i));
+			ItemMeta upMeta = upgrade.getItemMeta();
+			upMeta.setDisplayName(akchewalUpgrade.getItemMeta().getDisplayName());
+			List<String> upLore = new ArrayList<>();
+			upLore.add(ChatColor.GREEN + "$" + plugin.getUpgradePrice(i));
+			upMeta.setLore(upLore);
+			upgrade.setItemMeta(upMeta);
+			inv.setItem(10 + i, upgrade);
+		}
+		
+		p.openInventory(inv);
+	}
 }

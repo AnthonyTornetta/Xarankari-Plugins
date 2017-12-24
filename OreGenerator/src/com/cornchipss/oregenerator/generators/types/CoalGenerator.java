@@ -13,7 +13,6 @@ import com.cornchipss.oregenerator.upgrades.GeneratorUpgrade;
 
 public class CoalGenerator extends Generator
 {
-	//Vector3 defaultRange, int chance, int genId, Block generatorBlock, OreGeneratorPlugin plugin, ArrayList<GeneratorUpgrade> upgrades
 	public CoalGenerator(Block generatorBlock, OreGeneratorPlugin plugin, List<GeneratorUpgrade> upgrades) 
 	{
 		super(new Vector3(3, 3, 3), 1, GeneratorUtils.GENERATOR_COAL_ID, generatorBlock, plugin, upgrades);

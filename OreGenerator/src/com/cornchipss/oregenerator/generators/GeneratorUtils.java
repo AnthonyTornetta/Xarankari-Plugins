@@ -25,7 +25,6 @@ import com.cornchipss.oregenerator.generators.types.RedstoneGenerator;
 import com.cornchipss.oregenerator.ref.Helper;
 import com.cornchipss.oregenerator.upgrades.GeneratorUpgrade;
 import com.cornchipss.oregenerator.upgrades.UpgradeUtils;
-import com.cornchipss.oregenerator.upgrades.types.SpeedUpgrade;
 
 
 public class GeneratorUtils 
@@ -222,12 +221,7 @@ public class GeneratorUtils
 					
 					GeneratorUpgrade upgrade = null;
 					
-					switch(upgradeType)
-					{
-						case UpgradeUtils.UPGRADE_SPEED_ID:
-							upgrade = new SpeedUpgrade();
-							break;
-					}
+					upgrade = UpgradeUtils.createUpgradeFromId(plugin, upgradeType);
 					
 					for(int k = 0; k < Integer.parseInt(split[1]); k++)
 					{

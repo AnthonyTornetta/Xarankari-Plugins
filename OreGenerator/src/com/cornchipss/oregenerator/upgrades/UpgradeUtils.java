@@ -10,16 +10,23 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import com.cornchipss.oregenerator.OreGeneratorPlugin;
 import com.cornchipss.oregenerator.ref.Helper;
 import com.cornchipss.oregenerator.upgrades.types.SpeedUpgrade;
+import com.cornchipss.oregenerator.upgrades.types.XRangeUpgrade;
+import com.cornchipss.oregenerator.upgrades.types.YRangeUpgrade;
+import com.cornchipss.oregenerator.upgrades.types.ZRangeUpgrade;
 
 public class UpgradeUtils 
 {
 	public static final int UPGRADE_SPEED_ID = 0;
-	public static final int MAX_UPGRADE_ID = UPGRADE_SPEED_ID;
+	public static final int UPGRADE_X_RANGE_ID  = 1;
+	public static final int UPGRADE_Z_RANGE_ID  = 2;
+	public static final int UPGRADE_Y_RANGE_ID  = 3;
 	public static final int MIN_UPGRADE_ID = UPGRADE_SPEED_ID;
+	public static final int MAX_UPGRADE_ID = UPGRADE_Y_RANGE_ID;
 	
-	public static GeneratorUpgrade createUpgradeFromId(int id)
+	public static GeneratorUpgrade createUpgradeFromId(OreGeneratorPlugin plugin, int id)
 	{
 		GeneratorUpgrade g = null;
 		
@@ -27,7 +34,23 @@ public class UpgradeUtils
 		{
 			case UPGRADE_SPEED_ID:
 			{
-				g = new SpeedUpgrade();
+				g = new SpeedUpgrade(plugin);
+				break;
+			}
+			case UPGRADE_X_RANGE_ID:
+			{
+				g = new XRangeUpgrade(plugin);
+				break;
+			}
+			case UPGRADE_Z_RANGE_ID:
+			{
+				g = new ZRangeUpgrade(plugin);
+				break;
+			}
+			case UPGRADE_Y_RANGE_ID:
+			{
+				g = new YRangeUpgrade(plugin);
+				break;
 			}
 		}
 		return g;
@@ -68,7 +91,7 @@ public class UpgradeUtils
 	
 	public static ItemStack createUpgradeItemStack(int id, Material material)
 	{
-		if(id < 0 || id > MAX_UPGRADE_ID)
+		if(id < MIN_UPGRADE_ID || id > MAX_UPGRADE_ID)
 		{
 			System.out.println("WARNING: Generator ID out of range");
 			return null; // Not a valid id
@@ -86,6 +109,15 @@ public class UpgradeUtils
 		{
 		case UPGRADE_SPEED_ID:
 			name = ChatColor.AQUA + "Speed";
+			break;
+		case UPGRADE_X_RANGE_ID:
+			name = ChatColor.AQUA + "X-Range";
+			break;
+		case UPGRADE_Z_RANGE_ID:
+			name = ChatColor.AQUA + "Z-Range";
+			break;
+		case UPGRADE_Y_RANGE_ID:
+			name = ChatColor.AQUA + "Y-Range";
 			break;
 		}
 		

@@ -42,7 +42,8 @@ public class OreGeneratorPlugin extends JavaPlugin
 	
 	// Upgrades
 	private Material[] upgradeMaterials;
-	private int maxUpgrades = 10;
+	private double[] upgradePrices;
+	private int maxUpgrades;
 	
 	// Valut stuff
 	Economy eco = null;
@@ -158,7 +159,7 @@ public class OreGeneratorPlugin extends JavaPlugin
 		//// Upgrades Setup ////
 		////////////////////////
 		
-		String[] defaultUpgradeMaterials = { "SUGAR" };
+		String[] defaultUpgradeMaterials = { "SUGAR, REDSTONE_TORCH_ON, REDSTONE_TORCH_OFF, RABBIT_FOOT" };
 		String[] upgradeMaterialsConfig = cfg.getOrSetStringArray(Reference.CFG_UPGRADE_MATERIALS, defaultUpgradeMaterials);
 		
 		upgradeMaterials = new Material[7];
@@ -176,6 +177,14 @@ public class OreGeneratorPlugin extends JavaPlugin
 				return "CRITICAL ERROR: Invalid material: '" + upgradeMaterials[i] + "'.  Make sure everything is written correctly; for example for a coal block: COAL_BLOCK";
 			}
 		}
+		
+		double[] defaultUpgradePrices = { 10000.0, 10000.0, 10000.0, 10000.0, 10000.0 };
+		double[] upgradePricesConfig = cfg.getOrSetDoubleArray(Reference.CFG_UPGRADE_PRICES_KEY, defaultUpgradePrices);
+		upgradePrices = new double[upgradeMaterials.length];
+		if(upgradePricesConfig.length != generatorPrices.length)
+			cfg.setDoubleArray(Reference.CFG_UPGRADE_PRICES_KEY, defaultUpgradePrices);
+		
+		upgradePrices = cfg.getDoubleArray(Reference.CFG_UPGRADE_PRICES_KEY);
 		
 		maxUpgrades = cfg.getOrSetInt(Reference.CFG_MAX_UPGRADES_KEY, 10);
 		
@@ -236,9 +245,11 @@ public class OreGeneratorPlugin extends JavaPlugin
 	}
 	
 	public Material getGeneratorMaterial(int genId) { return generatorMaterials[genId]; }
-	public int getGeneratorTimeBetween(int genId) { return timesBetween[genId]; }
-	public double getGeneratorPrice(int genId) { return generatorPrices[genId]; }
+	public int getGeneratorTimeBetween(int genId)   { return timesBetween[genId]; }
+	public double getGeneratorPrice(int genId)      { return generatorPrices[genId]; }
+	
 	public Material getUpgradeMaterial(int upId) { return upgradeMaterials[upId]; }
+	public double getUpgradePrice(int upId)      { return upgradePrices[upId]; }
 	
 	public List<Material> getGeneratorMaterials()
 	{
@@ -255,4 +266,6 @@ public class OreGeneratorPlugin extends JavaPlugin
 	public int getMaxUpgrades() { return maxUpgrades; }
 	
 	public Economy getEco() { return this.eco; }
+
+	
 }
