@@ -113,7 +113,43 @@ public class OreGeneratorPlugin extends JavaPlugin
 		if(cfg.isEmpty())
 		{
 			List<String> txt = new ArrayList<>();
-			txt.add("# The version of the plugin");
+			txt.add("# The version of the plugin - please do not manually change");
+			txt.add(Reference.CFG_VERSION_KEY + ": ");
+			txt.add("");
+			txt.add("##################");
+			txt.add("### Generators ###");
+			txt.add("##################");
+			txt.add("");
+			txt.add("# Materials to be used for the generators");
+			txt.add(Reference.CFG_GENERATOR_MATERIALS_KEY + ": ");
+			txt.add("# The time it takes w/out any upgrades for each generator to transmute");
+			txt.add(Reference.CFG_GENERATOR_TIME_BETWEEN_TRANSMUTES + ": ");
+			txt.add("# The block that will be turned into the ore");
+			txt.add(Reference.CFG_TRANSMUTABLE_BLOCK_KEY + ": ");
+			txt.add("# The prices each generator will cost");
+			txt.add(Reference.CFG_GENERATOR_PRICES_KEY + ": ");
+			txt.add("");
+			txt.add("################");
+			txt.add("### Upgrades ###");
+			txt.add("################");
+			txt.add("");
+			txt.add("# Upgrade Materials");
+			txt.add(Reference.CFG_UPGRADE_MATERIALS + ": ");
+			txt.add("# Upgrade Prices");
+			txt.add(Reference.CFG_UPGRADE_PRICES_KEY + ": ");
+			txt.add("# The max amounts of upgrades a generator can have");
+			txt.add(Reference.CFG_MAX_UPGRADES_KEY + ": ");
+			cfg.setText(txt);
+			
+			try
+			{
+				cfg.save();
+			} 
+			catch (IOException e) 
+			{
+				e.printStackTrace();
+				return "CRITICAL ERROR: Could not save config file!";
+			}
 		}
 		
 		cfg.setString(Reference.CFG_VERSION_KEY, Reference.PLUGIN_VERSION); // make sure the version is up to date (can be used in case we change the way we store things in later versions and want to convert the file to the new format)
@@ -127,14 +163,14 @@ public class OreGeneratorPlugin extends JavaPlugin
 		String[] generatorMaterialsConfig = cfg.getOrSetStringArray(Reference.CFG_GENERATOR_MATERIALS_KEY, defualtGeneratorMaterials);
 		
 		int[] defaultTimesBetweenTransmutes = {10, 20, 30, 40, 50, 60, 70};
-		timesBetween = cfg.getOrSetIntArray(Reference.CFG_DEFAULT_TIME_BETWEEN_TRANSMUTES, defaultTimesBetweenTransmutes);
+		timesBetween = cfg.getOrSetIntArray(Reference.CFG_GENERATOR_TIME_BETWEEN_TRANSMUTES, defaultTimesBetweenTransmutes);
 		
 		generatorMaterials = new Material[GeneratorUtils.MAX_GENERATOR_ID + 1];
 		
 		if(generatorMaterialsConfig.length < generatorMaterials.length)
 			cfg.setStringArray(Reference.CFG_GENERATOR_MATERIALS_KEY, generatorMaterialsConfig); // Probs updated and have more gens now
 		if(timesBetween.length != generatorMaterialsConfig.length)
-			cfg.setStringArray(Reference.CFG_DEFAULT_TIME_BETWEEN_TRANSMUTES, defualtGeneratorMaterials); // Probs updated and have more gens now		
+			cfg.setStringArray(Reference.CFG_GENERATOR_TIME_BETWEEN_TRANSMUTES, defualtGeneratorMaterials); // Probs updated and have more gens now		
 		
 		// Parse each material read in and put it in the generator materials array
 		for(int i = 0; i < generatorMaterialsConfig.length; i++)
