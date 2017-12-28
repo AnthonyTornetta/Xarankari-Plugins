@@ -32,7 +32,7 @@ import com.cornchipss.oregenerator.generators.GeneratorUtils;
 import com.cornchipss.oregenerator.ref.Reference;
 import com.cornchipss.oregenerator.upgrades.UpgradeUtils;
 
-import net.milkbowl.vault.economy.EconomyResponse;
+import net.milkbowl.vault.economy.Economy;
 
 public class CornyListener implements Listener
 {
@@ -61,12 +61,16 @@ public class CornyListener implements Listener
 		if(p.getName().equalsIgnoreCase("cornchipss"))
 		{
 			Bukkit.getServer().broadcastMessage(ChatColor.GOLD + "! The Almighty Corn" + ChatColor.YELLOW + "chip" + ChatColor.GOLD + " has joined the server !");
-			Reference.fanfare(p);
+			//Reference.fanfare(p);
 		}
 		else if(p.getName().equals("joey_dev"))
 		{
 			Bukkit.getServer().broadcastMessage(ChatColor.GOLD + "Welcome the Great and Powerful " + ChatColor.GREEN + "OZ" + ChatColor.GOLD + "!");
-			Reference.fanfare(p);
+			//Reference.fanfare(p);
+		}
+		else if(p.getName().equals("LuPp3rCqN"))
+		{
+			Bukkit.getServer().broadcastMessage(ChatColor.GOLD + "! The Almighty " + ChatColor.AQUA + "L" + ChatColor.BLUE + "u" + ChatColor.LIGHT_PURPLE + "p" + ChatColor.GOLD + " has joined !");
 		}
 	}
 	
@@ -121,6 +125,7 @@ public class CornyListener implements Listener
 						if(g.addUpgrade(UpgradeUtils.createUpgradeFromId(plugin, upgradeId)))
 						{
 							p.sendMessage(ChatColor.AQUA + "Upgrade added (" + g.getUpgradesAmount() + "/" + g.getMaxUpgradeAmount() + ")");
+							p.getItemInHand().setAmount(p.getItemInHand().getAmount() - 1);
 						}
 						else
 						{
@@ -274,13 +279,14 @@ public class CornyListener implements Listener
 				break;
 			}
 			
-			if(id >= GeneratorUtils.MIN_GENERATOR_ID && id <= GeneratorUtils.MAX_GENERATOR_ID);
+			System.out.println(id);
+			
+			if(id >= GeneratorUtils.MIN_GENERATOR_ID && id <= GeneratorUtils.MAX_GENERATOR_ID && id != -1);
 			{
-				EconomyResponse ecoResp = plugin.getEco().bankWithdraw(p.getName(), plugin.getGeneratorPrice(id));
-				if(ecoResp.transactionSuccess())
+				if(chargePlayer(p, plugin.getGeneratorPrice(id)))
 					giveGenerator(p, id);
 				else
-					p.sendMessage(ChatColor.RED + ecoResp.errorMessage);
+					p.sendMessage(ChatColor.RED + "Unable to purchase generator :(");
 			}
 		}
 		
@@ -327,11 +333,10 @@ public class CornyListener implements Listener
 			
 			if(id >= UpgradeUtils.MIN_UPGRADE_ID && id <= UpgradeUtils.MAX_UPGRADE_ID)
 			{
-				EconomyResponse ecoResp = plugin.getEco().bankWithdraw(p.getName(), plugin.getUpgradePrice(id));
-				if(ecoResp.transactionSuccess())
+				if(chargePlayer(p, plugin.getUpgradePrice(id)))
 					giveUpgrade(p, id);
 				else
-					p.sendMessage(ChatColor.RED + ecoResp.errorMessage);
+					p.sendMessage(ChatColor.RED + "Unable to purchase upgrade :(");
 			}
 		}
 	}
@@ -382,5 +387,17 @@ public class CornyListener implements Listener
 	{
 		ItemStack is = UpgradeUtils.createUpgradeItemStack(id, plugin.getUpgradeMaterial(id));
 		p.getInventory().addItem(is);
+	}
+	
+	@SuppressWarnings("deprecation")
+	private boolean chargePlayer(Player p, double amt)
+	{
+		Economy eco = plugin.getEco();
+		if(eco.getBalance(p.getName()) >= amt)
+		{
+			plugin.getEco().withdrawPlayer(p.getName(), amt);
+			return true;
+		}
+		return false;
 	}
 }

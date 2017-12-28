@@ -110,7 +110,7 @@ public class OreGeneratorPlugin extends JavaPlugin
 	{
 		cfg = new Config(this.getDataFolder() + "\\oregen-config.yml");
 		
-		if(cfg.isEmpty())
+		/*if(cfg.isEmpty())
 		{
 			List<String> txt = new ArrayList<>();
 			txt.add("# The version of the plugin - please do not manually change");
@@ -150,7 +150,7 @@ public class OreGeneratorPlugin extends JavaPlugin
 				e.printStackTrace();
 				return "CRITICAL ERROR: Could not save config file!";
 			}
-		}
+		}*/
 		
 		cfg.setString(Reference.CFG_VERSION_KEY, Reference.PLUGIN_VERSION); // make sure the version is up to date (can be used in case we change the way we store things in later versions and want to convert the file to the new format)
 		

@@ -14,7 +14,7 @@ import java.util.List;
 
 import com.cornchipss.oregenerator.ref.Helper;
 
-public class Config 
+public class Config
 {
 	// A bad value used if a key is not found in a get call
 	public static final int BAD_VALUE = -9999;
@@ -94,6 +94,7 @@ public class Config
 	public String getComment(String line)
 	{
 		boolean marking = false;
+		@SuppressWarnings("unused")
 		String comment = "";
 		for(char c : line.toCharArray())
 		{
@@ -103,7 +104,7 @@ public class Config
 				comment += c;
 		}
 		
-		return comment;
+		return "";//comment;
 	}
 	
 	/**
@@ -113,6 +114,8 @@ public class Config
 	 */
 	public String removeTrailingSpace(final String txt)
 	{
+		return txt;
+		/*
 		if(txt == null)
 			return null;
 		if(txt.length() >= 1)
@@ -121,7 +124,7 @@ public class Config
 				return txt.substring(0, txt.length() - 1);
 			return txt;
 		}
-		return "";
+		return "";*/
 	}
 	
 	/**
@@ -131,12 +134,14 @@ public class Config
 	 */
 	public String stripComment(final String txt)
 	{
+		return txt;
+		/*
 		int indexOf = txt.indexOf("#");
 		if(indexOf == -1)
 			return txt;
 		String commentRemoved = txt.substring(0, indexOf);
 		commentRemoved = removeTrailingSpace(commentRemoved);
-		return commentRemoved;
+		return commentRemoved;*/
 	}
 	
 	/**
@@ -466,7 +471,7 @@ public class Config
 			{
 				if(split.length > 1)
 				{
-					String[] stringsSplit = stripComment(split[1]).split(",");
+					String[] stringsSplit = stripComment(split[1]).split(", ");
 					return stringsSplit;
 				}
 			}

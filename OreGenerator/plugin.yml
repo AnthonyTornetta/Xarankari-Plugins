@@ -18,9 +18,3 @@ commands:
     upgrade:
         description: Gives you a specified generator upgrade or opens up the upgrade selection menu
         usage: /upgrades (type)
-    bal:
-        description: Tells you your current balance
-        usage: /bal [player]
-    givemoney:
-        descriptions: gives player money
-        usage: /givemoney
