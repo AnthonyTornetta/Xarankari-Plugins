@@ -278,10 +278,8 @@ public class CornyListener implements Listener
 				id = -1;
 				break;
 			}
-			
-			System.out.println(id);
-			
-			if(id >= GeneratorUtils.MIN_GENERATOR_ID && id <= GeneratorUtils.MAX_GENERATOR_ID && id != -1);
+				
+			if(id >= GeneratorUtils.MIN_GENERATOR_ID && id <= GeneratorUtils.MAX_GENERATOR_ID)
 			{
 				if(chargePlayer(p, plugin.getGeneratorPrice(id)))
 					giveGenerator(p, id);
