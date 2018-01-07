@@ -1,19 +1,15 @@
 package com.cornchipss.oregenerator.commands;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import com.cornchipss.oregenerator.OreGeneratorPlugin;
-import com.cornchipss.oregenerator.generators.GeneratorUtils;
-import com.cornchipss.oregenerator.upgrades.UpgradeUtils;
 
 public class CommandManager 
 {
 	public static boolean runThroughCommands(final Command command, final CommandSender sender, final String[] args, final OreGeneratorPlugin plugin) 
 	{
+		/*
 		if (!(sender instanceof Player))
 		{
 			sender.sendMessage("You must be a player!");
@@ -25,6 +21,7 @@ public class CommandManager
 		
 		if(cmd.equalsIgnoreCase("oregenerator") || cmd.equalsIgnoreCase("oregen") || cmd.equals("gen"))
 		{
+			/*
 			if(args.length == 0)
 			{
 				CommandInventories.openGetGeneratorGUI(p, plugin);
@@ -63,10 +60,12 @@ public class CommandManager
 			ItemStack is = GeneratorUtils.createGeneratorItemStack(GeneratorUtils.GENERATOR_COAL_ID, plugin.getGeneratorMaterial(genId));
 			p.getInventory().addItem(is);
 			return true;
+			
 		}
 		
 		if(cmd.equalsIgnoreCase("upgrades") || cmd.equalsIgnoreCase("upgrade"))
 		{
+			/*
 			if(args.length == 0)
 			{
 				CommandInventories.openGetUpgradesGUI(p, plugin);
@@ -89,8 +88,9 @@ public class CommandManager
 				p.getInventory().addItem(is);
 			}
 			return true;
+			
 		}
-		
+		*/
 		return true;
 	}
 }

@@ -1,0 +1,5 @@
+name: CustomBosses
+main: com.cornchipss.custombosses.CustomBosses
+version: 1.0
+commands:
+    
