@@ -13,7 +13,6 @@ import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.cornchipss.oregenerator.commands.CommandManager;
@@ -23,9 +22,6 @@ import com.cornchipss.oregenerator.generators.GeneratorUtils;
 import com.cornchipss.oregenerator.listeners.CornyListener;
 import com.cornchipss.oregenerator.ref.Reference;
 import com.cornchipss.oregenerator.upgrades.UpgradeUtils;
-
-import net.milkbowl.vault.economy.Economy;
-
 
 public class OreGeneratorPlugin extends JavaPlugin
 {
@@ -46,21 +42,11 @@ public class OreGeneratorPlugin extends JavaPlugin
 	private double[] upgradePrices;
 	private int maxUpgrades;
 	
-	// Vault stuff
-	Economy eco = null;
-	
 	@Override
 	public void onEnable()
 	{
 		String logMe = initConfig();
 		
-		if (!setupEconomy()) 
-		{
-            getLogger().severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
-				
 		try
 		{
 			readGenerators(genHandler);
@@ -265,20 +251,7 @@ public class OreGeneratorPlugin extends JavaPlugin
 		}
 		br.close();
 	}
-	
-	private boolean setupEconomy() 
-	{
-        if (getServer().getPluginManager().getPlugin("Vault") == null) {
-            return false;
-        }
-        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
-        if (rsp == null) {
-            return false;
-        }
-        eco = rsp.getProvider();
-        return eco != null;
-    }
-	
+
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args)
 	{
@@ -304,9 +277,5 @@ public class OreGeneratorPlugin extends JavaPlugin
 	
 	public GeneratorHandler getGeneratorHandler() { return this.genHandler; }
 
-	public int getMaxUpgrades() { return maxUpgrades; }
-	
-	public Economy getEco() { return this.eco; }
-
-	
+	public int getMaxUpgrades() { return maxUpgrades; }	
 }

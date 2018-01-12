@@ -1,0 +1,13 @@
+{
+	"name": "JIMMY",
+	"email": "jim@him.com",
+	"age": 122,
+	"isDev": true,
+	"address":
+	{
+		"street": "Main",
+		"houseNum": "333",
+		"city": "NYC",
+		"country": "'Merica"
+	}
+}

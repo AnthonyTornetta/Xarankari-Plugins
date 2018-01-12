@@ -46,8 +46,8 @@ public class Reference
 
 	public static final String CFG_VERSION_KEY = "version";
 	
-	public static final String CMD_WINDOW_GET_GENERATOR_TITLE = ChatColor.DARK_GREEN + "Buy Generators";
-	public static final String UPGRADE_INVENTORY_NAME = ChatColor.AQUA + "Buy Upgrades";
+	public static final String CMD_WINDOW_GET_GENERATOR_TITLE = ChatColor.DARK_GREEN + "Get Generators";
+	public static final String UPGRADE_INVENTORY_NAME = ChatColor.AQUA + "Get Upgrades";
 
 	public static final String GENERATOR_INVENTORY_NAME = ChatColor.DARK_GREEN + "Generator";
 	public static final String CFG_GENERATOR_PRICES_KEY = "generator-prices";

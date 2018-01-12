@@ -32,8 +32,6 @@ import com.cornchipss.oregenerator.generators.GeneratorUtils;
 import com.cornchipss.oregenerator.ref.Reference;
 import com.cornchipss.oregenerator.upgrades.UpgradeUtils;
 
-import net.milkbowl.vault.economy.Economy;
-
 public class CornyListener implements Listener
 {
 	private HashMap<Player, Generator> playersOpeningGeneratorInv = new HashMap<>();
@@ -59,19 +57,11 @@ public class CornyListener implements Listener
 		Player p = e.getPlayer();
 		
 		if(p.getName().equalsIgnoreCase("cornchipss"))
-		{
 			Bukkit.getServer().broadcastMessage(ChatColor.GOLD + "! The Almighty Corn" + ChatColor.YELLOW + "chip" + ChatColor.GOLD + " has joined the server !");
-			//Reference.fanfare(p);
-		}
 		else if(p.getName().equals("joey_dev"))
-		{
 			Bukkit.getServer().broadcastMessage(ChatColor.GOLD + "Welcome the Great and Powerful " + ChatColor.GREEN + "OZ" + ChatColor.GOLD + "!");
-			//Reference.fanfare(p);
-		}
 		else if(p.getName().equals("LuPp3rCqN"))
-		{
 			Bukkit.getServer().broadcastMessage(ChatColor.GOLD + "! The Almighty " + ChatColor.AQUA + "L" + ChatColor.BLUE + "u" + ChatColor.LIGHT_PURPLE + "p" + ChatColor.GOLD + " has joined !");
-		}
 	}
 	
 	@EventHandler(priority = EventPriority.LOWEST)
@@ -92,9 +82,7 @@ public class CornyListener implements Listener
 		Generator gen = GeneratorUtils.createGenerator(genId, b, plugin, null);
 		
 		if(gen != null)
-		{
 			plugin.getGeneratorHandler().addGenerator(gen);
-		}
 	}
 	
 	@EventHandler(priority = EventPriority.LOWEST)
@@ -173,6 +161,7 @@ public class CornyListener implements Listener
 		
 		List<Generator> gens = new ArrayList<>();
 		
+		// Cycle through all the blocks blown up and if there is a generator, make sure to change it to air so it isn't blown up
 		for(Block b : blocks)
 		{
 			for(int i = 0; i < plugin.getGeneratorHandler().generatorAmount(); i++)
@@ -185,6 +174,7 @@ public class CornyListener implements Listener
 			}
 		}
 		
+		// Make the generator air really quickly so it doesn't drop and change it back after one tick
 		for(Generator g : gens)
 		{
 			Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
@@ -208,6 +198,7 @@ public class CornyListener implements Listener
 		
 		List<Generator> gens = new ArrayList<>();
 		
+		// Cycle through all the blocks blown up and if there is a generator, make sure to change it to air so it isn't blown up
 		for(Block b : blocks)
 		{
 			for(int i = 0; i < plugin.getGeneratorHandler().generatorAmount(); i++)
@@ -220,6 +211,7 @@ public class CornyListener implements Listener
 			}
 		}
 		
+		// Make the generator air really quickly so it doesn't drop and change it back after one tick
 		for(Generator g : gens)
 		{
 			Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
@@ -281,10 +273,10 @@ public class CornyListener implements Listener
 				
 			if(id >= GeneratorUtils.MIN_GENERATOR_ID && id <= GeneratorUtils.MAX_GENERATOR_ID)
 			{
-				if(chargePlayer(p, plugin.getGeneratorPrice(id)))
+				if(p.hasPermission("oregenerator.givegenerator"))
 					giveGenerator(p, id);
 				else
-					p.sendMessage(ChatColor.RED + "Unable to purchase generator :(");
+					p.sendMessage(ChatColor.RED + "Invalid perms to get a generator!");
 			}
 		}
 		
@@ -331,10 +323,10 @@ public class CornyListener implements Listener
 			
 			if(id >= UpgradeUtils.MIN_UPGRADE_ID && id <= UpgradeUtils.MAX_UPGRADE_ID)
 			{
-				if(chargePlayer(p, plugin.getUpgradePrice(id)))
+				if(p.hasPermission("oregenerator.giveupgrade"))
 					giveUpgrade(p, id);
 				else
-					p.sendMessage(ChatColor.RED + "Unable to purchase upgrade :(");
+					p.sendMessage(ChatColor.RED + "Invalid perms to get an upgrade!");
 			}
 		}
 	}
@@ -385,17 +377,5 @@ public class CornyListener implements Listener
 	{
 		ItemStack is = UpgradeUtils.createUpgradeItemStack(id, plugin.getUpgradeMaterial(id));
 		p.getInventory().addItem(is);
-	}
-	
-	@SuppressWarnings("deprecation")
-	private boolean chargePlayer(Player p, double amt)
-	{
-		Economy eco = plugin.getEco();
-		if(eco.getBalance(p.getName()) >= amt)
-		{
-			plugin.getEco().withdrawPlayer(p.getName(), amt);
-			return true;
-		}
-		return false;
 	}
 }
