@@ -46,7 +46,7 @@
           "chilly"
         ],
         "enchants": {
-          "SHARPNESS": 8,
+          "DAMAGE_ALL": 8,
           "FIRE_ASPECT": 10
         }
       }

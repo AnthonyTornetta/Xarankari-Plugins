@@ -1,4 +1,4 @@
-package com.cornchipss.custombosses.ref;
+package com.cornchipss.custombosses.util;
 
 import java.util.Random;
 

@@ -11,21 +11,39 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.cornchipss.custombosses.boss.Boss;
 import com.cornchipss.custombosses.boss.json.JsonBoss;
 import com.cornchipss.custombosses.boss.json.equipment.ArmorJson;
 import com.cornchipss.custombosses.boss.json.equipment.BossEquipmentJson;
 import com.cornchipss.custombosses.boss.json.equipment.HandJson;
+import com.cornchipss.custombosses.listener.CornyListener;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
+
+
+// https://dev.bukkit.org/projects/supplies/pages/material-list
 
 public class CustomBosses extends JavaPlugin
 {	
 	@Override
 	public void onEnable()
 	{
+		CornyListener cl = new CornyListener();
 		
+		PluginManager pm = getServer().getPluginManager();
+		pm.registerEvents(cl, this);
+		
+		try {
+			serializeBoss();
+			deserializeBoss();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public void onDisable()
@@ -33,43 +51,7 @@ public class CustomBosses extends JavaPlugin
 		
 	}
 	
-	public static void main(String[] args) throws IOException
-	{
-		String json = "";
-		BufferedReader br = new BufferedReader(new FileReader("./res/boss-file-default.json"));
-		for(String s = br.readLine(); s != null; s = br.readLine())
-		{
-			json += s + "\n";
-		}
-		
-//		ObjectMapper mapper = new ObjectMapper();
-//		mapper.configure(Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-//		
-//		List<Test> tests = mapper.readValue(json, mapper.getTypeFactory().constructCollectionType(List.class, Test.class));
-//		for(Test t : tests)
-//		{
-//			System.out.println(t);
-//		}
-		
-		//serializeBoss();
-		deserializeBoss();
-	}
-	
-	private static void serializeUserNested() throws IOException
-	{
-		//String street, String houseNumber, String city, String country
-		UserAddress address = new UserAddress("Main Street", "322", "adsf", "asdf");
-		UserNested un = new UserNested("Normy", "normy@jim.com", 27, true, address);
-		
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		String json = gson.toJson(un);
-		System.out.println(json);
-		BufferedWriter bw = new BufferedWriter(new FileWriter("bosses.json"));
-		bw.write(json);
-		bw.close();
-	}
-	
-	private static void deserializeUserNested() throws IOException
+	private static boolean deserializeBoss() throws IOException
 	{
 		BufferedReader br = new BufferedReader(new FileReader("bosses.json"));
 		String json = "";
@@ -77,24 +59,26 @@ public class CustomBosses extends JavaPlugin
 		{
 			json += s;
 		}
+		br.close();
 		
 		Gson gson = new Gson();
-		UserNested un = gson.fromJson(json, UserNested.class);
-		System.out.println(un);
-	}
-	
-	private static void deserializeBoss() throws IOException
-	{
-		BufferedReader br = new BufferedReader(new FileReader("bosses.json"));
-		String json = "";
-		for(String s = br.readLine(); s != null; s = br.readLine())
+		List<JsonBoss> jsonBawses;
+		try
 		{
-			json += s;
+			jsonBawses = Arrays.asList(gson.fromJson(json, JsonBoss[].class));
+		}
+		catch(JsonSyntaxException ex)
+		{
+			return false;
+		}
+				
+		for(JsonBoss baws : jsonBawses)
+		{
+			Boss b = baws.createBoss();
+			System.out.println(b);
 		}
 		
-		Gson gson = new Gson();
-		List<JsonBoss> jsonBawses = Arrays.asList(gson.fromJson(json, JsonBoss[].class));
-		System.out.println(jsonBawses);
+		return true;
 	}
 	
 	private static void serializeBoss() throws IOException
@@ -106,7 +90,7 @@ public class CustomBosses extends JavaPlugin
 		
 		Map<String, Integer> enchants = new HashMap<>();
 		enchants.put("FIRE_ASPECT", 10);
-		enchants.put("SHARPNESS", 8);
+		enchants.put("DAMAGE_ALL", 8);
 		
 		List<String> flags = new ArrayList<>();
 		flags.add("unbreakable");

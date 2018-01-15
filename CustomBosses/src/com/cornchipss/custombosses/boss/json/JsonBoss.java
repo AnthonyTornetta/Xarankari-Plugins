@@ -1,5 +1,6 @@
 package com.cornchipss.custombosses.boss.json;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +13,7 @@ import com.cornchipss.custombosses.boss.Boss;
 import com.cornchipss.custombosses.boss.json.equipment.ArmorJson;
 import com.cornchipss.custombosses.boss.json.equipment.BossEquipmentJson;
 import com.cornchipss.custombosses.boss.json.equipment.HandJson;
+import com.cornchipss.custombosses.util.Vector2;
 
 public class JsonBoss 
 {
@@ -31,8 +33,7 @@ public class JsonBoss
 	
 	public Boss createBoss()
 	{
-		
-		//int startingHealth, EntityType entityType, String displayName, ItemStack handEquipment, ItemStack[] armor
+		// Take the armor from a String to actual armor, then add enchants
 		List<ArmorJson> armorJson = equipment.getArmor();		
 		ItemStack[] armor = new ItemStack[4];		
 		for(int i = 0; i < armorJson.size(); i++)
@@ -45,15 +46,33 @@ public class JsonBoss
 			}
 		}
 		
+		// Create the item held in the hand from the material name and add enchants
 		HandJson handJson = equipment.getHand();
-		ItemStack hand;
-		hand = new ItemStack(Material.valueOf(handJson.getMaterial()));
+		ItemStack hand = new ItemStack(Material.valueOf(handJson.getMaterial()), 1);
 		for(String s : handJson.getEnchants().keySet())
 		{
 			hand.addUnsafeEnchantment(Enchantment.getByName(s), handJson.getEnchants().get(s));
 		}
 		
-		return new Boss(startHealth, EntityType.valueOf(mobType), displayName, hand, armor);
+		// Create the drops it will have
+		Map<ItemStack, Vector2<Integer, Integer>> dropsComplete = new HashMap<>();
+		for(String itemName : drops.keySet())
+		{
+			ItemStack item = new ItemStack(Material.valueOf(itemName));
+			String[] split = drops.get(itemName).replaceAll(" ", "").split("-");
+			Vector2<Integer, Integer> dropRange;
+			if(split.length == 1)
+			{
+				int val = Integer.parseInt(split[0]);
+				dropRange = new Vector2<>(val, val);
+			}
+			else
+				dropRange = new Vector2<>(Integer.parseInt(split[0]), Integer.parseInt(split[1]));
+			
+			dropsComplete.put(item, dropRange);
+		}
+		
+		return new Boss(startHealth, EntityType.valueOf(mobType), displayName, hand, armor, dropsComplete);
 	}
 	
 	@Override

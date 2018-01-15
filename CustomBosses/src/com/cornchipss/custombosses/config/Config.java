@@ -12,7 +12,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.cornchipss.custombosses.ref.Helper;
+import com.cornchipss.custombosses.util.Helper;
 
 public class Config
 {
