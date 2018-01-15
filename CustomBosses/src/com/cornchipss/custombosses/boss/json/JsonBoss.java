@@ -1,5 +1,6 @@
 package com.cornchipss.custombosses.boss.json;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,6 +74,42 @@ public class JsonBoss
 		}
 		
 		return new Boss(startHealth, EntityType.valueOf(mobType), displayName, hand, armor, dropsComplete);
+	}
+	
+	public static JsonBoss fromBoss(Boss b)
+	{
+		int startHealth = b.getStartingHealth();
+		String displayName = b.getDisplayName();
+		String mobType = b.getEntityType().name();
+		
+		ItemStack hand = b.getHandEquipment();
+		Map<Enchantment, Integer> enchants = hand.getEnchantments();
+		Map<String, Integer> enchantsJson = new HashMap<>(); 
+		for(Enchantment k : enchants.keySet())
+		{
+			enchantsJson.put(k.getName(), enchants.get(k));
+		}
+		HandJson hjson = new HandJson(hand.getType().name(), hand.getItemMeta().getDisplayName(), hand.getItemMeta().getLore(), enchantsJson, new ArrayList<String>());
+		
+		List<ArmorJson> ajson = new ArrayList<>();
+		for(int i = 0; i < 4; i++)
+		{
+			ItemStack piece = b.getArmor(i);
+			Map<Enchantment, Integer> armorEnchants = piece.getEnchantments();
+			Map<String, Integer> armorEnchantsJson = new HashMap<>(); 
+			for(Enchantment k : armorEnchants.keySet())
+			{
+				armorEnchantsJson.put(k.getName(), armorEnchants.get(k));
+			}
+			ajson.add(new ArmorJson(piece.getType().name(), piece.getItemMeta().getDisplayName(), piece.getItemMeta().getLore(), armorEnchantsJson, new ArrayList<>()));
+		}
+		
+		BossEquipmentJson ejson = new BossEquipmentJson(ajson, hjson);
+		Map<String, String> drops = new HashMap<>();
+		
+		JsonBoss jsonBoss = new JsonBoss(startHealth, displayName, mobType, ejson, drops);
+		
+		return jsonBoss;
 	}
 	
 	@Override

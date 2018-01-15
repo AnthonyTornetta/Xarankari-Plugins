@@ -11,15 +11,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.EntityType;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.cornchipss.custombosses.boss.Boss;
 import com.cornchipss.custombosses.boss.json.JsonBoss;
-import com.cornchipss.custombosses.boss.json.equipment.ArmorJson;
-import com.cornchipss.custombosses.boss.json.equipment.BossEquipmentJson;
-import com.cornchipss.custombosses.boss.json.equipment.HandJson;
 import com.cornchipss.custombosses.listener.CornyListener;
+import com.cornchipss.custombosses.util.Vector2;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
@@ -37,11 +39,25 @@ public class CustomBosses extends JavaPlugin
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvents(cl, this);
 		
+		ItemStack[] armor = new ItemStack[4];
+		armor[0] = new ItemStack(Material.DIAMOND_HELMET);
+		armor[1] = new ItemStack(Material.DIAMOND_CHESTPLATE);
+		armor[2] = new ItemStack(Material.DIAMOND_LEGGINGS);
+		armor[3] = new ItemStack(Material.DIAMOND_BOOTS);
+		armor[0].addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 200);
+		
+		ItemStack sword = new ItemStack(Material.DIAMOND_AXE);
+		sword.addUnsafeEnchantment(Enchantment.LOOT_BONUS_MOBS, 10);
+		
+		Map<ItemStack, Vector2<Integer, Integer>> drops = new HashMap<>();
+		drops.put(new ItemStack(Material.ANVIL), new Vector2<>(3, 20));
+		
+		Boss b = new Boss(100, EntityType.BLAZE, "&4Blaze o Doom", sword, armor, drops);
+		
 		try {
-			serializeBoss();
+			serializeBoss(b);
 			deserializeBoss();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -81,42 +97,16 @@ public class CustomBosses extends JavaPlugin
 		return true;
 	}
 	
-	private static void serializeBoss() throws IOException
+	private static void serializeBoss(Boss b) throws IOException
 	{
-		//int startHealth, String displayName, String mobType, BossEquipmentJson equipment
-		List<String> handLore = new ArrayList<>();
-		handLore.add("is good");
-		handLore.add("is fun");
-		
-		Map<String, Integer> enchants = new HashMap<>();
-		enchants.put("FIRE_ASPECT", 10);
-		enchants.put("DAMAGE_ALL", 8);
-		
-		List<String> flags = new ArrayList<>();
-		flags.add("unbreakable");
-		flags.add("chilly");
-		
-		Map<String, String> drops = new HashMap<>();
-		drops.put("COBBLESTONE", "3");
-		drops.put("DIAMOND", "1-5");
-		drops.put("IRON_INGOT", "200");
-		
-		HandJson hand = new HandJson("DIAMOND_SWORD", "Kewl Sword", handLore, enchants, flags);
-		List<ArmorJson> aj = new ArrayList<>();
-		aj.add(new ArmorJson("DIAMOND_HELMET", "DISPLAY NAME", new ArrayList<>(), new HashMap<>(), new ArrayList<>()));
-		aj.add(new ArmorJson("DIAMOND_CHESTPLATE", "DISPLAY NAME CHESTPLATE", new ArrayList<>(), new HashMap<>(), new ArrayList<>()));
-		aj.add(new ArmorJson("DIAMOND_LEGGINGS", "DISPLAY NAME LEGS", new ArrayList<>(), new HashMap<>(), new ArrayList<>()));
-		aj.add(new ArmorJson("DIAMOND_BOOTS", "DISPLAY NAME BOOTIES", new ArrayList<>(), new HashMap<>(), new ArrayList<>()));
-		BossEquipmentJson bj = new BossEquipmentJson(aj, hand);
-		
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		
-		List<JsonBoss> bosses = new ArrayList<>();
-		bosses.add(new JsonBoss(100, "Kewl Kid", "ZOMBIE", bj, drops));
-		bosses.add(new JsonBoss(200, "Kewl Kid 2.0", "SKELETON", bj, drops));
-		bosses.add(new JsonBoss(300, "Kewl Kid 2.1", "WITHER_SKELETON", bj, drops));
+		List<JsonBoss> bjs = new ArrayList<>();
+		JsonBoss bj = JsonBoss.fromBoss(b);
+		bjs.add(bj);
 		
-		String json = gson.toJson(bosses);
+		String json = gson.toJson(bjs);
+		
 		System.out.println(json);
 		BufferedWriter bw = new BufferedWriter(new FileWriter("bosses.json"));
 		bw.write(json);
