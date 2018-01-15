@@ -1,53 +1,176 @@
-{
-  "startHealth": 100,
-  "displayName": "Kewl Kid",
-  "mobType": "ZOMBIE",
-  "equipment": {
-    "armor": [
-      {
-        "material": "DIAMOND_HELMET",
-        "display": "DISPLAY NAME",
-        "lore": [],
-        "flags": [],
-        "enchants": {}
-      },
-      {
-        "material": "DIAMOND_CHESTPLATE",
-        "display": "DISPLAY NAME CHESTPLATE",
-        "lore": [],
-        "flags": [],
-        "enchants": {}
-      },
-      {
-        "material": "DIAMOND_LEGGINGS",
-        "display": "DISPLAY NAME LEGS",
-        "lore": [],
-        "flags": [],
-        "enchants": {}
-      },
-      {
-        "material": "DIAMOND_BOOTS",
-        "display": "DISPLAY NAME BOOTIES",
-        "lore": [],
-        "flags": [],
-        "enchants": {}
-      }
-    ],
-    "hand": {
-      "material": "DIAMOND_SWORD",
-      "display": "Kewl Sword",
-      "lore": [
-        "is good",
-        "is fun"
+[
+  {
+    "startHealth": 100,
+    "displayName": "Kewl Kid",
+    "mobType": "ZOMBIE",
+    "equipment": {
+      "armor": [
+        {
+          "material": "DIAMOND_HELMET",
+          "display": "DISPLAY NAME",
+          "lore": [],
+          "flags": [],
+          "enchants": {}
+        },
+        {
+          "material": "DIAMOND_CHESTPLATE",
+          "display": "DISPLAY NAME CHESTPLATE",
+          "lore": [],
+          "flags": [],
+          "enchants": {}
+        },
+        {
+          "material": "DIAMOND_LEGGINGS",
+          "display": "DISPLAY NAME LEGS",
+          "lore": [],
+          "flags": [],
+          "enchants": {}
+        },
+        {
+          "material": "DIAMOND_BOOTS",
+          "display": "DISPLAY NAME BOOTIES",
+          "lore": [],
+          "flags": [],
+          "enchants": {}
+        }
       ],
-      "flags": [
-        "unbreakable",
-        "chilly"
-      ],
-      "enchants": {
-        "SHARPNESS": 8,
-        "FIRE_ASPECT": 10
+      "hand": {
+        "material": "DIAMOND_SWORD",
+        "display": "Kewl Sword",
+        "lore": [
+          "is good",
+          "is fun"
+        ],
+        "flags": [
+          "unbreakable",
+          "chilly"
+        ],
+        "enchants": {
+          "SHARPNESS": 8,
+          "FIRE_ASPECT": 10
+        }
       }
+    },
+    "drops": {
+      "DIAMOND": "1-5",
+      "IRON_INGOT": "200",
+      "COBBLESTONE": "3"
+    }
+  },
+  {
+    "startHealth": 200,
+    "displayName": "Kewl Kid 2.0",
+    "mobType": "SKELETON",
+    "equipment": {
+      "armor": [
+        {
+          "material": "DIAMOND_HELMET",
+          "display": "DISPLAY NAME",
+          "lore": [],
+          "flags": [],
+          "enchants": {}
+        },
+        {
+          "material": "DIAMOND_CHESTPLATE",
+          "display": "DISPLAY NAME CHESTPLATE",
+          "lore": [],
+          "flags": [],
+          "enchants": {}
+        },
+        {
+          "material": "DIAMOND_LEGGINGS",
+          "display": "DISPLAY NAME LEGS",
+          "lore": [],
+          "flags": [],
+          "enchants": {}
+        },
+        {
+          "material": "DIAMOND_BOOTS",
+          "display": "DISPLAY NAME BOOTIES",
+          "lore": [],
+          "flags": [],
+          "enchants": {}
+        }
+      ],
+      "hand": {
+        "material": "DIAMOND_SWORD",
+        "display": "Kewl Sword",
+        "lore": [
+          "is good",
+          "is fun"
+        ],
+        "flags": [
+          "unbreakable",
+          "chilly"
+        ],
+        "enchants": {
+          "SHARPNESS": 8,
+          "FIRE_ASPECT": 10
+        }
+      }
+    },
+    "drops": {
+      "DIAMOND": "1-5",
+      "IRON_INGOT": "200",
+      "COBBLESTONE": "3"
+    }
+  },
+  {
+    "startHealth": 300,
+    "displayName": "Kewl Kid 2.1",
+    "mobType": "WITHER_SKELETON",
+    "equipment": {
+      "armor": [
+        {
+          "material": "DIAMOND_HELMET",
+          "display": "DISPLAY NAME",
+          "lore": [],
+          "flags": [],
+          "enchants": {}
+        },
+        {
+          "material": "DIAMOND_CHESTPLATE",
+          "display": "DISPLAY NAME CHESTPLATE",
+          "lore": [],
+          "flags": [],
+          "enchants": {}
+        },
+        {
+          "material": "DIAMOND_LEGGINGS",
+          "display": "DISPLAY NAME LEGS",
+          "lore": [],
+          "flags": [],
+          "enchants": {}
+        },
+        {
+          "material": "DIAMOND_BOOTS",
+          "display": "DISPLAY NAME BOOTIES",
+          "lore": [],
+          "flags": [],
+          "enchants": {}
+        }
+      ],
+      "hand": {
+        "material": "DIAMOND_SWORD",
+        "display": "Kewl Sword",
+        "lore": [
+          "is good",
+          "is fun"
+        ],
+        "flags": [
+          "unbreakable",
+          "chilly"
+        ],
+        "enchants": {
+          "SHARPNESS": 8,
+          "FIRE_ASPECT": 10
+        }
+      }
+    },
+    "drops": {
+      "DIAMOND": "1-5",
+      "IRON_INGOT": "200",
+      "COBBLESTONE": "3"
     }
   }
-}
+]

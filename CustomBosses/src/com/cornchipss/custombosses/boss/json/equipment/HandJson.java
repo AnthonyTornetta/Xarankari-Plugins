@@ -17,7 +17,13 @@ public class HandJson
 		this.enchants = enchants;
 		this.flags = flags;
 	}
-
+	
+	@Override
+	public String toString()
+	{
+		return "HandJson [" + getDisplay() + "; Material: " + getMaterial() + "; Lore: " + getLore() + "; Enchants: " + getEnchants() + "; Flags: " + getFlags() + "]";
+	}
+	
 	public String getMaterial() { return material; }
 	public void setMaterial(String material) { this.material = material; }
 

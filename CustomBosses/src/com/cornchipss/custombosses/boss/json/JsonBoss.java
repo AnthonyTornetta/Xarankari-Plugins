@@ -1,6 +1,7 @@
 package com.cornchipss.custombosses.boss.json;
 
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -17,13 +18,15 @@ public class JsonBoss
 	private int startHealth;
 	private String displayName, mobType;
 	private BossEquipmentJson equipment;
+	Map<String, String> drops;
 	
-	public JsonBoss(int startHealth, String displayName, String mobType, BossEquipmentJson equipment) 
+	public JsonBoss(int startHealth, String displayName, String mobType, BossEquipmentJson equipment, Map<String, String> drops) 
 	{
 		this.startHealth = startHealth;
 		this.displayName = displayName;
 		this.mobType = mobType;
 		this.equipment = equipment;
+		this.drops = drops;
 	}
 	
 	public Boss createBoss()
@@ -52,7 +55,13 @@ public class JsonBoss
 		
 		return new Boss(startHealth, EntityType.valueOf(mobType), displayName, hand, armor);
 	}
-
+	
+	@Override
+	public String toString()
+	{
+		return "JsonBoss [" + getDisplayName() + ":" + getStartHealth() + "; " + getEquipment() + "; Mob Type: " + getMobType() + "; " + getDrops() + "]";
+	}
+	
 	public int getStartHealth() { return startHealth; }
 	public void setStartHealth(int startHealth) { this.startHealth = startHealth; }
 
@@ -64,4 +73,7 @@ public class JsonBoss
 
 	public BossEquipmentJson getEquipment() { return equipment; }
 	public void setEquipment(BossEquipmentJson equipment) { this.equipment = equipment; }
+	
+	public Map<String, String> getDrops() { return drops; }
+	public void setDrops(Map<String, String> drops) { this.drops = drops; }
 }

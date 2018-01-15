@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,8 +51,8 @@ public class CustomBosses extends JavaPlugin
 //			System.out.println(t);
 //		}
 		
-		serializeBoss();
-		
+		//serializeBoss();
+		deserializeBoss();
 	}
 	
 	private static void serializeUserNested() throws IOException
@@ -82,6 +83,20 @@ public class CustomBosses extends JavaPlugin
 		System.out.println(un);
 	}
 	
+	private static void deserializeBoss() throws IOException
+	{
+		BufferedReader br = new BufferedReader(new FileReader("bosses.json"));
+		String json = "";
+		for(String s = br.readLine(); s != null; s = br.readLine())
+		{
+			json += s;
+		}
+		
+		Gson gson = new Gson();
+		List<JsonBoss> jsonBawses = Arrays.asList(gson.fromJson(json, JsonBoss[].class));
+		System.out.println(jsonBawses);
+	}
+	
 	private static void serializeBoss() throws IOException
 	{
 		//int startHealth, String displayName, String mobType, BossEquipmentJson equipment
@@ -97,6 +112,11 @@ public class CustomBosses extends JavaPlugin
 		flags.add("unbreakable");
 		flags.add("chilly");
 		
+		Map<String, String> drops = new HashMap<>();
+		drops.put("COBBLESTONE", "3");
+		drops.put("DIAMOND", "1-5");
+		drops.put("IRON_INGOT", "200");
+		
 		HandJson hand = new HandJson("DIAMOND_SWORD", "Kewl Sword", handLore, enchants, flags);
 		List<ArmorJson> aj = new ArrayList<>();
 		aj.add(new ArmorJson("DIAMOND_HELMET", "DISPLAY NAME", new ArrayList<>(), new HashMap<>(), new ArrayList<>()));
@@ -104,10 +124,15 @@ public class CustomBosses extends JavaPlugin
 		aj.add(new ArmorJson("DIAMOND_LEGGINGS", "DISPLAY NAME LEGS", new ArrayList<>(), new HashMap<>(), new ArrayList<>()));
 		aj.add(new ArmorJson("DIAMOND_BOOTS", "DISPLAY NAME BOOTIES", new ArrayList<>(), new HashMap<>(), new ArrayList<>()));
 		BossEquipmentJson bj = new BossEquipmentJson(aj, hand);
-		JsonBoss boss = new JsonBoss(100, "Kewl Kid", "ZOMBIE", bj);
 		
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		String json = gson.toJson(boss);
+		
+		List<JsonBoss> bosses = new ArrayList<>();
+		bosses.add(new JsonBoss(100, "Kewl Kid", "ZOMBIE", bj, drops));
+		bosses.add(new JsonBoss(200, "Kewl Kid 2.0", "SKELETON", bj, drops));
+		bosses.add(new JsonBoss(300, "Kewl Kid 2.1", "WITHER_SKELETON", bj, drops));
+		
+		String json = gson.toJson(bosses);
 		System.out.println(json);
 		BufferedWriter bw = new BufferedWriter(new FileWriter("bosses.json"));
 		bw.write(json);

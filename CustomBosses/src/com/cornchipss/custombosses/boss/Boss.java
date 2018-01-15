@@ -10,18 +10,18 @@ import org.bukkit.inventory.ItemStack;
 
 public class Boss 
 {
+	String displayName;
 	private int startingHealth;
 	EntityType entityType;
-	String displayName;
 	ItemStack handEquipment;
 	ItemStack[] armor = new ItemStack[4];
 	LivingEntity spawnedBoss = null;
 	
 	public Boss(int startingHealth, EntityType entityType, String displayName, ItemStack handEquipment, ItemStack[] armor) 
 	{
+		this.displayName = displayName;
 		this.startingHealth = startingHealth;
 		this.entityType = entityType;
-		this.displayName = displayName;
 		this.handEquipment = handEquipment;
 		this.armor = armor;
 	}
