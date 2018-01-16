@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
 
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -21,15 +23,19 @@ public class JsonBoss
 	private int startHealth;
 	private String displayName, mobType;
 	private BossEquipmentJson equipment;
-	Map<String, String> drops;
+	private Map<String, String> drops;
+	private int damagePerHit;
+	private int price;
 	
-	public JsonBoss(int startHealth, String displayName, String mobType, BossEquipmentJson equipment, Map<String, String> drops) 
+	public JsonBoss(int startHealth, String displayName, String mobType, BossEquipmentJson equipment, Map<String, String> drops, int damagePerHit, int price) 
 	{
 		this.startHealth = startHealth;
 		this.displayName = displayName;
 		this.mobType = mobType;
 		this.equipment = equipment;
 		this.drops = drops;
+		this.damagePerHit = damagePerHit;
+		this.price = price;
 	}
 	
 	public Boss createBoss()
@@ -68,12 +74,25 @@ public class JsonBoss
 				dropRange = new Vector2<>(val, val);
 			}
 			else
-				dropRange = new Vector2<>(Integer.parseInt(split[0]), Integer.parseInt(split[1]));
+			{
+				String[] splitAgain = split[1].split(";");
+				dropRange = new Vector2<>(Integer.parseInt(split[0]), Integer.parseInt(splitAgain[0]));
+				
+				if(splitAgain.length > 1)
+				{
+					String[] enchants = splitAgain[1].split(",");
+					for(int i = 0; i < enchants.length; i++)
+					{
+						String[] enchantAndAmount = enchants[i].split("#");
+						item.addUnsafeEnchantment(Enchantment.getByName(enchantAndAmount[0].toUpperCase()), Integer.parseInt(enchantAndAmount[1]));
+					}
+				}
+			}
 			
 			dropsComplete.put(item, dropRange);
 		}
 		
-		return new Boss(startHealth, EntityType.valueOf(mobType), displayName, hand, armor, dropsComplete);
+		return new Boss(startHealth, EntityType.valueOf(mobType), displayName, hand, armor, dropsComplete, damagePerHit, price);
 	}
 	
 	public static JsonBoss fromBoss(Boss b)
@@ -105,9 +124,42 @@ public class JsonBoss
 		}
 		
 		BossEquipmentJson ejson = new BossEquipmentJson(ajson, hjson);
-		Map<String, String> drops = new HashMap<>();
 		
-		JsonBoss jsonBoss = new JsonBoss(startHealth, displayName, mobType, ejson, drops);
+		Map<String, String> drops = new HashMap<>();
+		Map<ItemStack, Vector2<Integer, Integer>> bossDrops = b.getDrops();
+		
+		for(ItemStack is : bossDrops.keySet())
+		{
+			Vector2<Integer, Integer> range = bossDrops.get(is);
+			String matName = is.getType().name();
+			
+			String amount = range.getX() + "";
+			if(range.getX() != range.getY())
+				amount += "-" + range.getY();
+			
+			Map<Enchantment, Integer> itemEnchants = is.getEnchantments();
+			Set<Enchantment> keySet = itemEnchants.keySet();
+			if(keySet.size() == 0)
+				drops.put(matName, amount);
+			else
+			{
+				String enchantsStr = "";
+				int i = 0;
+				for(Enchantment en : keySet)
+				{
+					enchantsStr += en.getName() + "#" + itemEnchants.get(en);
+					if(i + 1 != keySet.size())
+					{
+						enchantsStr += ",";
+					}
+					i++;
+				}
+				
+				drops.put(matName, amount + ";" + enchantsStr);
+			}
+		}
+		
+		JsonBoss jsonBoss = new JsonBoss(startHealth, displayName, mobType, ejson, drops, b.getDamagePerHit(), b.getPrice());
 		
 		return jsonBoss;
 	}

@@ -16,15 +16,19 @@ import com.cornchipss.custombosses.util.Vector2;
 
 public class Boss 
 {
-	String displayName;
+	private String displayName;
 	private int startingHealth;
-	Map<ItemStack, Vector2<Integer, Integer>> drops;
-	EntityType entityType;
-	ItemStack handEquipment;
-	ItemStack[] armor = new ItemStack[4];
-	LivingEntity spawnedBoss = null;
+	private Map<ItemStack, Vector2<Integer, Integer>> drops;
+	private EntityType entityType;
+	private ItemStack handEquipment;
+	private ItemStack[] armor = new ItemStack[4];
+	private LivingEntity spawnedBoss = null;
+	private int price = -1;
 	
-	public Boss(int startingHealth, EntityType entityType, String displayName, ItemStack handEquipment, ItemStack[] armor, Map<ItemStack, Vector2<Integer, Integer>> drops) 
+	// TODO: Make the damamge per hit specifiable
+	int damagePerHit = 0;
+	
+	public Boss(int startingHealth, EntityType entityType, String displayName, ItemStack handEquipment, ItemStack[] armor, Map<ItemStack, Vector2<Integer, Integer>> drops, int damagePerHit, int price) 
 	{
 		this.displayName = displayName;
 		this.startingHealth = startingHealth;
@@ -32,6 +36,8 @@ public class Boss
 		this.handEquipment = handEquipment;
 		this.armor = armor;
 		this.drops = drops;
+		this.damagePerHit = damagePerHit;
+		this.price = price;
 	}
 	
 	public Entity spawn(Location loc)
@@ -48,6 +54,12 @@ public class Boss
 		equipment.setItemInHand(getHandEquipment());
 
 		return spawnedBoss;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return "Boss [" + getDisplayName() + "; " + getEntityType() + "; " + getStartingHealth() + "; " + getHandEquipment() + "; " + getArmor(0) + ", " + getArmor(1) + ", " + getArmor(2) + ", " + getArmor(3) + "; " + getDropItems() + "; " + getDamagePerHit() + "; " + getPrice() + "]";
 	}
 	
 	public int getStartingHealth() { return startingHealth; }
@@ -74,4 +86,10 @@ public class Boss
 			items.add(i);
 		return items;
 	}
+
+	public int getDamagePerHit() { return damagePerHit; }
+	public void setDamagePerHit(int dmg) { this.damagePerHit = dmg; }
+
+	public int getPrice() { return price; }
+	public void setPrice(int p) { this.price = p; }
 }
