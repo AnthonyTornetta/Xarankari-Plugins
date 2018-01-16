@@ -1,6 +1,5 @@
 package com.cornchipss.custombosses.boss.handler;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

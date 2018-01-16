@@ -5,18 +5,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
 
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import com.cornchipss.custombosses.boss.Boss;
 import com.cornchipss.custombosses.boss.json.equipment.ArmorJson;
 import com.cornchipss.custombosses.boss.json.equipment.BossEquipmentJson;
 import com.cornchipss.custombosses.boss.json.equipment.HandJson;
 import com.cornchipss.custombosses.util.Vector2;
+
+import net.md_5.bungee.api.ChatColor;
 
 public class JsonBoss 
 {
@@ -26,8 +28,10 @@ public class JsonBoss
 	private Map<String, String> drops;
 	private int damagePerHit;
 	private int price;
+	private String spawnItem;
+	private int bossId;
 	
-	public JsonBoss(int startHealth, String displayName, String mobType, BossEquipmentJson equipment, Map<String, String> drops, int damagePerHit, int price) 
+	public JsonBoss(int startHealth, String displayName, String mobType, BossEquipmentJson equipment, Map<String, String> drops, int damagePerHit, int price, String spawnItem, int bossId) 
 	{
 		this.startHealth = startHealth;
 		this.displayName = displayName;
@@ -36,6 +40,8 @@ public class JsonBoss
 		this.drops = drops;
 		this.damagePerHit = damagePerHit;
 		this.price = price;
+		this.spawnItem = spawnItem;
+		this.bossId = bossId;
 	}
 	
 	public Boss createBoss()
@@ -92,7 +98,15 @@ public class JsonBoss
 			dropsComplete.put(item, dropRange);
 		}
 		
-		return new Boss(startHealth, EntityType.valueOf(mobType), displayName, hand, armor, dropsComplete, damagePerHit, price);
+		ItemStack spawnItem = new ItemStack(Material.valueOf(this.spawnItem));
+		ItemMeta spawnMeta = spawnItem.getItemMeta();
+		spawnMeta.setDisplayName(ChatColor.GOLD + "Spawn " + displayName);
+		List<String> spawnLore = new ArrayList<>();
+		spawnLore.add("Boss Spawn Item [" + bossId + "]");
+		spawnMeta.setLore(spawnLore);
+		spawnItem.setItemMeta(spawnMeta);
+		
+		return new Boss(startHealth, EntityType.valueOf(mobType), displayName, hand, armor, dropsComplete, damagePerHit, price, spawnItem, bossId);
 	}
 	
 	public static JsonBoss fromBoss(Boss b)
@@ -159,7 +173,7 @@ public class JsonBoss
 			}
 		}
 		
-		JsonBoss jsonBoss = new JsonBoss(startHealth, displayName, mobType, ejson, drops, b.getDamagePerHit(), b.getPrice());
+		JsonBoss jsonBoss = new JsonBoss(startHealth, displayName, mobType, ejson, drops, b.getDamagePerHit(), b.getPrice(), b.getSpawnItem().getType().name(), b.getId());
 		
 		return jsonBoss;
 	}

@@ -46,8 +46,8 @@ public class CustomBosses extends JavaPlugin
 		i.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 17);
 		i.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, 14);
 		drops.put(i, new Vector2<>(3, 20));
-		
-		Boss b = new Boss(100, EntityType.BLAZE, "&4Blaze o Doom", sword, armor, drops, 20, 1000000);
+				
+		Boss b = new Boss(100, EntityType.BLAZE, "&4Blaze o Doom", sword, armor, drops, 20, 1000000, new ItemStack(Material.BEACON), 0);
 		
 		bosses.add(b);
 		

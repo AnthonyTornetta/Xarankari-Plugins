@@ -24,11 +24,13 @@ public class Boss
 	private ItemStack[] armor = new ItemStack[4];
 	private LivingEntity spawnedBoss = null;
 	private int price = -1;
-	
+	private ItemStack spawnItem;
 	// TODO: Make the damamge per hit specifiable
 	int damagePerHit = 0;
+	private int bossId;
 	
-	public Boss(int startingHealth, EntityType entityType, String displayName, ItemStack handEquipment, ItemStack[] armor, Map<ItemStack, Vector2<Integer, Integer>> drops, int damagePerHit, int price) 
+	public Boss(int startingHealth, EntityType entityType, String displayName, ItemStack handEquipment, ItemStack[] armor, Map<ItemStack, Vector2<Integer, Integer>> drops, 
+				int damagePerHit, int price, ItemStack spawnItem, int bossId) 
 	{
 		this.displayName = displayName;
 		this.startingHealth = startingHealth;
@@ -38,6 +40,8 @@ public class Boss
 		this.drops = drops;
 		this.damagePerHit = damagePerHit;
 		this.price = price;
+		this.spawnItem = spawnItem;
+		this.bossId = bossId;
 	}
 	
 	public Entity spawn(Location loc)
@@ -59,7 +63,7 @@ public class Boss
 	@Override
 	public String toString()
 	{
-		return "Boss [" + getDisplayName() + "; " + getEntityType() + "; " + getStartingHealth() + "; " + getHandEquipment() + "; " + getArmor(0) + ", " + getArmor(1) + ", " + getArmor(2) + ", " + getArmor(3) + "; " + getDropItems() + "; " + getDamagePerHit() + "; " + getPrice() + "]";
+		return "Boss [" + getDisplayName() + "; " + getEntityType() + "; " + getStartingHealth() + "; " + getHandEquipment() + "; " + getArmor(0) + ", " + getArmor(1) + ", " + getArmor(2) + ", " + getArmor(3) + "; " + getDropItems() + "; " + getDamagePerHit() + "; " + getPrice() + "; " + getSpawnItem() + "]";
 	}
 	
 	public int getStartingHealth() { return startingHealth; }
@@ -92,4 +96,9 @@ public class Boss
 
 	public int getPrice() { return price; }
 	public void setPrice(int p) { this.price = p; }
+
+	public ItemStack getSpawnItem() { return spawnItem; }
+	public void setSpawnItem(ItemStack i) { this.spawnItem = i; }
+	
+	public int getId() { return bossId; }
 }
