@@ -17,6 +17,9 @@ public class Vector2<A, B>
 		this.y = null;
 	}
 	
+	@Override
+	public String toString() { return "Vector2 [" + getX() + ", " + getY() + "]"; }
+	
 	public A getX() { return x; }
 	public B getY() { return y; }
 	

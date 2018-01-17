@@ -4,12 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 
 import com.cornchipss.custombosses.util.Vector2;
@@ -22,15 +17,14 @@ public class Boss
 	private EntityType entityType;
 	private ItemStack handEquipment;
 	private ItemStack[] armor = new ItemStack[4];
-	private LivingEntity spawnedBoss = null;
 	private int price = -1;
 	private ItemStack spawnItem;
-	// TODO: Make the damamge per hit specifiable
 	int damagePerHit = 0;
 	private int bossId;
+	private int spawnChance;
 	
 	public Boss(int startingHealth, EntityType entityType, String displayName, ItemStack handEquipment, ItemStack[] armor, Map<ItemStack, Vector2<Integer, Integer>> drops, 
-				int damagePerHit, int price, ItemStack spawnItem, int bossId) 
+				int damagePerHit, int price, ItemStack spawnItem, int bossId, int spawnChance) 
 	{
 		this.displayName = displayName;
 		this.startingHealth = startingHealth;
@@ -42,22 +36,12 @@ public class Boss
 		this.price = price;
 		this.spawnItem = spawnItem;
 		this.bossId = bossId;
+		this.spawnChance = spawnChance;
 	}
 	
-	public Entity spawn(Location loc)
+	public LivingBoss createLivingBoss()
 	{
-		World w = loc.getWorld();
-		spawnedBoss = (LivingEntity) w.spawnEntity(loc, getEntityType());
-		
-		spawnedBoss.setCustomName(displayName);
-		EntityEquipment equipment = spawnedBoss.getEquipment();
-		equipment.setHelmet(getArmor(0));
-		equipment.setChestplate(getArmor(1));
-		equipment.setLeggings(getArmor(2));
-		equipment.setBoots(getArmor(3));
-		equipment.setItemInHand(getHandEquipment());
-
-		return spawnedBoss;
+		return new LivingBoss(this);
 	}
 	
 	@Override
@@ -101,4 +85,7 @@ public class Boss
 	public void setSpawnItem(ItemStack i) { this.spawnItem = i; }
 	
 	public int getId() { return bossId; }
+
+	public int getSpawnChance() { return spawnChance; }
+	public void setSpawnChance(int chance) { this.spawnChance = chance; }
 }

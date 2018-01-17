@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
@@ -18,14 +19,17 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.cornchipss.custombosses.boss.Boss;
 import com.cornchipss.custombosses.boss.handler.BossHandler;
 import com.cornchipss.custombosses.listener.CornyListener;
+import com.cornchipss.custombosses.util.Reference;
 import com.cornchipss.custombosses.util.Vector2;
+import com.cornchipss.custombosses.util.json.PluginJsonParser;
+import com.google.gson.JsonParseException;
 
 
 // https://dev.bukkit.org/projects/supplies/pages/material-list
 
 public class CustomBosses extends JavaPlugin
 {
-	private BossHandler bHandler = new BossHandler();
+	private BossHandler bHandler;
 	
 	@Override
 	public void onEnable()
@@ -47,25 +51,64 @@ public class CustomBosses extends JavaPlugin
 		i.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, 14);
 		drops.put(i, new Vector2<>(3, 20));
 				
-		Boss b = new Boss(100, EntityType.BLAZE, "&4Blaze o Doom", sword, armor, drops, 20, 1000000, new ItemStack(Material.BEACON), 0);
+		Boss b = new Boss(100, EntityType.BLAZE, "&4Blaze o Doom", sword, armor, drops, 20, 1000000, new ItemStack(Material.BEACON), 0, 20);
 		
 		bosses.add(b);
 		
-		String json = bHandler.serializeBosses(bosses);
+		List<Integer> ids = new ArrayList<>();
+		ids.add(b.getId());
 		
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter("bosses.json"));
-			bw.write(json);
+		Map<Vector2<Location, Location>, List<Integer>> locs = new HashMap<>();
+		locs.put(new Vector2<>(new Location(this.getServer().getWorlds().get(0), 100, 100, 100), new Location(this.getServer().getWorlds().get(0), 200, 200, 200)), ids);
+				
+		String bossJson = PluginJsonParser.serializeBosses(bosses);
+		String locsJson = PluginJsonParser.serializeLocations(locs);
+		
+		System.out.println(locsJson);
+		
+		try 
+		{
+			this.getDataFolder().mkdirs();
+			BufferedWriter bw = new BufferedWriter(new FileWriter(this.getDataFolder() + Reference.BOSSES_CONFIG_NAME));
+			bw.write(bossJson);
 			bw.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
+			bw = new BufferedWriter(new FileWriter(this.getDataFolder() + Reference.LOCATIONS_CONFIG_NAME));
+			bw.write(locsJson);
+			bw.close();
+		} 
+		catch (IOException ex)
+		{
+			ex.printStackTrace();
+			return;
 		}
 		
-		List<Boss> bees = bHandler.deserializeBosses(json);
-		System.out.println(bees);
+		try
+		{
+			bHandler = new BossHandler(PluginJsonParser.deserializeBosses(bossJson));
+		}
+		catch(JsonParseException ex)
+		{
+			ex.printStackTrace();
+			getLogger().info("Error parsing bosses file! Disabling");
+			getServer().getPluginManager().disablePlugin(this);
+			return;
+		}
 		
-		CornyListener cl = new CornyListener(this);
+		try
+		{
+			Map<Vector2<Location, Location>, List<Integer>> acutalLocs = PluginJsonParser.deserializeLocations(locsJson);
+			System.out.println(acutalLocs);
+		}
+		catch(JsonParseException ex)
+		{
+			ex.printStackTrace();
+			getLogger().info("Error parsing locations file! Disabling");
+			getServer().getPluginManager().disablePlugin(this);
+			return;
+		}
+		
+		CornyListener cl = new CornyListener(this.getBossHandler());
 		
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvents(cl, this);
@@ -73,18 +116,13 @@ public class CustomBosses extends JavaPlugin
 	
 	public void onDisable()
 	{
+		// TODO: Save alive bosses on server close - or save it as soon as one is added / removed
 	}
 	
 	private String loadBossJson() throws IOException
 	{
-		//File f = new File();
-		//BufferedReader br = new BufferedReader(new FileReader())
 		throw new IOException();
 	}
 
-	public List<Boss> getBosses() 
-	{
-		
-		return null;
-	}
+	public BossHandler getBossHandler() { return bHandler; }
 }

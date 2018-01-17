@@ -30,8 +30,9 @@ public class JsonBoss
 	private int price;
 	private String spawnItem;
 	private int bossId;
+	private int spawnChance;
 	
-	public JsonBoss(int startHealth, String displayName, String mobType, BossEquipmentJson equipment, Map<String, String> drops, int damagePerHit, int price, String spawnItem, int bossId) 
+	public JsonBoss(int startHealth, String displayName, String mobType, BossEquipmentJson equipment, Map<String, String> drops, int damagePerHit, int price, String spawnItem, int bossId, int spawnChance) 
 	{
 		this.startHealth = startHealth;
 		this.displayName = displayName;
@@ -42,6 +43,7 @@ public class JsonBoss
 		this.price = price;
 		this.spawnItem = spawnItem;
 		this.bossId = bossId;
+		this.spawnChance = spawnChance;
 	}
 	
 	public Boss createBoss()
@@ -106,7 +108,7 @@ public class JsonBoss
 		spawnMeta.setLore(spawnLore);
 		spawnItem.setItemMeta(spawnMeta);
 		
-		return new Boss(startHealth, EntityType.valueOf(mobType), displayName, hand, armor, dropsComplete, damagePerHit, price, spawnItem, bossId);
+		return new Boss(startHealth, EntityType.valueOf(mobType), displayName, hand, armor, dropsComplete, damagePerHit, price, spawnItem, bossId, spawnChance);
 	}
 	
 	public static JsonBoss fromBoss(Boss b)
@@ -173,7 +175,7 @@ public class JsonBoss
 			}
 		}
 		
-		JsonBoss jsonBoss = new JsonBoss(startHealth, displayName, mobType, ejson, drops, b.getDamagePerHit(), b.getPrice(), b.getSpawnItem().getType().name(), b.getId());
+		JsonBoss jsonBoss = new JsonBoss(startHealth, displayName, mobType, ejson, drops, b.getDamagePerHit(), b.getPrice(), b.getSpawnItem().getType().name(), b.getId(), b.getSpawnChance());
 		
 		return jsonBoss;
 	}
@@ -198,4 +200,7 @@ public class JsonBoss
 	
 	public Map<String, String> getDrops() { return drops; }
 	public void setDrops(Map<String, String> drops) { this.drops = drops; }
+	
+	public int getSpawnChance() { return this.spawnChance; }
+	public void setSpawnChance(int chance) { this.spawnChance = chance; }
 }

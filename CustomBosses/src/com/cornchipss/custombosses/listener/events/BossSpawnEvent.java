@@ -1,20 +1,19 @@
 package com.cornchipss.custombosses.listener.events;
 
-import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.EntitySpawnEvent;
 
-import com.cornchipss.custombosses.boss.Boss;
+import com.cornchipss.custombosses.boss.LivingBoss;
 
 public class BossSpawnEvent extends EntitySpawnEvent
 {
-	private Boss b;
+	private LivingBoss b;
 	
-	public BossSpawnEvent(Entity spawnee, Boss b) 
+	public BossSpawnEvent(LivingBoss b) 
 	{
-		super(spawnee);
+		super(b.getEntity());
 		this.b = b;
 	}
 
-	public Boss getB() { return b; }
-	public void setB(Boss b) { this.b = b; }
+	public LivingBoss getLivingBoss() { return b; }
+	public void setLivingBoss(LivingBoss b) { this.b = b; }
 }

@@ -1,33 +1,107 @@
 package com.cornchipss.custombosses.listener;
 
-import java.util.List;
-
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.cornchipss.custombosses.CustomBosses;
 import com.cornchipss.custombosses.boss.Boss;
+import com.cornchipss.custombosses.boss.LivingBoss;
+import com.cornchipss.custombosses.boss.handler.BossHandler;
+import com.cornchipss.custombosses.listener.events.BossDeathEvent;
+import com.cornchipss.custombosses.listener.events.BossSpawnEvent;
 
 public class CornyListener implements Listener
 {
-	private CustomBosses plugin;
-	private List<Boss> possibleBosses;
+	private BossHandler bossHandler;
 	
-	public CornyListener(CustomBosses plugin)
-	{
-		this.plugin = plugin;
-		
-		possibleBosses = plugin.getBosses();
+	public CornyListener(BossHandler handler)
+	{		
+		this.bossHandler = handler;
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void playerInteract(PlayerInteractEvent e)
 	{
+		if(e.isCancelled())
+			return;
+		
 		Player p = e.getPlayer();
-		ItemStack itemHeld = e.getPlayer().getItemInHand();
+		ItemStack itemHeld = p.getItemInHand();
+		
+		if(e.getAction() != Action.RIGHT_CLICK_BLOCK)
+			return;
+		
+		for(Boss b : bossHandler.getLoadedBosses())
+		{
+			ItemStack spawnItem = b.getSpawnItem();
+			if(spawnItem.equals(itemHeld))
+			{
+				LivingBoss newBoss = b.createLivingBoss();
+				BossSpawnEvent bossSpawnEvent = new BossSpawnEvent(newBoss);
+				
+				Bukkit.getPluginManager().callEvent(bossSpawnEvent);
+				if(bossSpawnEvent.isCancelled())
+					return;
+				
+				bossHandler.addLivingBoss(newBoss);
+				break;
+			}
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.NORMAL)
+	public void entityDeath(EntityDeathEvent e)
+	{
+		LivingEntity ent = e.getEntity(); // More of a DeadEntity now (ba dum tss)
+		
+		for(LivingBoss b : bossHandler.getLivingBosses())
+		{
+			if(b.getEntity().equals(ent))
+			{
+				BossDeathEvent bossDeathEvent = new BossDeathEvent(b);
+				Bukkit.getPluginManager().callEvent(bossDeathEvent);
+				break;
+			}
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.NORMAL)
+	public void something(EntityDamageByEntityEvent e)
+	{
+		LivingEntity damager = (LivingEntity)e.getDamager();
+		
+		for(LivingBoss b : bossHandler.getLivingBosses())
+		{
+			if(b.getEntity().equals(damager))
+			{
+				if(b.getBoss().getDamagePerHit() >= 0)
+				{
+					e.setDamage(b.getBoss().getDamagePerHit());
+				}
+			}
+		}		
+	}
+	
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void bossSpawn(BossSpawnEvent e)
+	{
+		LivingBoss boss = e.getLivingBoss();
+		Bukkit.broadcastMessage(ChatColor.GOLD + "The boss " + boss.getBoss().getDisplayName() + ChatColor.GOLD + " has spawned!");
+	}
+	
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void bossDeath(BossDeathEvent e)
+	{
+		LivingBoss boss = e.getLivingBoss();
+		bossHandler.removeAliveBoss(boss);
 	}
 }

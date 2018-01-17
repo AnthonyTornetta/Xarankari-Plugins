@@ -1,67 +1,29 @@
 package com.cornchipss.custombosses.boss.handler;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.bukkit.Location;
 
 import com.cornchipss.custombosses.boss.Boss;
-import com.cornchipss.custombosses.boss.json.JsonBoss;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
+import com.cornchipss.custombosses.boss.LivingBoss;
+import com.cornchipss.custombosses.util.Vector2;
 
 public class BossHandler 
 {
 	private List<Boss> loadedBosses;
-	private List<Boss> aliveBosses;
+	private List<LivingBoss> aliveBosses;
 	
-	public List<Boss> deserializeBosses(String json)
-	{
-		Gson gson = new Gson();
-		List<JsonBoss> jsonBosses;
-		
-		try
-		{
-			jsonBosses = Arrays.asList(gson.fromJson(json, JsonBoss[].class));
-		}
-		catch(JsonSyntaxException ex)
-		{
-			return null;
-		}
-		
-		List<Boss> bosses = new ArrayList<>();
-		for(JsonBoss jsonBoss : jsonBosses)
-			bosses.add(jsonBoss.createBoss());
-		
-		return bosses;
-	}
+	private Map<Boss, Vector2<Location, Location>> spawnBoundries;
 	
-	public String serializeBosses(List<Boss> bosses)
+	public BossHandler(List<Boss> loadedBosses) 
 	{
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		this.loadedBosses = loadedBosses;
 		
-		List<JsonBoss> bjs = new ArrayList<>();
-		
-		for(Boss b : bosses)
-			bjs.add(JsonBoss.fromBoss(b));
-		
-		return gson.toJson(bjs);
+		this.spawnBoundries = new HashMap<>();
 	}
-
-		/*ItemStack[] armor = new ItemStack[4];
-		armor[0] = new ItemStack(Material.DIAMOND_HELMET);
-		armor[1] = new ItemStack(Material.DIAMOND_CHESTPLATE);
-		armor[2] = new ItemStack(Material.DIAMOND_LEGGINGS);
-		armor[3] = new ItemStack(Material.DIAMOND_BOOTS);
-		armor[0].addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 200);
-		
-		ItemStack sword = new ItemStack(Material.DIAMOND_AXE);
-		sword.addUnsafeEnchantment(Enchantment.LOOT_BONUS_MOBS, 10);
-		
-		Map<ItemStack, Vector2<Integer, Integer>> drops = new HashMap<>();
-		drops.put(new ItemStack(Material.ANVIL), new Vector2<>(3, 20));
-		
-		Boss b = new Boss(100, EntityType.BLAZE, "&4Blaze o Doom", sword, armor, drops);*/
 	
 	public List<Boss> getLoadedBosses()
 	{
@@ -71,20 +33,25 @@ public class BossHandler
 		return clone;
 	}
 	
-	public List<Boss> getSpawnedBosses()
+	public List<LivingBoss> getLivingBosses()
 	{
-		List<Boss> clone = new ArrayList<>();
-		for(Boss b : aliveBosses)
+		List<LivingBoss> clone = new ArrayList<>();
+		for(LivingBoss b : aliveBosses)
 			clone.add(b);
 		return clone;
 	}
 	
-	public void addAliveBoss(Boss b)
+	public void addLivingBoss(LivingBoss b) { aliveBosses.add(b); }
+	public void removeAliveBoss(LivingBoss b) { aliveBosses.remove(b); }
+	
+	public void setSpawnBoundries(Map<Boss, Vector2<Location, Location>> locs) { this.spawnBoundries = locs; }
+	public Map<Boss, Vector2<Location, Location>> getSpawnLocations()
 	{
-		aliveBosses.add(b);
-	}
-	public void removeAliveBoss(Boss b)
-	{
-		aliveBosses.remove(b);
+		Map<Boss, Vector2<Location, Location>> locs = new HashMap<>();
+		for(Boss b : spawnBoundries.keySet())
+		{
+			locs.put(b, spawnBoundries.get(b));
+		}
+		return locs;
 	}
 }
