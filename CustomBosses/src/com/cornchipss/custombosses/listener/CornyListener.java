@@ -2,8 +2,10 @@ package com.cornchipss.custombosses.listener;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -11,6 +13,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.cornchipss.custombosses.boss.Boss;
@@ -18,6 +21,7 @@ import com.cornchipss.custombosses.boss.LivingBoss;
 import com.cornchipss.custombosses.boss.handler.BossHandler;
 import com.cornchipss.custombosses.listener.events.BossDeathEvent;
 import com.cornchipss.custombosses.listener.events.BossSpawnEvent;
+import com.cornchipss.custombosses.util.Reference;
 
 public class CornyListener implements Listener
 {
@@ -37,25 +41,42 @@ public class CornyListener implements Listener
 		Player p = e.getPlayer();
 		ItemStack itemHeld = p.getItemInHand();
 		
-		if(e.getAction() != Action.RIGHT_CLICK_BLOCK)
+		if(e.getAction() != Action.RIGHT_CLICK_BLOCK && itemHeld != null)
 			return;
+		
+		System.out.println("Ayye lmao 1");
 		
 		for(Boss b : bossHandler.getLoadedBosses())
 		{
-			ItemStack spawnItem = b.getSpawnItem();
-			if(spawnItem.equals(itemHeld))
+			ItemStack spawnItem = b.getSpawnItem();		
+			
+			if(Reference.equiv(itemHeld, spawnItem))
 			{
+				System.out.println("Ayye lmao 1.5");
 				LivingBoss newBoss = b.createLivingBoss();
 				BossSpawnEvent bossSpawnEvent = new BossSpawnEvent(newBoss);
+				
+				System.out.println("Ayye lmao 2");
 				
 				Bukkit.getPluginManager().callEvent(bossSpawnEvent);
 				if(bossSpawnEvent.isCancelled())
 					return;
 				
+				System.out.println("Ayye lmao 3");
+				
 				bossHandler.addLivingBoss(newBoss);
+				newBoss.spawn(e.getClickedBlock().getLocation().add(0.0, 1.0, 0.0));
+				
+				System.out.println("Ayye lmao 4");
 				break;
 			}
 		}
+	}
+	
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void playerJoin(PlayerJoinEvent e)
+	{
+		e.getPlayer().getInventory().addItem(bossHandler.getLoadedBosses().get(0).getSpawnItem());
 	}
 	
 	@EventHandler(priority = EventPriority.NORMAL)
@@ -75,20 +96,27 @@ public class CornyListener implements Listener
 	}
 	
 	@EventHandler(priority = EventPriority.NORMAL)
-	public void something(EntityDamageByEntityEvent e)
+	public void entityDamagedByEntity(EntityDamageByEntityEvent e)
 	{
-		LivingEntity damager = (LivingEntity)e.getDamager();
+		Entity damager = e.getDamager();
+		Entity thingCausingDamage = damager;
+		
+		if(damager instanceof Projectile)
+		{
+			Projectile projectile = (Projectile)damager;
+			thingCausingDamage = (Entity)projectile.getShooter();
+			System.out.println("DAMAGE TYPE = PROJECTILE");
+		}
 		
 		for(LivingBoss b : bossHandler.getLivingBosses())
 		{
-			if(b.getEntity().equals(damager))
+			if(b.getEntity().equals(thingCausingDamage))
 			{
-				if(b.getBoss().getDamagePerHit() >= 0)
-				{
-					e.setDamage(b.getBoss().getDamagePerHit());
-				}
+				System.out.println("RAN DAMAGE CHANGER");
+				e.setDamage(b.getBoss().getDamagePerHit());
+				System.out.println("Damage: " + e.getDamage());
 			}
-		}		
+		}
 	}
 	
 	@EventHandler(priority = EventPriority.LOWEST)

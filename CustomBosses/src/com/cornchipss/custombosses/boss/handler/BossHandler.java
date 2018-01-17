@@ -13,8 +13,8 @@ import com.cornchipss.custombosses.util.Vector2;
 
 public class BossHandler 
 {
-	private List<Boss> loadedBosses;
-	private List<LivingBoss> aliveBosses;
+	private List<Boss> loadedBosses = new ArrayList<>();
+	private List<LivingBoss> aliveBosses = new ArrayList<>();
 	
 	private Map<Boss, Vector2<Location, Location>> spawnBoundries;
 	

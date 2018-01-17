@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -17,6 +18,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.cornchipss.custombosses.boss.Boss;
+import com.cornchipss.custombosses.boss.LivingBoss;
 import com.cornchipss.custombosses.boss.handler.BossHandler;
 import com.cornchipss.custombosses.listener.CornyListener;
 import com.cornchipss.custombosses.util.Reference;
@@ -51,7 +53,7 @@ public class CustomBosses extends JavaPlugin
 		i.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, 14);
 		drops.put(i, new Vector2<>(3, 20));
 				
-		Boss b = new Boss(100, EntityType.BLAZE, "&4Blaze o Doom", sword, armor, drops, 20, 1000000, new ItemStack(Material.BEACON), 0, 20);
+		Boss b = new Boss(100, EntityType.BLAZE, ChatColor.translateAlternateColorCodes('&', "&4Blaze o Doom"), sword, armor, drops, 10, 1000000, new ItemStack(Material.STICK), 0, 20);
 		
 		bosses.add(b);
 		
@@ -115,10 +117,19 @@ public class CustomBosses extends JavaPlugin
 	}
 	
 	public void onDisable()
-	{
-		// TODO: Save alive bosses on server close - or save it as soon as one is added / removed
+	{		
+		List<LivingBoss> livingBosses = getBossHandler().getLivingBosses();
+		for(int i = 0; i < livingBosses.size(); i++)
+		{
+			Map<Integer, String> serializedAliveBosses = livingBosses.get(i).serialize();
+			Integer bossId = (Integer) serializedAliveBosses.keySet().toArray()[0];
+			getConfig().set(bossId + "", serializedAliveBosses.get(bossId));
+		}
+		
+		
 	}
 	
+	@SuppressWarnings("unused")
 	private String loadBossJson() throws IOException
 	{
 		throw new IOException();

@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 import com.cornchipss.custombosses.boss.Boss;
@@ -49,12 +48,11 @@ public class PluginJsonParser
 	{
 		Map<String, List<Integer>> serializeableData = new HashMap<>();
 		
-		for(Vector2<Location, Location> loc : locs.keySet())
+		for(Vector2<Location, Location> locsVector : locs.keySet())
 		{
-			List<Integer> bosses = locs.get(loc);
+			List<Integer> bosses = locs.get(locsVector);
 			
-			serializeableData.put(loc.getX().getWorld().getName() + "," + loc.getX().getX() + "," + loc.getX().getY() + "," + loc.getX().getZ() + "-" +
-									loc.getY().getWorld().getName() + "," + loc.getY().getX() + "," + loc.getY().getY() + "," + loc.getY().getZ(), bosses);
+			serializeableData.put(Serializer.serializeLocation(locsVector.getX()) + "-" + Serializer.serializeLocation(locsVector.getY()), bosses);
 		}
 		
 		JsonLocations jsonLocs = new JsonLocations();
@@ -76,18 +74,10 @@ public class PluginJsonParser
 		Map<String, List<Integer>> serializedLocs = locsClass.getSerializedLocations();
 		
 		for(String s : serializedLocs.keySet())
-		{			
-			Location[] locs = new Location[2];
+		{						
+			String[] locationsSerialized = s.split("-");
 			
-			String[] splitApart = s.split("-");
-			for(int i = 0; i < 2; i++)
-			{
-				String[] split = splitApart[i].split(",");
-				locs[i] = new Location(Bukkit.getWorld(split[0].toLowerCase()), 
-										Double.parseDouble(split[1]), Double.parseDouble(split[2]), Double.parseDouble(split[3]));
-			}
-			
-			parsed.put(new Vector2<>(locs[0], locs[1]), serializedLocs.get(s));
+			parsed.put(new Vector2<>(Serializer.deserializeLocation(locationsSerialized[0]), Serializer.deserializeLocation(locationsSerialized[1])), serializedLocs.get(s));
 		}
 		
 		return parsed;
