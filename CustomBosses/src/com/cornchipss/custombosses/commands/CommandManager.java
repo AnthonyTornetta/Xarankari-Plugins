@@ -62,10 +62,14 @@ public class CommandManager
 		}
 		else if(cmd.equals("killallbosses"))
 		{
+			int bawesesKilled = 0;
 			for(LivingBoss boss : customBosses.getBossHandler().getLivingBosses())
 			{
 				boss.kill();
+				bawesesKilled++;
 			}
+			
+			sender.sendMessage(ChatColor.GOLD + "You brutally murdered " + bawesesKilled + " bosses.");
 		}
 		return true;
 	}

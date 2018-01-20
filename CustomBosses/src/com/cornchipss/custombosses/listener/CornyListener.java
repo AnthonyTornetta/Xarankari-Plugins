@@ -1,7 +1,9 @@
 package com.cornchipss.custombosses.listener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -30,12 +32,17 @@ import com.cornchipss.custombosses.listener.events.BossSpawnEvent;
 import com.cornchipss.custombosses.util.Helper;
 import com.cornchipss.custombosses.util.Reference;
 
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
+
 public class CornyListener extends Debug implements Listener
 {
 	private BossHandler bossHandler;
 	// Because in 1.9 there are two hands, and I only have access to one (1.8), I must ignore the second call because that's for the off hand
 	// So I store a list of players that have called it and if they are in said list I ignore the event and remove them
 	private List<Player> playerThatInteracted = new ArrayList<>();
+	
+	private Map<LivingBoss, List<Player>> playersListening = new HashMap<>();
 	
 	public CornyListener(BossHandler handler)
 	{		
@@ -59,7 +66,7 @@ public class CornyListener extends Debug implements Listener
 		if(e.isCancelled())
 			return;
 		
-		ItemStack itemHeld = p.getItemInHand();
+		ItemStack itemHeld = p.getInventory().getItemInMainHand();
 		
 		if(e.getAction() != Action.RIGHT_CLICK_BLOCK && itemHeld != null)
 			return;
@@ -80,6 +87,8 @@ public class CornyListener extends Debug implements Listener
 				// Make sure to spawn it before adding it, because it needs the location to serialize it
 				newBoss.spawn(e.getClickedBlock().getLocation().add(0.0, 1.0, 0.0));
 				bossHandler.addLivingBoss(newBoss);
+				
+				itemHeld.setAmount(itemHeld.getAmount() - 1);
 				break;
 			}
 		}
@@ -143,21 +152,64 @@ public class CornyListener extends Debug implements Listener
 	public void entityDamagedByEntity(EntityDamageByEntityEvent e)
 	{
 		Entity damager = e.getDamager();
-		Entity thingCausingDamage = damager;
+		Entity damaged = e.getEntity();
 		
 		if(damager instanceof Projectile)
 		{
 			Projectile projectile = (Projectile)damager;
-			thingCausingDamage = (Entity)projectile.getShooter();
+			damager = (Entity)projectile.getShooter();
 		}
 		
-		for(LivingBoss b : bossHandler.getLivingBosses())
+		if(damager instanceof Player)
 		{
-			if(b.getEntity().equals(thingCausingDamage))
+			Player p = (Player)damager;
+			
+			boolean playerGot = false;
+			
+			for(LivingBoss b : bossHandler.getLivingBosses())
 			{
-				if(b.getBoss().getDamagePerHit() >= 0)
+				if(damaged.equals(b.getEntity()))
 				{
-					e.setDamage(b.getBoss().getDamagePerHit());
+					List<Player> alreadyListening = playersListening.get(b);
+					if(alreadyListening == null)
+						alreadyListening = new ArrayList<>();
+					if(!alreadyListening.contains(p))
+						alreadyListening.add(p);
+					playerGot = true;
+					
+					for(Player player : alreadyListening)
+					{
+						double amtToShow = b.getEntity().getHealth() - e.getFinalDamage();
+						if(amtToShow < 0)
+							amtToShow = 0;
+						player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText((int)Math.round(amtToShow) + "/" + b.getBoss().getStartingHealth()));
+					}
+				}
+			}
+			
+			if(!playerGot)
+			{
+				for(LivingBoss b : playersListening.keySet())
+				{
+					List<Player> alreadyListening = playersListening.get(b);
+					if(alreadyListening.contains(p))
+					{
+						alreadyListening.remove(p);
+						break;
+					}
+				}
+			}
+		}
+		else
+		{			
+			for(LivingBoss b : bossHandler.getLivingBosses())
+			{
+				if(b.getEntity().equals(damager))
+				{
+					if(b.getBoss().getDamagePerHit() >= 0)
+					{
+						e.setDamage(b.getBoss().getDamagePerHit());
+					}
 				}
 			}
 		}
@@ -174,6 +226,7 @@ public class CornyListener extends Debug implements Listener
 	public void bossDeath(BossDeathEvent e)
 	{
 		LivingBoss boss = e.getLivingBoss();
+		playersListening.remove(boss);
 		bossHandler.removeLivingBoss(boss);
 	}
 }

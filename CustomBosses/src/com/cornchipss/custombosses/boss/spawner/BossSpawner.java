@@ -8,9 +8,9 @@ import com.cornchipss.custombosses.listener.events.BossSpawnEvent;
 
 public class BossSpawner implements Runnable
 {
-	private BossHandler handler;
+	private final BossHandler handler;
 	
-	public BossSpawner(BossHandler handler)
+	public BossSpawner(final BossHandler handler)
 	{
 		this.handler = handler;
 	}
@@ -18,10 +18,13 @@ public class BossSpawner implements Runnable
 	@Override
 	public void run() 
 	{
+		System.out.println("RANDED");
 		for(BossSpawnArea spawnArea : handler.getSpawnAreas())
 		{
+			System.out.println("SPAWN AREAD");
 			for(LivingBoss toSpawn : spawnArea.run())
 			{
+				System.out.println("ATTEMPTING");
 				BossSpawnEvent bse = new BossSpawnEvent(toSpawn);
 				Bukkit.getPluginManager().callEvent(bse);
 				if(bse.isCancelled())

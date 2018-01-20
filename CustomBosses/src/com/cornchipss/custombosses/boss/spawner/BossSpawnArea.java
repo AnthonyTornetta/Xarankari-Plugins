@@ -26,13 +26,15 @@ public class BossSpawnArea
 	public List<LivingBoss> run()
 	{
 		List<LivingBoss> spawned = new ArrayList<>();
-		
+
 		for(Boss b : spawnableBosses)
 		{
 			if(b.getSpawnChance() <= 0 || b.getSpawnChance() > 10000)
 				continue;
 			
-			if(Helper.iRandomRange(0, 10000 - b.getSpawnChance()) == 0)
+			System.out.println("went rhru");
+			
+			if(Helper.iRandomRange(0, 10000 - b.getSpawnChance()) == b.getSpawnChance() - 1)
 			{
 				double diameterX = area.getX().getX() - area.getY().getX();
 				double diameterZ = area.getY().getZ() - area.getY().getZ();

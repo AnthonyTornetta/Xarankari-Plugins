@@ -8,6 +8,8 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.EntityEquipment;
@@ -44,7 +46,8 @@ public class LivingBoss
 		entity.setRemoveWhenFarAway(true);
 		
 		entity.setCustomName(boss.getDisplayName());
-		entity.setMaxHealth(boss.getStartingHealth());
+		AttributeInstance healthAttribute = entity.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+		healthAttribute.setBaseValue(this.getBoss().getStartingHealth());
 		entity.setHealth(boss.getStartingHealth());
 		
 		EntityEquipment equipment = entity.getEquipment();		
@@ -52,13 +55,13 @@ public class LivingBoss
 		equipment.setChestplate(boss.getArmor(1));
 		equipment.setLeggings(boss.getArmor(2));
 		equipment.setBoots(boss.getArmor(3));
-		equipment.setItemInHand(boss.getHandEquipment());
+		equipment.setItemInMainHand(boss.getHandEquipment());
 		
 		entity.getEquipment().setBootsDropChance(0);
 		entity.getEquipment().setLeggingsDropChance(0);
 		entity.getEquipment().setChestplateDropChance(0);
 		entity.getEquipment().setHelmetDropChance(0);
-		entity.getEquipment().setItemInHandDropChance(0);
+		entity.getEquipment().setItemInOffHandDropChance(0);
 	}
 	
 	public void spawn()
@@ -77,7 +80,6 @@ public class LivingBoss
 	{
 		for(int i : serializedData.keySet())
 		{
-			System.out.println(i);
 			for(Boss b : loadedBosses)
 			{
 				if(b.getId() == i)
