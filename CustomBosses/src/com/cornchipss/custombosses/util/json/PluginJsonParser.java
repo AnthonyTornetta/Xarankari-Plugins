@@ -6,11 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bukkit.Location;
-
 import com.cornchipss.custombosses.boss.Boss;
 import com.cornchipss.custombosses.boss.json.JsonBoss;
 import com.cornchipss.custombosses.boss.json.JsonLocations;
+import com.cornchipss.custombosses.boss.spawner.BossSpawnArea;
+import com.cornchipss.custombosses.util.Reference;
 import com.cornchipss.custombosses.util.Vector2;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -44,15 +44,15 @@ public class PluginJsonParser
 		return gson.toJson(bjs);
 	}
 
-	public static String serializeLocations(Map<Vector2<Location, Location>, List<Integer>> locs) 
+	public static String serializeLocations(List<BossSpawnArea> areas) 
 	{
 		Map<String, List<Integer>> serializeableData = new HashMap<>();
 		
-		for(Vector2<Location, Location> locsVector : locs.keySet())
+		for(BossSpawnArea area : areas)
 		{
-			List<Integer> bosses = locs.get(locsVector);
+			List<Integer> bosses = Reference.getBossIds(area.getBosses());
 			
-			serializeableData.put(Serializer.serializeLocation(locsVector.getX()) + "-" + Serializer.serializeLocation(locsVector.getY()), bosses);
+			serializeableData.put(Serializer.serializeLocation(area.getLocationX()) + "-" + Serializer.serializeLocation(area.getLocationY()), bosses);
 		}
 		
 		JsonLocations jsonLocs = new JsonLocations();
@@ -61,15 +61,18 @@ public class PluginJsonParser
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		return gson.toJson(jsonLocs);
 	}
-
-	public static Map<Vector2<Location, Location>, List<Integer>> deserializeLocations(String json) 
+	
+	public static List<BossSpawnArea> deserializeLocations(List<Boss> loadedBosses, String json) 
 	{
-		Map<Vector2<Location, Location>, List<Integer>> parsed = new HashMap<>();
+		List<BossSpawnArea> parsed = new ArrayList<>();
 		
 		Gson gson = new Gson();
 		JsonLocations locsClass;
 		
 		locsClass = gson.fromJson(json, JsonLocations.class);
+		
+		if(locsClass == null)
+			return new ArrayList<>();
 		
 		Map<String, List<Integer>> serializedLocs = locsClass.getSerializedLocations();
 		
@@ -77,7 +80,9 @@ public class PluginJsonParser
 		{						
 			String[] locationsSerialized = s.split("-");
 			
-			parsed.put(new Vector2<>(Serializer.deserializeLocation(locationsSerialized[0]), Serializer.deserializeLocation(locationsSerialized[1])), serializedLocs.get(s));
+			parsed.add(new BossSpawnArea(new Vector2<>(Serializer.deserializeLocation(locationsSerialized[0]), 
+														Serializer.deserializeLocation(locationsSerialized[1])), 
+														Reference.getBossesFromIds(loadedBosses, serializedLocs.get(s))));
 		}
 		
 		return parsed;

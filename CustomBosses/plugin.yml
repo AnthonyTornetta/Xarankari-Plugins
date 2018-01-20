@@ -2,4 +2,9 @@ name: CustomBosses
 main: com.cornchipss.custombosses.CustomBosses
 version: 1.0
 commands:
-    
+    bossegg:
+        description: Gives you the GUI to the boss eggs, or you can specify the id to get
+        usage: /bossegg (id)
+    killallbosses:
+        description: Kills every boss
+        usage: /killallbosses

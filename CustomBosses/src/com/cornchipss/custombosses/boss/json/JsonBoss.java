@@ -12,6 +12,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import com.cornchipss.custombosses.Debug;
 import com.cornchipss.custombosses.boss.Boss;
 import com.cornchipss.custombosses.boss.json.equipment.ArmorJson;
 import com.cornchipss.custombosses.boss.json.equipment.BossEquipmentJson;
@@ -20,7 +21,7 @@ import com.cornchipss.custombosses.util.Vector2;
 
 import net.md_5.bungee.api.ChatColor;
 
-public class JsonBoss 
+public class JsonBoss extends Debug
 {
 	private int startHealth;
 	private String displayName, mobType;
@@ -50,10 +51,11 @@ public class JsonBoss
 	{
 		// Take the armor from a String to actual armor, then add enchants
 		List<ArmorJson> armorJson = equipment.getArmor();		
-		ItemStack[] armor = new ItemStack[4];		
+		ItemStack[] armor = new ItemStack[4];
+		
 		for(int i = 0; i < armorJson.size(); i++)
 		{
-			ArmorJson json = armorJson.get(0);
+			ArmorJson json = armorJson.get(i);
 			armor[i] = new ItemStack(Material.valueOf(json.getMaterial()));
 			for(String s : json.getEnchants().keySet())
 			{
@@ -71,6 +73,7 @@ public class JsonBoss
 		
 		// Create the drops it will have
 		Map<ItemStack, Vector2<Integer, Integer>> dropsComplete = new HashMap<>();
+				
 		for(String itemName : drops.keySet())
 		{
 			ItemStack item = new ItemStack(Material.valueOf(itemName));
@@ -85,7 +88,6 @@ public class JsonBoss
 			{
 				String[] splitAgain = split[1].split(";");
 				dropRange = new Vector2<>(Integer.parseInt(split[0]), Integer.parseInt(splitAgain[0]));
-				
 				if(splitAgain.length > 1)
 				{
 					String[] enchants = splitAgain[1].split(",");
@@ -95,8 +97,7 @@ public class JsonBoss
 						item.addUnsafeEnchantment(Enchantment.getByName(enchantAndAmount[0].toUpperCase()), Integer.parseInt(enchantAndAmount[1]));
 					}
 				}
-			}
-			
+			}			
 			dropsComplete.put(item, dropRange);
 		}
 		
@@ -178,6 +179,14 @@ public class JsonBoss
 		JsonBoss jsonBoss = new JsonBoss(startHealth, displayName, mobType, ejson, drops, b.getDamagePerHit(), b.getPrice(), b.getSpawnItem().getType().name(), b.getId(), b.getSpawnChance());
 		
 		return jsonBoss;
+	}
+	
+	public static List<JsonBoss> fromBossList(List<Boss> bosses) 
+	{
+		List<JsonBoss> jsonBosses = new ArrayList<>();
+		for(Boss b : bosses)
+			jsonBosses.add(fromBoss(b));
+		return jsonBosses;
 	}
 	
 	@Override

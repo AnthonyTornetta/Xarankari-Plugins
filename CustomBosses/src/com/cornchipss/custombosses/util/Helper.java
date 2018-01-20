@@ -1,5 +1,9 @@
 package com.cornchipss.custombosses.util;
 
+import org.bukkit.Location;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
 public class Helper 
 {
 	public static boolean isWhole(double num)
@@ -94,9 +98,48 @@ public class Helper
 		return true; // We only got here if no exception was found and it is a number
 	}
 	
+	// TODO this
+	public Location findSpawnableLocation(Location startSearch)
+	{		
+		return null;
+	}
+	
+	/**
+	 * Compares two itemstacks to see if they are basically equivalent (ignores amount, durability, and other various things)
+	 * @param i1 The first itemstack
+	 * @param i2 The second itemstack
+	 * @return True if they are basically equivalent, false if not
+	 */
+	public static boolean equiv(ItemStack i1, ItemStack i2) 
+	{
+		ItemMeta m1 = i1.getItemMeta();
+		ItemMeta m2 = i2.getItemMeta();
+		
+		if(m1 == null && m2 != null || m1 != null && m2 == null)
+			return false;
+		
+		if(m1.getLore() == null && m2.getLore() != null || m1.getLore() != null && m2.getLore() == null)
+			return false;
+		
+		boolean metasSame = ((m1 == null && m2 == null) || (m1.getDisplayName().equals(m2.getDisplayName()))) && (m1 == null && m2 == null || m1.getLore().equals(m2.getLore()));
+		
+		return metasSame && i1.getType() == i2.getType();
+	}
+	
 	public static int iRandomRange(int min, int max)
 	{
-		return (int)Math.round(Math.random() * (max - min) + min);
+		if(min == max)
+			return min;
+		assert max > min;
+		return (int)(Math.random() * max - min);
+	}
+	
+	public static double dRandomRange(double min, double max) 
+	{
+		if(Double.compare(min, max) == 0)
+			return min;
+		assert max > min;
+		return Math.random() * max - min;
 	}
 	
 	public static boolean within(double x, double minX, double maxX)
@@ -122,5 +165,17 @@ public class Helper
 	public static int ceil(double d)
 	{
 		return (int)Math.ceil(d);
+	}
+
+	public static int reverseIndexOf(String str, String lookFor) 
+	{
+		assert str.length() > lookFor.length();
+		
+		for(int i = str.length() - lookFor.length(); i >= 0; i--)
+		{
+			if(str.substring(i, i + lookFor.length()).equals(lookFor))
+				return i + 1;
+		}
+		return -1;
 	}
 }

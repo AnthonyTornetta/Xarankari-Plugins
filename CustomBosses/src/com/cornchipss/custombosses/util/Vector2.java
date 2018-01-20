@@ -17,6 +17,11 @@ public class Vector2<A, B>
 		this.y = null;
 	}
 	
+	public Vector2<A, B> clone()
+	{
+		return new Vector2<>(this.getX(), this.getY());
+	}
+	
 	@Override
 	public String toString() { return "Vector2 [" + getX() + ", " + getY() + "]"; }
 	

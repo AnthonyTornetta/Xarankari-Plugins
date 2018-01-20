@@ -3,13 +3,16 @@ package com.cornchipss.custombosses.boss;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
+import com.cornchipss.custombosses.util.Helper;
 import com.cornchipss.custombosses.util.Vector2;
 
-public class Boss 
+public class Boss
 {
 	private String displayName;
 	private int startingHealth;
@@ -44,6 +47,11 @@ public class Boss
 		return new LivingBoss(this);
 	}
 	
+	public LivingBoss createLivingBoss(Location loc)
+	{
+		return new LivingBoss(this, loc);
+	}
+	
 	@Override
 	public String toString()
 	{
@@ -62,17 +70,28 @@ public class Boss
 	public ItemStack getHandEquipment() { return handEquipment; }
 	public void setHandEquipment(ItemStack handEquipment) { this.handEquipment = handEquipment; }
 
-	public ItemStack getArmor(int i) { return armor[i]; }
+	public ItemStack getArmor(int i) { return getArmor()[i]; }
 	public void setArmor(int i, ItemStack piece) { this.armor[i] = piece; }
+	public ItemStack[] getArmor() { return this.armor; }
 
 	public Map<ItemStack, Vector2<Integer, Integer>> getDrops() { return drops; }
 
 	public List<ItemStack> getDropItems() 
 	{
-		List<ItemStack> items = new ArrayList<>();
-		for(ItemStack i : drops.keySet())
-			items.add(i);
-		return items;
+		List<ItemStack> drops = new ArrayList<>();
+		
+		Set<ItemStack> dropsList = getDrops().keySet();
+		for(ItemStack temp : dropsList)
+		{
+			ItemStack i = temp.clone();
+			
+			Vector2<Integer, Integer> range = this.getDrops().get(i);
+			i.setAmount(Helper.iRandomRange(range.getX(), range.getY()));
+			
+			drops.add(i);
+		}
+		
+		return drops;
 	}
 
 	public int getDamagePerHit() { return damagePerHit; }

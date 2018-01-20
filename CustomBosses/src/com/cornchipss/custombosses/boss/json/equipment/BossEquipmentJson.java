@@ -4,8 +4,8 @@ import java.util.List;
 
 public class BossEquipmentJson 
 {
-	List<ArmorJson> armor;
-	HandJson hand;
+	private List<ArmorJson> armor;
+	private HandJson hand;
 	
 	public BossEquipmentJson(List<ArmorJson> armor, HandJson hand) 
 	{
