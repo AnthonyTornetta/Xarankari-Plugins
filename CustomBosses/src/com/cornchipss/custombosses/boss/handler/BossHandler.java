@@ -68,6 +68,8 @@ public class BossHandler
 			for(int i = 0; i < livingBosses.size(); i++)
 			{
 				Map<Integer, String> serializedAliveBosses = livingBosses.get(i).serialize();
+				if(serializedAliveBosses == null)
+					continue;
 				Integer bossId = (Integer) serializedAliveBosses.keySet().toArray()[0];
 				bw.write(bossId + ":" + serializedAliveBosses.get(bossId));
 				bw.newLine();
@@ -133,7 +135,6 @@ public class BossHandler
 			String[] split = s.split(":");
 			serializedAliveBosses.put(Integer.parseInt(split[0]), split[1]);
 			
-			System.out.println(serializedAliveBosses);
 			livingBosses.add(LivingBoss.deserialize(loadedBosses, serializedAliveBosses));
 		}
 		br.close();

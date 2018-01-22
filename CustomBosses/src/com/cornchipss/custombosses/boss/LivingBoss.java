@@ -21,6 +21,7 @@ public class LivingBoss
 	private LivingEntity entity = null;
 	private Location spawnHereLocation = null;
 	private Boss boss;
+	private int timeSinceLastHit = 0;
 	
 	public LivingBoss(Boss b)
 	{
@@ -72,6 +73,9 @@ public class LivingBoss
 	public Map<Integer, String> serialize()
 	{
 		Map<Integer, String> serialized = new HashMap<>();
+		if(getEntity() == null)
+			return null;
+		
 		serialized.put(getBoss().getId(), getEntity().getUniqueId() + ";" + getEntity().getWorld().getName());
 		return serialized;
 	}
@@ -102,21 +106,25 @@ public class LivingBoss
 		return null;
 	}
 	
-	public void kill() 
+	public void remove() 
 	{
 		BossDeathEvent e = new BossDeathEvent(this);
 		Bukkit.getPluginManager().callEvent(e);
 		this.getEntity().remove();
 	}
 	
-	public LivingEntity getEntity() { return this.entity; }
-	public void setEntity(LivingEntity ent) { this.entity = ent; }
-	
-	public Boss getBoss() { return this.boss; }
-	
 	@Override
 	public String toString()
 	{
 		return this.getBoss() + "; " + this.getEntity();
 	}
+	
+	public LivingEntity getEntity() { return this.entity; }
+	public void setEntity(LivingEntity ent) { this.entity = ent; }
+	
+	public Boss getBoss() { return this.boss; }
+
+	public void increaseTimeBetweenHits() { this.timeSinceLastHit++; }
+	public void setTimeSinceLastHit(int time) { this.timeSinceLastHit = time; }
+	public int getTimeSinceLastHit() { return this.timeSinceLastHit; }
 }

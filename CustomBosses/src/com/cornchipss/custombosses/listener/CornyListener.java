@@ -100,7 +100,10 @@ public class CornyListener extends Debug implements Listener
 	{
 		Inventory i = e.getInventory();
 		Player p = (Player)e.getWhoClicked();
-
+		
+		if(i.getName().equals(Reference.BOSS_LOCATIONS_GUI))
+			e.setCancelled(true);
+		
 		if((i.getName().equals(Reference.BOSS_EGG_MENU_NAME)))
 		{
 			e.setCancelled(true); // Don't want them taking my blocks >:(
@@ -170,6 +173,8 @@ public class CornyListener extends Debug implements Listener
 			{
 				if(damaged.equals(b.getEntity()))
 				{
+					b.setTimeSinceLastHit(0);
+					
 					List<Player> alreadyListening = playersListening.get(b);
 					if(alreadyListening == null)
 						alreadyListening = new ArrayList<>();

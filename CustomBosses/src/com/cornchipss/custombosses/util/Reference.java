@@ -17,7 +17,8 @@ public class Reference
 	public static final String BOSSES_CONFIG_NAME = "\\bosses.json";
 	public static final String LOCATIONS_CONFIG_NAME = "\\spawn-locations.json";
 	public static final String SAVED_ALIVED_BOSSES = "\\saved-alive-bosses.dat";
-	public static final String BOSS_EGG_MENU_NAME = ChatColor.GREEN + "Boss Egg Menu";
+	public static final String BOSS_EGG_MENU_NAME = ChatColor.DARK_GREEN + "Boss Egg Menu";
+	public static final String BOSS_LOCATIONS_GUI = ChatColor.DARK_GREEN + "Boss Locations";
 	
 	public static List<Boss> cloneBosses(List<Boss> bosses)
 	{

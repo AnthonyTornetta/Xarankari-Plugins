@@ -40,6 +40,11 @@ public abstract class Debug
 			debug(location, lineNum, thing.toString());
 	}
 	
+	protected static void debug(String className, String location, int lineNum, String msg)
+	{
+		System.out.println(className + "[" + location + ":" + lineNum + "]: " + msg);
+	}
+	
 	protected static void debug(String className, String location, String msg)
 	{
 		System.out.println(className + "[" + location + "]: " + msg);
@@ -51,5 +56,13 @@ public abstract class Debug
 			debug(className, location, "null");
 		else
 			debug(className, location, thing.toString());
+	}
+	
+	protected static void debug(String className, String location, int lineNum, Object thing)
+	{
+		if(thing == null)
+			debug(className, location, lineNum, "null");
+		else
+			debug(className, location, lineNum, thing.toString());
 	}
 }

@@ -32,13 +32,10 @@ public class BossSpawnArea
 			if(b.getSpawnChance() <= 0 || b.getSpawnChance() > 10000)
 				continue;
 			
-			System.out.println("went rhru");
-			
-			if(Helper.iRandomRange(0, 10000 - b.getSpawnChance()) == b.getSpawnChance() - 1)
+			if(Helper.iRandomRange(0, 10000 - b.getSpawnChance()) == 0)
 			{
-				double diameterX = area.getX().getX() - area.getY().getX();
-				double diameterZ = area.getY().getZ() - area.getY().getZ();
-				
+				double diameterX = Math.abs(area.getX().getX() - area.getY().getX());
+				double diameterZ = Math.abs(area.getX().getZ() - area.getY().getZ());
 				double offsetX = Helper.dRandomRange(0, diameterX);
 				double offsetZ = Helper.dRandomRange(0, diameterZ);
 				
@@ -53,9 +50,11 @@ public class BossSpawnArea
 				for(double y = origY; y <= 255; y++)
 				{
 					Location testLocation = new Location(firstLoc.getWorld(), x, y, z);
-					if(testLocation.getBlock().getType() == Material.AIR && testLocation.add(0, 1, 0).getBlock().getType() == Material.AIR)
+					if(testLocation.getBlock().getType() != Material.AIR 
+					&& testLocation.add(0, 1, 0).getBlock().getType() == Material.AIR
+					&& testLocation.add(0, 2, 0).getBlock().getType() == Material.AIR)
 					{
-						spawnPosition = testLocation;
+						spawnPosition = testLocation.add(0, 1, 0);
 						break;
 					}
 				}
@@ -65,9 +64,11 @@ public class BossSpawnArea
 					for(double y = origY; y >= 0; y--)
 					{
 						Location testLocation = new Location(firstLoc.getWorld(), x, y, z);
-						if(testLocation.getBlock().getType() == Material.AIR && testLocation.add(0, 1, 0).getBlock().getType() == Material.AIR)
+						if(testLocation.getBlock().getType() == Material.AIR 
+						&& testLocation.subtract(0, 1, 0).getBlock().getType() == Material.AIR
+						&& testLocation.subtract(0, 2, 0).getBlock().getType() != Material.AIR)
 						{
-							spawnPosition = testLocation;
+							spawnPosition = testLocation.add(0, 1, 0);
 							break;
 						}
 					}

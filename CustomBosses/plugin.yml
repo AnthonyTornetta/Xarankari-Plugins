@@ -8,3 +8,6 @@ commands:
     killallbosses:
         description: Kills every boss
         usage: /killallbosses
+    bosses:
+        description: Tells you where all the bosses are located (click to tp)
+        usage: /bosses

@@ -8,6 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.cornchipss.custombosses.boss.BossExpirer;
 import com.cornchipss.custombosses.boss.handler.BossHandler;
 import com.cornchipss.custombosses.boss.spawner.BossSpawner;
 import com.cornchipss.custombosses.commands.CommandManager;
@@ -18,7 +19,7 @@ import com.cornchipss.custombosses.listener.CornyListener;
 public class CustomBosses extends JavaPlugin
 {
 	private BossHandler bossHandler;
-	private int repeatingTask;
+	private int spawningTask, bossExpiringTask;
 	private long spawnEveryXSeconds;
 	
 	@Override
@@ -47,25 +48,23 @@ public class CustomBosses extends JavaPlugin
 		pm.registerEvents(cl, this);
 		
 		setupSpawning();
+		setupLivingBossesExpiring();
 	}
 	
 	private void setupSpawning()
 	{
-		repeatingTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new BossSpawner(getBossHandler()), 0L, 20L * spawnEveryXSeconds);
+		spawningTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new BossSpawner(getBossHandler()), 0L, 20L * spawnEveryXSeconds);
+	}
+	
+	private void setupLivingBossesExpiring()
+	{
+		bossExpiringTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new BossExpirer(getBossHandler()), 0L, 20L);
 	}
 	
 	public void onDisable()
 	{
-		try
-		{
-			bossHandler.saveLivingBosses(bossHandler.getLivingBosses());
-		}
-		catch(IOException ex)
-		{
-			ex.printStackTrace();
-			getLogger().info("Could not save boss info");
-		}
-		Bukkit.getScheduler().cancelTask(repeatingTask);
+		Bukkit.getScheduler().cancelTask(spawningTask);
+		Bukkit.getScheduler().cancelTask(bossExpiringTask);
 	}
 	
 	@Override

@@ -18,13 +18,10 @@ public class BossSpawner implements Runnable
 	@Override
 	public void run() 
 	{
-		System.out.println("RANDED");
 		for(BossSpawnArea spawnArea : handler.getSpawnAreas())
 		{
-			System.out.println("SPAWN AREAD");
 			for(LivingBoss toSpawn : spawnArea.run())
 			{
-				System.out.println("ATTEMPTING");
 				BossSpawnEvent bse = new BossSpawnEvent(toSpawn);
 				Bukkit.getPluginManager().callEvent(bse);
 				if(bse.isCancelled())
