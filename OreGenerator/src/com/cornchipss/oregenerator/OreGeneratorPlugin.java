@@ -47,6 +47,8 @@ public class OreGeneratorPlugin extends JavaPlugin
 	{
 		String logMe = initConfig();
 		
+		this.getDataFolder().mkdir();
+		
 		try
 		{
 			readGenerators(genHandler);

@@ -8,6 +8,7 @@ import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -31,9 +32,6 @@ import com.cornchipss.custombosses.listener.events.BossDeathEvent;
 import com.cornchipss.custombosses.listener.events.BossSpawnEvent;
 import com.cornchipss.custombosses.util.Helper;
 import com.cornchipss.custombosses.util.Reference;
-
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 
 public class CornyListener extends Debug implements Listener
 {
@@ -136,11 +134,19 @@ public class CornyListener extends Debug implements Listener
 		
 		for(LivingBoss b : bossHandler.getLivingBosses())
 		{
+			System.out.println(b + ", " + ent);
 			if(b.getEntity().equals(ent))
 			{
-				BossDeathEvent bossDeathEvent = new BossDeathEvent(b);
+				Entity killer = e.getEntity().getKiller();
+				Player pKiller = null;
+				
+				if(killer instanceof Player)
+					pKiller = (Player)killer;
+				
+				BossDeathEvent bossDeathEvent = new BossDeathEvent(b, pKiller);
 				Bukkit.getPluginManager().callEvent(bossDeathEvent);
 				
+				e.setDroppedExp(b.getBoss().getXpDropped());
 				e.getDrops().clear();
 				
 				for(ItemStack i : bossDeathEvent.getDrops())
@@ -166,42 +172,14 @@ public class CornyListener extends Debug implements Listener
 		if(damager instanceof Player)
 		{
 			Player p = (Player)damager;
-			
-			boolean playerGot = false;
-			
+						
 			for(LivingBoss b : bossHandler.getLivingBosses())
 			{
 				if(damaged.equals(b.getEntity()))
 				{
 					b.setTimeSinceLastHit(0);
-					
-					List<Player> alreadyListening = playersListening.get(b);
-					if(alreadyListening == null)
-						alreadyListening = new ArrayList<>();
-					if(!alreadyListening.contains(p))
-						alreadyListening.add(p);
-					playerGot = true;
-					
-					for(Player player : alreadyListening)
-					{
-						double amtToShow = b.getEntity().getHealth() - e.getFinalDamage();
-						if(amtToShow < 0)
-							amtToShow = 0;
-						player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText((int)Math.round(amtToShow) + "/" + b.getBoss().getStartingHealth()));
-					}
-				}
-			}
-			
-			if(!playerGot)
-			{
-				for(LivingBoss b : playersListening.keySet())
-				{
-					List<Player> alreadyListening = playersListening.get(b);
-					if(alreadyListening.contains(p))
-					{
-						alreadyListening.remove(p);
-						break;
-					}
+					b.getBossBar().setProgress(b.getEntity().getHealth() / b.getEntity().getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+					b.getBossBar().addPlayer(p);
 				}
 			}
 		}
@@ -232,6 +210,26 @@ public class CornyListener extends Debug implements Listener
 	{
 		LivingBoss boss = e.getLivingBoss();
 		playersListening.remove(boss);
+		String deathCmd = boss.getBoss().getDeathCommand();
+		String deathMessage = boss.getBoss().getDeathMessage();
+		
+		if(e.getKiller() != null)
+		{
+			if(!deathCmd.isEmpty())
+			{
+				deathCmd.replaceAll("%player%", e.getKiller().getDisplayName());
+				deathCmd.replaceAll("%boss%", boss.getBoss().getDisplayName());
+				Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), deathCmd);
+			}
+			
+			if(!deathMessage.isEmpty())
+			{
+				deathMessage.replaceAll("%player%", e.getKiller().getDisplayName());
+				deathMessage.replaceAll("%boss%", boss.getBoss().getDisplayName());
+				Bukkit.broadcastMessage(deathMessage);
+			}
+		}
+		boss.getBossBar().removeAll();
 		bossHandler.removeLivingBoss(boss);
 	}
 }

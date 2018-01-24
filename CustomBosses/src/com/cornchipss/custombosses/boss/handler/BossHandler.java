@@ -11,11 +11,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.entity.EntityType;
+
 import com.cornchipss.custombosses.boss.Boss;
 import com.cornchipss.custombosses.boss.LivingBoss;
 import com.cornchipss.custombosses.boss.json.JsonBoss;
+import com.cornchipss.custombosses.boss.json.equipment.BossEquipmentJson;
+import com.cornchipss.custombosses.boss.json.equipment.ItemStackJson;
+import com.cornchipss.custombosses.boss.json.equipment.ItemStackJsonAmountRange;
 import com.cornchipss.custombosses.boss.spawner.BossSpawnArea;
 import com.cornchipss.custombosses.util.Reference;
+import com.cornchipss.custombosses.util.Vector2;
 import com.cornchipss.custombosses.util.json.PluginJsonParser;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
@@ -27,21 +36,12 @@ public class BossHandler
 	private List<BossSpawnArea> bossSpawnAreas;
 	private final File folderPath;
 	
-	public BossHandler(File folderPath, List<Boss> loadedBosses) throws IOException
-	{
-		this.folderPath = folderPath;
-		this.loadedBosses = loadedBosses;		
-		
-		initFiles();
-		this.livingBosses = (loadLivingBosses(getLoadedBosses()));
-		setSpawnAreas(loadSpawnAreas(getLoadedBosses()));
-	}
-	
 	public BossHandler(File folderPath) throws IOException
-	{
+	{		
 		this.folderPath = folderPath;
 		initFiles();
 		setLoadedBosses(loadBosses());
+		
 		this.livingBosses = (loadLivingBosses(getLoadedBosses()));
 		setSpawnAreas(loadSpawnAreas(getLoadedBosses()));
 	}
@@ -94,8 +94,42 @@ public class BossHandler
 		
 		if(bossFile.createNewFile())
 		{
+			List<ItemStackJson> aj = new ArrayList<>();
+			Map<String, Integer> enchants = new HashMap<>();
+			enchants.put("PROTECTION_ENVIRONMENTAL", 200);
+			aj.add(new ItemStackJson(Material.DIAMOND_HELMET.name(), "Helmet ig uess", new ArrayList<>(), enchants));
+			
+			Map<String, Integer> hE = new HashMap<>();
+			hE.put("DAMAGE_ALL", 200);
+			ItemStackJson hand = new ItemStackJson(Material.DIAMOND_SWORD.name(), "Helmet ig uess", new ArrayList<>(), hE);
+			BossEquipmentJson be = new BossEquipmentJson(aj, hand);
+			
+			List<ItemStackJsonAmountRange> drops = new ArrayList<>();
+			drops.add(new ItemStackJsonAmountRange("GOLDEN_APPLE", "Super Apple", new ArrayList<>(), hE, new Vector2<>(4, 8)));
+			
+			Map<String, Integer> dropBlazerodEnchants = new HashMap<>();
+			dropBlazerodEnchants.put("DAMAGE_ALL", 17);
+			dropBlazerodEnchants.put("FIRE_ASPECT", 14);
+			
+			drops.add(new ItemStackJsonAmountRange("BLAZE_ROD", ChatColor.RED + "Blaze Rod of Doom", new ArrayList<>(), dropBlazerodEnchants, new Vector2<>(1, 1)));
+			
+			JsonBoss b = new JsonBoss(100, ChatColor.GOLD + "Blaze of Death", EntityType.BLAZE.name(), be, drops, 100, Material.BLAZE_POWDER.name(), 0, 5000, 100, "", "%player% has killed the mythical %boss%!");
+			
+			List<JsonBoss> jsonBosses = new ArrayList<>();
+			jsonBosses.add(b);
+			System.out.println("GOT HERE");
+			System.out.println("ASDF: " + jsonBosses);
+			
 			BufferedWriter bw = new BufferedWriter(new FileWriter(bossFile));
-			bw.write(Reference.DEFAULT_BOSS_JSON);
+			//bw.write(Reference.DEFAULT_BOSS_JSON);
+			System.out.println(jsonBosses);
+			String json = new GsonBuilder().setPrettyPrinting().create().toJson(jsonBosses);
+			bw.write(json);
+			if(json.isEmpty())
+			{
+				System.out.println("BAD BOI");
+			}
+			System.out.println(json);
 			bw.close();
 		}
 		
@@ -116,6 +150,7 @@ public class BossHandler
 		{
 			json += line + "\n";
 		}
+		
 		br.close();
 		
 		return PluginJsonParser.deserializeBosses(json);
@@ -133,8 +168,13 @@ public class BossHandler
 			
 			Map<Integer, String> serializedAliveBosses = new HashMap<>();
 			String[] split = s.split(":");
-			serializedAliveBosses.put(Integer.parseInt(split[0]), split[1]);
-			
+			int id = Integer.parseInt(split[0]);
+			serializedAliveBosses.put(id, split[1]);
+			if(!Reference.getBossIds(getLoadedBosses()).contains(id))
+			{
+				Bukkit.getLogger().info("CustomBosses> Invalid boss id in saved alive bosses file (" + id + ") - disabling to avoid damage");
+				Bukkit.getPluginManager().disablePlugin(Reference.getPlugin());
+			}
 			livingBosses.add(LivingBoss.deserialize(loadedBosses, serializedAliveBosses));
 		}
 		br.close();

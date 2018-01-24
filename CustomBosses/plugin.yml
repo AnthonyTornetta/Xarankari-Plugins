@@ -1,6 +1,7 @@
 name: CustomBosses
 main: com.cornchipss.custombosses.CustomBosses
 version: 1.0
+author: Cornchipss
 commands:
     bossegg:
         description: Gives you the GUI to the boss eggs, or you can specify the id to get

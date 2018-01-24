@@ -4,20 +4,20 @@ import java.util.List;
 
 public class BossEquipmentJson 
 {
-	private List<ArmorJson> armor;
-	private HandJson hand;
+	private List<ItemStackJson> armor;
+	private ItemStackJson hand;
 	
-	public BossEquipmentJson(List<ArmorJson> armor, HandJson hand) 
+	public BossEquipmentJson(List<ItemStackJson> armor, ItemStackJson hand) 
 	{
 		this.armor = armor;
 		this.hand = hand;
 	}
 
-	public List<ArmorJson> getArmor() { return armor; }
-	public void setArmor(List<ArmorJson> armor) { this.armor = armor; }
+	public List<ItemStackJson> getArmor() { return armor; }
+	public void setArmor(List<ItemStackJson> armor) { this.armor = armor; }
 
-	public HandJson getHand() { return hand; }
-	public void setHand(HandJson hand) { this.hand = hand; }
+	public ItemStackJson getHand() { return hand; }
+	public void setHand(ItemStackJson hand) { this.hand = hand; }
 	
 	@Override
 	public String toString()

@@ -3,7 +3,9 @@ package com.cornchipss.custombosses.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.plugin.Plugin;
 
 import com.cornchipss.custombosses.boss.Boss;
 import com.cornchipss.custombosses.boss.spawner.BossSpawnArea;
@@ -48,7 +50,15 @@ public class Reference
 	{
 		List<Boss> bosses = new ArrayList<>();
 		for(int id : ids)
-			bosses.add(getBossFromId(loadedBosses, id));
+		{
+			Boss b = getBossFromId(loadedBosses, id);
+			if(b == null)
+			{
+				Bukkit.getLogger().info("CustomBosses> Invalid id in spawn locations file - disabling to avoid damage");
+				Bukkit.getPluginManager().disablePlugin(Reference.getPlugin());
+			}
+			bosses.add(b);
+		}
 		return bosses;
 	}
 	
@@ -58,6 +68,11 @@ public class Reference
 			if(b.getId() == id)
 				return b;
 		return null;
+	}
+	
+	public static Plugin getPlugin()
+	{
+		return Bukkit.getPluginManager().getPlugin("CustomBosses");
 	}
 	
 	// TODO: Put this in a file at some point

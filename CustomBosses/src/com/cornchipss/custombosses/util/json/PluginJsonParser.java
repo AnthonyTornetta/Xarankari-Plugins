@@ -6,6 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
+import org.bukkit.enchantments.Enchantment;
+
 import com.cornchipss.custombosses.boss.Boss;
 import com.cornchipss.custombosses.boss.json.JsonBoss;
 import com.cornchipss.custombosses.boss.json.JsonLocations;
@@ -22,6 +25,9 @@ public class PluginJsonParser
 	{
 		Gson gson = new Gson();
 		List<JsonBoss> jsonBosses;
+		
+		if(json.isEmpty())
+			System.out.println("JSON IS REMPTY -- I REPEAT -- JSON ISSSS EMPTY!");
 		
 		jsonBosses = Arrays.asList(gson.fromJson(json, JsonBoss[].class));
 		
@@ -50,9 +56,17 @@ public class PluginJsonParser
 		
 		for(BossSpawnArea area : areas)
 		{
-			List<Integer> bosses = Reference.getBossIds(area.getBosses());
-			
-			serializeableData.put(Serializer.serializeLocation(area.getLocationX()) + "-" + Serializer.serializeLocation(area.getLocationY()), bosses);
+			try
+			{
+				List<Integer> bosses = Reference.getBossIds(area.getBosses());
+				
+				serializeableData.put(Serializer.serializeLocation(area.getLocationX()) + "-" + Serializer.serializeLocation(area.getLocationY()), bosses);
+			}
+			catch(NullPointerException ex)
+			{
+				Bukkit.getServer().getLogger().info("CustomBosses> Invalid boss id in locations file! Disabling to avoid any damage");
+				Bukkit.getPluginManager().disablePlugin(Reference.getPlugin());
+			}
 		}
 		
 		JsonLocations jsonLocs = new JsonLocations();
@@ -86,5 +100,15 @@ public class PluginJsonParser
 		}
 		
 		return parsed;
+	}
+
+	public static Map<String, Integer> serializeEnchants(Map<Enchantment, Integer> enchantments) 
+	{
+		Map<String, Integer> serialized = new HashMap<>();
+		for(Enchantment e : enchantments.keySet())
+		{
+			serialized.put(e.getName(), enchantments.get(e));
+		}
+		return serialized;
 	}
 }

@@ -10,6 +10,10 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarFlag;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.EntityEquipment;
@@ -22,6 +26,7 @@ public class LivingBoss
 	private Location spawnHereLocation = null;
 	private Boss boss;
 	private int timeSinceLastHit = 0;
+	private BossBar bossBar;
 	
 	public LivingBoss(Boss b)
 	{
@@ -63,6 +68,8 @@ public class LivingBoss
 		entity.getEquipment().setChestplateDropChance(0);
 		entity.getEquipment().setHelmetDropChance(0);
 		entity.getEquipment().setItemInOffHandDropChance(0);
+		
+		bossBar = Bukkit.createBossBar(this.getBoss().getDisplayName(), BarColor.RED, BarStyle.SOLID, BarFlag.CREATE_FOG);
 	}
 	
 	public void spawn()
@@ -108,7 +115,7 @@ public class LivingBoss
 	
 	public void remove() 
 	{
-		BossDeathEvent e = new BossDeathEvent(this);
+		BossDeathEvent e = new BossDeathEvent(this, null);
 		Bukkit.getPluginManager().callEvent(e);
 		this.getEntity().remove();
 	}
@@ -127,4 +134,6 @@ public class LivingBoss
 	public void increaseTimeBetweenHits() { this.timeSinceLastHit++; }
 	public void setTimeSinceLastHit(int time) { this.timeSinceLastHit = time; }
 	public int getTimeSinceLastHit() { return this.timeSinceLastHit; }
+	
+	public BossBar getBossBar() { return this.bossBar; }
 }

@@ -20,14 +20,16 @@ public class Boss
 	private EntityType entityType;
 	private ItemStack handEquipment;
 	private ItemStack[] armor = new ItemStack[4];
-	private int price = -1;
 	private ItemStack spawnItem;
 	int damagePerHit = 0;
 	private int bossId;
 	private int spawnChance;
+	int xpDropped;
+	String deathCommand;
+	String deathMessage;
 	
 	public Boss(int startingHealth, EntityType entityType, String displayName, ItemStack handEquipment, ItemStack[] armor, Map<ItemStack, Vector2<Integer, Integer>> drops, 
-				int damagePerHit, int price, ItemStack spawnItem, int bossId, int spawnChance) 
+				int damagePerHit, ItemStack spawnItem, int bossId, int spawnChance, int xpDropped, String deathCommand, String deathMessage) 
 	{
 		this.displayName = displayName;
 		this.startingHealth = startingHealth;
@@ -36,10 +38,12 @@ public class Boss
 		this.armor = armor;
 		this.drops = drops;
 		this.damagePerHit = damagePerHit;
-		this.price = price;
 		this.spawnItem = spawnItem;
 		this.bossId = bossId;
 		this.spawnChance = spawnChance;
+		this.xpDropped = xpDropped;
+		this.deathCommand = deathCommand;
+		this.deathMessage = deathMessage;
 	}
 	
 	public LivingBoss createLivingBoss()
@@ -55,7 +59,7 @@ public class Boss
 	@Override
 	public String toString()
 	{
-		return "Boss [" + getDisplayName() + "; " + getEntityType() + "; " + getStartingHealth() + "; " + getHandEquipment() + "; " + getArmor(0) + ", " + getArmor(1) + ", " + getArmor(2) + ", " + getArmor(3) + "; " + getDropItems() + "; " + getDamagePerHit() + "; " + getPrice() + "; " + getSpawnItem() + "]";
+		return "Boss [" + getDisplayName() + "; " + getEntityType() + "; " + getStartingHealth() + "; " + getHandEquipment() + "; " + getArmor(0) + ", " + getArmor(1) + ", " + getArmor(2) + ", " + getArmor(3) + "; " + getDropItems() + "; " + getDamagePerHit() + "; " + getSpawnItem() + "]";
 	}
 	
 	public int getStartingHealth() { return startingHealth; }
@@ -86,7 +90,10 @@ public class Boss
 			ItemStack i = temp.clone();
 			
 			Vector2<Integer, Integer> range = this.getDrops().get(i);
-			i.setAmount(Helper.iRandomRange(range.getX(), range.getY()));
+			int amt = Helper.iRandomRange(range.getX(), range.getY());
+			if(amt <= 0)
+				continue;
+			i.setAmount(amt);
 			
 			drops.add(i);
 		}
@@ -97,9 +104,6 @@ public class Boss
 	public int getDamagePerHit() { return damagePerHit; }
 	public void setDamagePerHit(int dmg) { this.damagePerHit = dmg; }
 
-	public int getPrice() { return price; }
-	public void setPrice(int p) { this.price = p; }
-
 	public ItemStack getSpawnItem() { return spawnItem; }
 	public void setSpawnItem(ItemStack i) { this.spawnItem = i; }
 	
@@ -107,4 +111,13 @@ public class Boss
 
 	public int getSpawnChance() { return spawnChance; }
 	public void setSpawnChance(int chance) { this.spawnChance = chance; }
+
+	public int getXpDropped() { return xpDropped; }
+	public void setXpDropped(int xpDropped) { this.xpDropped = xpDropped; }
+
+	public String getDeathCommand() { return deathCommand; }
+	public void setDeathCommand(String deathCommand) { this.deathCommand = deathCommand; }
+
+	public String getDeathMessage() { return deathMessage; }
+	public void setDeathMessage(String deathMessage) { this.deathMessage = deathMessage; }	
 }

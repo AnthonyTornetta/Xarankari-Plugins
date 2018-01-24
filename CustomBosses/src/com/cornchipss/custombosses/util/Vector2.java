@@ -2,19 +2,19 @@ package com.cornchipss.custombosses.util;
 
 public class Vector2<A, B>
 {
-	private A x;
-	private B y;
+	private A minDropRate;
+	private B maxDropRate;
 	
 	public Vector2(A x, B y)
 	{
-		this.x = x;
-		this.y = y;
+		this.minDropRate = x;
+		this.maxDropRate = y;
 	}
 	
 	public Vector2()
 	{
-		this.x = null;
-		this.y = null;
+		this.minDropRate = null;
+		this.maxDropRate = null;
 	}
 	
 	public Vector2<A, B> clone()
@@ -25,9 +25,9 @@ public class Vector2<A, B>
 	@Override
 	public String toString() { return "Vector2 [" + getX() + ", " + getY() + "]"; }
 	
-	public A getX() { return x; }
-	public B getY() { return y; }
+	public A getX() { return minDropRate; }
+	public B getY() { return maxDropRate; }
 	
-	public void setX(A x) { this.x = x; }
-	public void setY(B y) { this.y = y; }
+	public void setX(A x) { this.minDropRate = x; }
+	public void setY(B y) { this.maxDropRate = y; }
 }
