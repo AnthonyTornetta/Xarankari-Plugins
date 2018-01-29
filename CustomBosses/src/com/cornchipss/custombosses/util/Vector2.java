@@ -1,20 +1,24 @@
 package com.cornchipss.custombosses.util;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Vector2<A, B>
 {
-	private A minDropRate;
-	private B maxDropRate;
+	@SerializedName("minDropRate")
+	private A x;
+	@SerializedName("maxDropRate")
+	private B y;
 	
 	public Vector2(A x, B y)
 	{
-		this.minDropRate = x;
-		this.maxDropRate = y;
+		this.x = x;
+		this.y = y;
 	}
 	
 	public Vector2()
 	{
-		this.minDropRate = null;
-		this.maxDropRate = null;
+		this.x = null;
+		this.y = null;
 	}
 	
 	public Vector2<A, B> clone()
@@ -25,9 +29,9 @@ public class Vector2<A, B>
 	@Override
 	public String toString() { return "Vector2 [" + getX() + ", " + getY() + "]"; }
 	
-	public A getX() { return minDropRate; }
-	public B getY() { return maxDropRate; }
+	public A getX() { return x; }
+	public B getY() { return y; }
 	
-	public void setX(A x) { this.minDropRate = x; }
-	public void setY(B y) { this.maxDropRate = y; }
+	public void setX(A x) { this.x = x; }
+	public void setY(B y) { this.y = y; }
 }

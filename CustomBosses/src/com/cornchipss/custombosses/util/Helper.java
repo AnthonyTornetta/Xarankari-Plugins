@@ -29,6 +29,14 @@ public class Helper
 		return val;
 	}
 	
+	public static double roundToNthDecimal(double num, int place)
+	{
+		num *= (place * 10);
+		num = Math.round(num);
+		num /= (place * 10);
+		return num;
+	}
+	
 	public static boolean isInt(String possibleNumber)
 	{
 		boolean validNumber = false; // We use this to see if the last number checked was a number too

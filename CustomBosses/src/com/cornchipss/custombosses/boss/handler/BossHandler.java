@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 
@@ -251,10 +252,23 @@ public class BossHandler
 		catch (IOException e) 
 		{ e.printStackTrace(); }
 	}
+	public void addSpawnArea(Vector2<Location, Location> locs) 
+	{
+	}
 	
 	public List<Boss> getLoadedBosses()
 	{
 		return Reference.cloneBosses(loadedBosses);
 	}
 	public void setLoadedBosses(List<Boss> loadBosses) { this.loadedBosses = loadBosses; }
+	
+	public Boss getBossFromId(int id)
+	{
+		for(Boss b : getLoadedBosses())
+		{
+			if(b.getId() == id)
+				return b;
+		}
+		return null;
+	}
 }

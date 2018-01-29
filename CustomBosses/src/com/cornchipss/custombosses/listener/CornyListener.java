@@ -68,7 +68,7 @@ public class CornyListener extends Debug implements Listener
 		
 		if(e.getAction() != Action.RIGHT_CLICK_BLOCK && itemHeld != null)
 			return;
-				
+		
 		for(Boss b : bossHandler.getLoadedBosses())
 		{
 			ItemStack spawnItem = b.getSpawnItem();		
@@ -84,7 +84,10 @@ public class CornyListener extends Debug implements Listener
 				
 				// Make sure to spawn it before adding it, because it needs the location to serialize it
 				newBoss.spawn(e.getClickedBlock().getLocation().add(0.0, 1.0, 0.0));
+				debug("playerInteract", 87, newBoss.getEntity());
 				bossHandler.addLivingBoss(newBoss);
+				
+				debug("entityDeath", bossHandler.getLivingBosses().size());
 				
 				itemHeld.setAmount(itemHeld.getAmount() - 1);
 				break;
@@ -131,22 +134,22 @@ public class CornyListener extends Debug implements Listener
 	public void entityDeath(EntityDeathEvent e)
 	{
 		LivingEntity ent = e.getEntity(); // More of a DeadEntity now (ba dum tss)
-		
-		for(LivingBoss b : bossHandler.getLivingBosses())
+		debug("entityDeath", bossHandler.getLivingBosses().size());
+		for(LivingBoss livingBoss : bossHandler.getLivingBosses())
 		{
-			System.out.println(b + ", " + ent);
-			if(b.getEntity().equals(ent))
+			debug("entityDeath", 138, livingBoss.getEntity() + ":" + ent);
+			if(livingBoss.getEntity().equals(ent))
 			{
-				Entity killer = e.getEntity().getKiller();
+				Entity killer = ent.getKiller();
 				Player pKiller = null;
 				
 				if(killer instanceof Player)
 					pKiller = (Player)killer;
 				
-				BossDeathEvent bossDeathEvent = new BossDeathEvent(b, pKiller);
+				BossDeathEvent bossDeathEvent = new BossDeathEvent(livingBoss, pKiller);
 				Bukkit.getPluginManager().callEvent(bossDeathEvent);
 				
-				e.setDroppedExp(b.getBoss().getXpDropped());
+				e.setDroppedExp(livingBoss.getBoss().getXpDropped());
 				e.getDrops().clear();
 				
 				for(ItemStack i : bossDeathEvent.getDrops())
@@ -169,24 +172,28 @@ public class CornyListener extends Debug implements Listener
 			damager = (Entity)projectile.getShooter();
 		}
 		
+		LivingBoss b = null;
+		
 		if(damager instanceof Player)
 		{
 			Player p = (Player)damager;
 						
-			for(LivingBoss b : bossHandler.getLivingBosses())
+			for(LivingBoss lb : bossHandler.getLivingBosses())
 			{
+				b = lb;
 				if(damaged.equals(b.getEntity()))
 				{
 					b.setTimeSinceLastHit(0);
-					b.getBossBar().setProgress(b.getEntity().getHealth() / b.getEntity().getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 					b.getBossBar().addPlayer(p);
 				}
+				break;
 			}
 		}
 		else
 		{			
-			for(LivingBoss b : bossHandler.getLivingBosses())
+			for(LivingBoss lb : bossHandler.getLivingBosses())
 			{
+				b = lb;
 				if(b.getEntity().equals(damager))
 				{
 					if(b.getBoss().getDamagePerHit() >= 0)
@@ -194,7 +201,16 @@ public class CornyListener extends Debug implements Listener
 						e.setDamage(b.getBoss().getDamagePerHit());
 					}
 				}
+				break;
 			}
+		}
+		
+		if(b != null)
+		{
+			double maxHealth = b.getEntity().getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+			double newHealth = b.getEntity().getHealth() - e.getFinalDamage();
+			
+			b.getBossBar().setProgress(Helper.clamp(newHealth, 0, maxHealth) / maxHealth);
 		}
 	}
 	
@@ -217,19 +233,26 @@ public class CornyListener extends Debug implements Listener
 		{
 			if(!deathCmd.isEmpty())
 			{
-				deathCmd.replaceAll("%player%", e.getKiller().getDisplayName());
-				deathCmd.replaceAll("%boss%", boss.getBoss().getDisplayName());
+				deathCmd = deathCmd.replace("%player%", ChatColor.stripColor(e.getKiller().getName()));
+				deathCmd = deathCmd.replace("%display%", e.getKiller().getDisplayName());
+				deathCmd = deathCmd.replace("%boss%", boss.getBoss().getDisplayName());
 				Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), deathCmd);
 			}
 			
 			if(!deathMessage.isEmpty())
 			{
-				deathMessage.replaceAll("%player%", e.getKiller().getDisplayName());
-				deathMessage.replaceAll("%boss%", boss.getBoss().getDisplayName());
-				Bukkit.broadcastMessage(deathMessage);
+				deathMessage = deathMessage.replace("%player%", ChatColor.stripColor(e.getKiller().getName()));
+				deathMessage = deathMessage.replace("%display%", e.getKiller().getDisplayName());
+				deathMessage = deathMessage.replace("%boss%", boss.getBoss().getDisplayName());
+				Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', deathMessage));
 			}
 		}
-		boss.getBossBar().removeAll();
+	
+		boss.getBossBar().setVisible(false);
+		for(Player p : boss.getBossBar().getPlayers())
+		{
+			boss.getBossBar().removePlayer(p);
+		}
 		bossHandler.removeLivingBoss(boss);
 	}
 }

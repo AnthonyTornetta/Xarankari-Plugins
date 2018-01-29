@@ -60,7 +60,7 @@ public class PluginJsonParser
 			{
 				List<Integer> bosses = Reference.getBossIds(area.getBosses());
 				
-				serializeableData.put(Serializer.serializeLocation(area.getLocationX()) + "-" + Serializer.serializeLocation(area.getLocationY()), bosses);
+				serializeableData.put(Serializer.serializeLocation(area.getLocationX()) + "/" + Serializer.serializeLocation(area.getLocationY()), bosses);
 			}
 			catch(NullPointerException ex)
 			{
@@ -91,8 +91,8 @@ public class PluginJsonParser
 		Map<String, List<Integer>> serializedLocs = locsClass.getSerializedLocations();
 		
 		for(String s : serializedLocs.keySet())
-		{						
-			String[] locationsSerialized = s.split("-");
+		{
+			String[] locationsSerialized = s.split("/");
 			
 			parsed.add(new BossSpawnArea(new Vector2<>(Serializer.deserializeLocation(locationsSerialized[0]), 
 														Serializer.deserializeLocation(locationsSerialized[1])), 

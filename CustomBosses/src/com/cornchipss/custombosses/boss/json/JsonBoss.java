@@ -16,6 +16,7 @@ import com.cornchipss.custombosses.boss.Boss;
 import com.cornchipss.custombosses.boss.json.equipment.BossEquipmentJson;
 import com.cornchipss.custombosses.boss.json.equipment.ItemStackJson;
 import com.cornchipss.custombosses.boss.json.equipment.ItemStackJsonAmountRange;
+import com.cornchipss.custombosses.util.Reference;
 import com.cornchipss.custombosses.util.Vector2;
 import com.cornchipss.custombosses.util.json.PluginJsonParser;
 
@@ -65,7 +66,14 @@ public class JsonBoss extends Debug
 			armor[i] = new ItemStack(Material.valueOf(json.getMaterial()));
 			for(String s : json.getEnchants().keySet())
 			{
-				armor[i].addUnsafeEnchantment(Enchantment.getByName(s), json.getEnchants().get(s));
+				Enchantment enchant = Enchantment.getByName(s);
+				if(enchant == null)
+				{
+					Reference.getPlugin().getLogger().info("Error: enchantment '" + s + "' is not a valid enchantment");
+					Reference.getPlugin().getLogger().info("See this list (https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/enchantments/Enchantment.html) for a full list of bukkit enchantments (middle column)");
+					continue;
+				}
+				armor[i].addUnsafeEnchantment(enchant, json.getEnchants().get(s));
 			}
 		}
 		
