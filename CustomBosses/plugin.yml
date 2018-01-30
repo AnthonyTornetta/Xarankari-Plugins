@@ -10,5 +10,18 @@ commands:
         description: Kills every boss
         usage: /killallbosses
     bosses:
-        description: Tells you where all the bosses are located (click to tp)
+        description: Tells you where all the bosses are located
         usage: /bosses
+    bosspos1:
+        description: Sets the first boss spawn area corner to be saved
+        usage: /bosspos1
+    bosspos2:
+        description: Sets the second boss spawn area corner to be saved
+        usage: /bosspos2
+    savespawnarea:
+        description: Saves the boss area designated by the 2 positions set and will be used from now on
+        usage: /savespawnarea <boss id> (boss id) (boss id) (etc)
+    listspawnareas:
+        description: Lists all boss spawn areas
+        usage: /listspawnareas
+    

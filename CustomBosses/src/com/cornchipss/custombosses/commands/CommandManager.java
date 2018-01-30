@@ -11,18 +11,15 @@ import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import com.cornchipss.custombosses.CustomBosses;
 import com.cornchipss.custombosses.Debug;
 import com.cornchipss.custombosses.boss.Boss;
 import com.cornchipss.custombosses.boss.LivingBoss;
+import com.cornchipss.custombosses.boss.spawner.BossSpawnArea;
 import com.cornchipss.custombosses.util.Helper;
 import com.cornchipss.custombosses.util.Reference;
 import com.cornchipss.custombosses.util.Vector2;
-import com.cornchipss.custombosses.util.mobheads.Head.Mob;
 
 public class CommandManager extends Debug
 {
@@ -79,7 +76,7 @@ public class CommandManager extends Debug
 			
 			if(args.length == 0)
 			{
-				openBossEggGui(customBosses.getBossHandler().getLoadedBosses(), p);
+				InventoryHelper.openBossEggGUI(customBosses.getBossHandler().getLoadedBosses(), p);
 			}
 			else
 			{
@@ -151,7 +148,7 @@ public class CommandManager extends Debug
 					sender.sendMessage(ChatColor.GOLD + "There are no alive bosses");
 					return true;
 				}
-				openBossLocationGui(customBosses.getBossHandler().getLivingBosses(), (Player)sender);
+				InventoryHelper.openBossLocationGUI(customBosses.getBossHandler().getLivingBosses(), (Player)sender);
 			}
 			else
 			{
@@ -165,7 +162,7 @@ public class CommandManager extends Debug
 				sender.sendMessage("You must be a player to use this command");
 				return true;
 			}
-			if(sender.hasPermission("custombosses.setspawnlocation"))
+			if(sender.hasPermission("custombosses.setspawnarea"))
 			{
 				Player p = (Player)sender;
 				int posNum = Integer.parseInt(cmd.charAt(cmd.length() - 1) + "");
@@ -194,24 +191,23 @@ public class CommandManager extends Debug
 				}
 				
 				playersSettingLocations.put(p, locs);
-				p.sendMessage(ChatColor.RED + "Spawn corner " + posNum + " set to " + locOfPlayer.getX() + ", " + locOfPlayer.getY() + ", " + locOfPlayer.getZ());
+				p.sendMessage(ChatColor.GOLD + "Spawn corner " + posNum + " set to " + locOfPlayer.getX() + ", " + locOfPlayer.getY() + ", " + locOfPlayer.getZ());
 			}
 			else
 			{
 				sender.sendMessage(ChatColor.RED + "You do not have the proper permissions.");
 			}
 		}
-		else if(cmd.equals("savebosspos"))
+		else if(cmd.equals("savespawnarea"))
 		{
 			if(!(sender instanceof Player))
 			{
 				sender.sendMessage("You must be a player to use this command");
 				return true;
 			}
-			if(sender.hasPermission("custombosses.savespawnlocation"))
+			if(sender.hasPermission("custombosses.save.spawnarea"))
 			{
 				Player p = (Player)sender;
-				Location locOfPlayer = p.getLocation().clone();
 				
 				Vector2<Location, Location> locs = null;
 				for(Player alreadySetPlayer : playersSettingLocations.keySet())
@@ -225,7 +221,8 @@ public class CommandManager extends Debug
 				
 				if(args.length == 0)
 				{
-					p.sendMessage("You must specify which bosses will spawn (by their id) like so: /savespawnlocation 0 1 2 3 etc...");
+					p.sendMessage("You must specify which bosses will spawn (by their id) like so: /savespawnarea 0 1 2 3 etc...");
+					return true;
 				}
 				
 				List<Integer> bossIds = new ArrayList<>();
@@ -233,11 +230,18 @@ public class CommandManager extends Debug
 				{
 					if(Helper.isInt(s))
 					{
-						bossIds.add(Integer.);
+						int id = Integer.parseInt(s);
+						if(!Reference.getBossIds(customBosses.getBossHandler().getLoadedBosses()).contains(id))
+						{
+							sender.sendMessage(ChatColor.RED + "Invalid boss id! Do /bossegg and look at the number in the brackets to see all the ids");
+							return true;
+						}
+						bossIds.add(id);
 					}
 					else
 					{
-						
+						sender.sendMessage("The id of " + s + " is not a valid integer.");
+						return true;
 					}
 				}
 				
@@ -257,59 +261,45 @@ public class CommandManager extends Debug
 					p.sendMessage(ChatColor.RED + "You haven't set the second spawn corner yet");
 					return true;
 				}
+				if(!locs.getX().getWorld().equals(locs.getY().getWorld()))
+				{
+					p.sendMessage(ChatColor.RED + "The corners must be in the same world!");
+					return true;
+				}
 				
-				List<Boss> bossesThatWillSpawn = new ArrayList<>();
+				List<Boss> bossesThatWillSpawn = Reference.getBossesFromIds(customBosses.getBossHandler().getLoadedBosses(), bossIds);
 				
 				customBosses.getBossHandler().addSpawnArea(locs, bossesThatWillSpawn);
 				
 				playersSettingLocations.remove(p);
+				
+				p.sendMessage(ChatColor.GOLD + "Boss Spawn Location set!");
 			}
 			else
 			{
 				sender.sendMessage(ChatColor.RED + "You do not have the proper permissions.");
 			}
 		}
+		else if(cmd.equals("listspawnareas"))
+		{
+			if(sender.hasPermission("custombosses.list.spawnareas"))
+			{
+				if(sender instanceof Player)
+				{
+					InventoryHelper.openBossSpawnAreasGUI(customBosses.getBossHandler().getSpawnAreas(), (Player)sender);
+				}
+				else
+				{
+					for(BossSpawnArea a : customBosses.getBossHandler().getSpawnAreas())
+					{
+						sender.sendMessage(a.getLocationX().getX() + ", " + a.getLocationX().getY() + ", " + a.getLocationX().getZ() + "; " + a.getLocationX().getWorld());
+						sender.sendMessage(a.getLocationY().getX() + ", " + a.getLocationY().getY() + ", " + a.getLocationY().getZ() + "; " + a.getLocationY().getWorld());
+						sender.sendMessage("---");
+					}
+				}
+			}
+		}
 		
 		return true;
 	}
-
-	private static void openBossEggGui(List<Boss> bosses, Player p) 
-	{
-		final int ROWS = 2 + (int)Math.ceil(bosses.size() / 9.0);
-		Inventory inv = Bukkit.createInventory(null, 9 * ROWS, Reference.BOSS_EGG_MENU_NAME);
-		
-		InventoryHelper.genBorders(ROWS, inv);
-		
-		for(int i = 0; i < bosses.size(); i++)
-		{
-			inv.setItem(10 + i, bosses.get(i).getSpawnItem());
-		}
-		
-		p.openInventory(inv);
-	}
-	
-	private static void openBossLocationGui(List<LivingBoss> bosses, Player p)
-	{
-		final int ROWS = (int)Math.ceil(bosses.size() / 9.0);
-		Inventory inv = Bukkit.createInventory(null, 9 * ROWS, Reference.BOSS_LOCATIONS_GUI);
-		
-		for(int i = 0; i < bosses.size(); i++)
-		{
-			LivingBoss b = bosses.get(i);
-			ItemStack skull = Mob.getFromType(b.getEntity().getType()).getHead();
-			ItemMeta skullMeta = skull.getItemMeta();
-			skullMeta.setDisplayName(b.getBoss().getDisplayName());
-			List<String> lore = new ArrayList<>();
-			Location bLoc = b.getEntity().getLocation();
-			
-			lore.add(ChatColor.GOLD + "" + (int)Math.round(bLoc.getX()) + ", " + (int)Math.round(bLoc.getY()) + ", " + (int)Math.round(bLoc.getZ()) + ", " + bLoc.getWorld().getName());
-			skullMeta.setLore(lore);
-			skull.setItemMeta(skullMeta);
-			
-			inv.setItem(i, skull);
-		}
-		
-		p.openInventory(inv);
-	}
-
 }

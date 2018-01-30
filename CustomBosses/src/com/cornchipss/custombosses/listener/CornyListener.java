@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
@@ -28,6 +29,8 @@ import com.cornchipss.custombosses.Debug;
 import com.cornchipss.custombosses.boss.Boss;
 import com.cornchipss.custombosses.boss.LivingBoss;
 import com.cornchipss.custombosses.boss.handler.BossHandler;
+import com.cornchipss.custombosses.boss.spawner.BossSpawnArea;
+import com.cornchipss.custombosses.commands.InventoryHelper;
 import com.cornchipss.custombosses.listener.events.BossDeathEvent;
 import com.cornchipss.custombosses.listener.events.BossSpawnEvent;
 import com.cornchipss.custombosses.util.Helper;
@@ -99,13 +102,12 @@ public class CornyListener extends Debug implements Listener
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onPlayerClickInventory(InventoryClickEvent e)
 	{
-		Inventory i = e.getInventory();
+		Inventory inv = e.getInventory();
 		Player p = (Player)e.getWhoClicked();
 		
-		if(i.getName().equals(Reference.BOSS_LOCATIONS_GUI))
+		if(inv.getName().equals(Reference.BOSS_LOCATIONS_GUI))
 			e.setCancelled(true);
-		
-		if((i.getName().equals(Reference.BOSS_EGG_MENU_NAME)))
+		else if(inv.getName().equals(Reference.BOSS_EGG_MENU_NAME))
 		{
 			e.setCancelled(true); // Don't want them taking my blocks >:(
 			if(e.getCurrentItem() == null)
@@ -119,12 +121,86 @@ public class CornyListener extends Debug implements Listener
 				{
 					if(b.getSpawnItem().equals(e.getCurrentItem()))
 					{
-						// TODO: Create a cool effect that there is an infinite amount of them ;)
-//						int slot = e.getSlot();
-//						e.setCancelled(false);
-//						i.setItem(slot, e.getCurrentItem().clone());
 						p.getInventory().addItem(e.getCurrentItem());
 					}
+				}
+			}
+		}
+		else if(inv.getName().equals(Reference.BOSS_SPAWN_AREA_GUI))
+		{
+			e.setCancelled(true);
+			if(e.getCurrentItem() == null)
+				return;
+			if((e.getCurrentItem().getDurability() == (short)13) && (e.getCurrentItem().getType().equals(Material.STAINED_GLASS_PANE))) // 13 = green = ok
+				p.closeInventory();
+			else if((e.getCurrentItem().getDurability() == (short)14) && (e.getCurrentItem().getType().equals(Material.STAINED_GLASS_PANE))) // 14 = red = discard
+			{
+				ItemStack bossSpawnArea = e.getInventory().getItem(InventoryHelper.BOSS_AREA_ITEMSTACK_SLOT_POSITION);
+				List<String> lore = bossSpawnArea.getItemMeta().getLore();
+				String[] locString1 = lore.get(0).split(", ");
+				String[] locString1ZWorld = locString1[2].split("; ");
+				
+				Location l1 = new Location(Bukkit.getWorld(locString1ZWorld[1]), Double.parseDouble(locString1[0]), Double.parseDouble(locString1[1]), Double.parseDouble(locString1ZWorld[0]));
+				
+				String[] locString2 = lore.get(1).split(", ");
+				String[] locString2ZWorld = locString2[2].split("; ");
+				
+				Location l2 = new Location(Bukkit.getWorld(locString2ZWorld[1]), Double.parseDouble(locString2[0]), Double.parseDouble(locString2[1]), Double.parseDouble(locString2ZWorld[0]));
+				
+				for(int i = 0; i < bossHandler.getSpawnAreas().size(); i++)
+				{
+					BossSpawnArea area = bossHandler.getSpawnAreas().get(i);
+					Location areaLoc1 = area.getLocationX();
+					Location areaLoc2 = area.getLocationY();
+					
+					if(l1.equals(areaLoc1) && l2.equals(areaLoc2))
+					{
+						bossHandler.removeSpawnArea(area);
+						p.closeInventory();
+						p.sendMessage(ChatColor.GOLD + "Boss Spawn Area Removed.");
+						break;
+					}
+				}
+			}
+		}
+		else if(inv.getName().equals(Reference.BOSS_SPAWN_AREAS_GUI))
+		{
+			if(e.getCurrentItem().getType() == Material.MAP)
+			{
+				e.setCancelled(true);
+				ItemStack bossSpawnArea = e.getCurrentItem();
+				List<String> lore = bossSpawnArea.getItemMeta().getLore();
+				String[] locString1 = lore.get(0).split(", ");
+				String[] locString1ZWorld = locString1[2].split("; ");
+				
+				Location l1 = new Location(Bukkit.getWorld(locString1ZWorld[1]), Double.parseDouble(locString1[0]), Double.parseDouble(locString1[1]), Double.parseDouble(locString1ZWorld[0]));
+				
+				String[] locString2 = lore.get(1).split(", ");
+				String[] locString2ZWorld = locString2[2].split("; ");
+				
+				Location l2 = new Location(Bukkit.getWorld(locString2ZWorld[1]), Double.parseDouble(locString2[0]), Double.parseDouble(locString2[1]), Double.parseDouble(locString2ZWorld[0]));
+				
+				BossSpawnArea area = null;
+				
+				for(int i = 0; i < bossHandler.getSpawnAreas().size(); i++)
+				{
+					area = bossHandler.getSpawnAreas().get(i);
+					Location areaLoc1 = area.getLocationX();
+					Location areaLoc2 = area.getLocationY();
+					
+					if(!l1.equals(areaLoc1) || !l2.equals(areaLoc2))
+						area = null;
+					else
+						break;
+				}
+				
+				if(area != null)
+				{
+					InventoryHelper.openBossSpawnAreaGUI(area, p);
+				}
+				else
+				{
+					System.out.println("err: area == null");
 				}
 			}
 		}
@@ -134,10 +210,8 @@ public class CornyListener extends Debug implements Listener
 	public void entityDeath(EntityDeathEvent e)
 	{
 		LivingEntity ent = e.getEntity(); // More of a DeadEntity now (ba dum tss)
-		debug("entityDeath", bossHandler.getLivingBosses().size());
 		for(LivingBoss livingBoss : bossHandler.getLivingBosses())
 		{
-			debug("entityDeath", 138, livingBoss.getEntity() + ":" + ent);
 			if(livingBoss.getEntity().equals(ent))
 			{
 				Entity killer = ent.getKiller();

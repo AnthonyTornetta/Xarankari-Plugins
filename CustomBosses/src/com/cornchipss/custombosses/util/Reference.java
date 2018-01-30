@@ -1,5 +1,6 @@
 package com.cornchipss.custombosses.util;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,15 +13,20 @@ import com.cornchipss.custombosses.boss.spawner.BossSpawnArea;
 
 public class Reference 
 {
-	public static final String PLUGIN_NAME = "Custom Bosses";
-	public static final String PLUGIN_VERSION = "1.0";
-	public static final String PLUGIN_AUTHOR = "Cornchip";
+	public static final String BOSSES_CONFIG_NAME    = File.separator + "bosses.json";
+	public static final String LOCATIONS_CONFIG_NAME = File.separator + "spawn-locations.json";
+	public static final String SAVED_ALIVED_BOSSES   = File.separator + "saved-alive-bosses.dat";
 	
-	public static final String BOSSES_CONFIG_NAME = "\\bosses.json";
-	public static final String LOCATIONS_CONFIG_NAME = "\\spawn-locations.json";
-	public static final String SAVED_ALIVED_BOSSES = "\\saved-alive-bosses.dat";
-	public static final String BOSS_EGG_MENU_NAME = ChatColor.DARK_GREEN + "Boss Egg Menu";
-	public static final String BOSS_LOCATIONS_GUI = ChatColor.DARK_GREEN + "Boss Locations";
+	public static final String BOSS_EGG_MENU_NAME   = ChatColor.DARK_GREEN + "Boss Egg Menu";
+	public static final String BOSS_LOCATIONS_GUI   = ChatColor.DARK_GREEN + "Boss Locations";
+	public static final String BOSS_SPAWN_AREAS_GUI = ChatColor.DARK_GREEN + "Boss Spawn Areas";
+	public static final String BOSS_SPAWN_AREA_GUI  = ChatColor.DARK_GREEN + "Boss Spawn Area";
+	
+	public static final String PLUGIN_NAME    = "Custom Bosses";
+	public static final String PLUGIN_VERSION = "1.0";
+	public static final String PLUGIN_AUTHOR  = "Cornchip";
+	
+	
 	
 	public static List<Boss> cloneBosses(List<Boss> bosses)
 	{
@@ -74,115 +80,4 @@ public class Reference
 	{
 		return Bukkit.getPluginManager().getPlugin("CustomBosses");
 	}
-	
-	// TODO: Put this in a file at some point
-	public static final String DEFAULT_BOSS_JSON =
-	"[\r\n" + 
-	"  {\r\n" + 
-	"    \"startHealth\": 100,\r\n" + 
-	"    \"displayName\": \"§4Blaze o Doom\",\r\n" + 
-	"    \"mobType\": \"BLAZE\",\r\n" + 
-	"    \"equipment\": {\r\n" + 
-	"      \"armor\": [\r\n" + 
-	"        {\r\n" + 
-	"          \"material\": \"DIAMOND_HELMET\",\r\n" + 
-	"          \"flags\": [],\r\n" + 
-	"          \"enchants\": {\r\n" + 
-	"            \"PROTECTION_ENVIRONMENTAL\": 200\r\n" + 
-	"          }\r\n" + 
-	"        },\r\n" + 
-	"        {\r\n" + 
-	"          \"material\": \"DIAMOND_CHESTPLATE\",\r\n" + 
-	"          \"flags\": [],\r\n" + 
-	"          \"enchants\": {\r\n" + 
-	"            \"PROTECTION_ENVIRONMENTAL\": 200\r\n" + 
-	"          }\r\n" + 
-	"        },\r\n" + 
-	"        {\r\n" + 
-	"          \"material\": \"DIAMOND_LEGGINGS\",\r\n" + 
-	"          \"flags\": [],\r\n" + 
-	"          \"enchants\": {\r\n" + 
-	"            \"PROTECTION_ENVIRONMENTAL\": 200\r\n" + 
-	"          }\r\n" + 
-	"        },\r\n" + 
-	"        {\r\n" + 
-	"          \"material\": \"DIAMOND_BOOTS\",\r\n" + 
-	"          \"flags\": [],\r\n" + 
-	"          \"enchants\": {\r\n" + 
-	"            \"PROTECTION_ENVIRONMENTAL\": 200\r\n" + 
-	"          }\r\n" + 
-	"        }\r\n" + 
-	"      ],\r\n" + 
-	"      \"hand\": {\r\n" + 
-	"        \"material\": \"DIAMOND_AXE\",\r\n" + 
-	"        \"flags\": [],\r\n" + 
-	"        \"enchants\": {\r\n" + 
-	"          \"LOOT_BONUS_MOBS\": 10\r\n" + 
-	"        }\r\n" + 
-	"      }\r\n" + 
-	"    },\r\n" + 
-	"    \"drops\": {\r\n" + 
-	"      \"GOLDEN_APPLE\": \"4\",\r\n" + 
-	"      \"ANVIL\": \"3-20;DAMAGE_ALL#17,FIRE_ASPECT#14\"\r\n" + 
-	"    },\r\n" + 
-	"    \"damagePerHit\": 1000,\r\n" + 
-	"    \"price\": 1000000,\r\n" + 
-	"    \"spawnItem\": \"BLAZE_POWDER\",\r\n" + 
-	"    \"bossId\": 0,\r\n" + 
-	"    \"spawnChance\": 20\r\n" + 
-	"  },\r\n" + 
-	"  {\r\n" + 
-	"    \"startHealth\": 600,\r\n" + 
-	"    \"displayName\": \"§0Space Zombie\",\r\n" + 
-	"    \"mobType\": \"ZOMBIE\",\r\n" + 
-	"    \"equipment\": {\r\n" + 
-	"      \"armor\": [\r\n" + 
-	"        {\r\n" + 
-	"          \"material\": \"GLASS\",\r\n" + 
-	"          \"flags\": [],\r\n" + 
-	"          \"enchants\": {\r\n" + 
-	"            \"THORNS\": 20\r\n" + 
-	"          }\r\n" + 
-	"        },\r\n" + 
-	"        {\r\n" + 
-	"          \"material\": \"DIAMOND_CHESTPLATE\",\r\n" + 
-	"          \"flags\": [],\r\n" + 
-	"          \"enchants\": {\r\n" + 
-	"            \"PROTECTION_ENVIRONMENTAL\": 4\r\n" + 
-	"          }\r\n" + 
-	"        },\r\n" + 
-	"        {\r\n" + 
-	"          \"material\": \"DIAMOND_LEGGINGS\",\r\n" + 
-	"          \"flags\": [],\r\n" + 
-	"          \"enchants\": {\r\n" + 
-	"            \"PROTECTION_ENVIRONMENTAL\": 4\r\n" + 
-	"          }\r\n" + 
-	"        },\r\n" + 
-	"        {\r\n" + 
-	"          \"material\": \"DIAMOND_BOOTS\",\r\n" + 
-	"          \"flags\": [],\r\n" + 
-	"          \"enchants\": {\r\n" + 
-	"            \"PROTECTION_ENVIRONMENTAL\": 4\r\n" + 
-	"          }\r\n" + 
-	"        }\r\n" + 
-	"      ],\r\n" + 
-	"      \"hand\": {\r\n" + 
-	"        \"material\": \"DIAMOND_SWORD\",\r\n" + 
-	"        \"flags\": [],\r\n" + 
-	"        \"enchants\": {\r\n" + 
-	"          \"LOOT_BONUS_MOBS\": 10,\r\n" + 
-	"          \"DAMAGE_ALL\": 30\r\n" + 
-	"        }\r\n" + 
-	"      }\r\n" + 
-	"    },\r\n" + 
-	"    \"drops\": {\r\n" + 
-	"      \"ROTTEN_FLESH\": \"1000-1000\"\r\n" + 
-	"    },\r\n" + 
-	"    \"damagePerHit\": -1,\r\n" + 
-	"    \"price\": 1000000,\r\n" + 
-	"    \"spawnItem\": \"ROTTEN_FLESH\",\r\n" + 
-	"    \"bossId\": 1,\r\n" + 
-	"    \"spawnChance\": 80\r\n" + 
-	"  }\r\n" + 
-	"]";
 }

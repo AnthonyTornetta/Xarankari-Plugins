@@ -100,7 +100,18 @@ public class Boss
 		
 		return drops;
 	}
-
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		if(obj instanceof Boss)
+		{
+			Boss b = (Boss)obj;
+			return b.getId() == getId();
+		}
+		return false;
+	}
+	
 	public int getDamagePerHit() { return damagePerHit; }
 	public void setDamagePerHit(int dmg) { this.damagePerHit = dmg; }
 

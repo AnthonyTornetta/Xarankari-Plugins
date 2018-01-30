@@ -83,7 +83,20 @@ public class BossSpawnArea
 		
 		return spawned;
 	}
-
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		if(obj instanceof BossSpawnArea)
+		{
+			BossSpawnArea compare = (BossSpawnArea)obj;
+			if(this.getBosses().equals(compare.getBosses()))
+				if(this.getLocationX().equals(compare.getLocationX()) && this.getLocationY().equals(compare.getLocationY()))
+					return true;
+		}
+		return false;
+	}
+	
 	public List<Boss> getBosses() 
 	{
 		return Reference.cloneBosses(spawnableBosses);

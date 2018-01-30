@@ -17,6 +17,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 
+import com.cornchipss.custombosses.Debug;
 import com.cornchipss.custombosses.boss.Boss;
 import com.cornchipss.custombosses.boss.LivingBoss;
 import com.cornchipss.custombosses.boss.json.JsonBoss;
@@ -30,7 +31,7 @@ import com.cornchipss.custombosses.util.json.PluginJsonParser;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
 
-public class BossHandler 
+public class BossHandler extends Debug
 {
 	private List<Boss> loadedBosses = new ArrayList<>();
 	private List<LivingBoss> livingBosses = new ArrayList<>();
@@ -176,7 +177,13 @@ public class BossHandler
 				Bukkit.getLogger().info("CustomBosses> Invalid boss id in saved alive bosses file (" + id + ") - disabling to avoid damage");
 				Bukkit.getPluginManager().disablePlugin(Reference.getPlugin());
 			}
-			livingBosses.add(LivingBoss.deserialize(loadedBosses, serializedAliveBosses));
+			LivingBoss b = LivingBoss.deserialize(loadedBosses, serializedAliveBosses);
+			if(b != null)
+				livingBosses.add(b);
+			else
+			{
+				debug("loadLivingBosses", 185, "living boss is null!!!");
+			}
 		}
 		br.close();
 		
@@ -252,8 +259,17 @@ public class BossHandler
 		catch (IOException e) 
 		{ e.printStackTrace(); }
 	}
-	public void addSpawnArea(Vector2<Location, Location> locs) 
+	public void addSpawnArea(Vector2<Location, Location> locs, List<Boss> bossesThatWillSpawn) 
 	{
+		List<BossSpawnArea> spawnAreas = getSpawnAreas();
+		spawnAreas.add(new BossSpawnArea(locs, bossesThatWillSpawn));
+		setSpawnAreas(spawnAreas);
+	}
+	public void removeSpawnArea(BossSpawnArea area)
+	{
+		List<BossSpawnArea> spawnAreas = getSpawnAreas();
+		spawnAreas.remove(area);
+		setSpawnAreas(spawnAreas);
 	}
 	
 	public List<Boss> getLoadedBosses()

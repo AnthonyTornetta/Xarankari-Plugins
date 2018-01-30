@@ -3,7 +3,6 @@ package com.cornchipss.custombosses.boss;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -14,13 +13,16 @@ import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftBlaze;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.EntityEquipment;
 
+import com.cornchipss.custombosses.Debug;
 import com.cornchipss.custombosses.listener.events.BossDeathEvent;
 
-public class LivingBoss
+public class LivingBoss extends Debug
 {	
 	private LivingEntity entity = null;
 	private Location spawnHereLocation = null;
@@ -43,6 +45,8 @@ public class LivingBoss
 	{
 		this.boss = b;
 		this.entity = (LivingEntity)e;
+		bossBar = Bukkit.createBossBar(this.getBoss().getDisplayName(), BarColor.RED, BarStyle.SOLID, BarFlag.CREATE_FOG);
+		bossBar.setProgress(this.getEntity().getHealth() / this.getEntity().getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 	}
 	
 	public void spawn(Location loc)
@@ -96,17 +100,28 @@ public class LivingBoss
 				if(b.getId() == i)
 				{
 					String[] split = serializedData.get(i).split(";");
-					UUID entId = UUID.fromString(split[0]);
 					Entity ent = null;
+					System.out.println(Bukkit.getWorld(split[1]));
+					System.out.println(Bukkit.getWorld(split[1]).getEntities());
 					for(Entity e : Bukkit.getWorld(split[1]).getEntities())
 					{
-						if(e.getUniqueId().equals(entId))
+						if(e.getType() == EntityType.BLAZE)
+							System.out.println(e.getUniqueId());
+						if(e.getUniqueId().toString().equals(split[0]))
 						{
 							ent = e;
 							break;
 						}
 					}
-					return new LivingBoss(b, ent);
+					
+					if(ent == null)	
+					{
+						debug("LivingBoss", "init", 115, "entity == null!");
+					}
+					else
+					{
+						return new LivingBoss(b, ent);
+					}
 				}
 			}
 		}		

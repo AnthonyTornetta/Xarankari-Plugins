@@ -9,6 +9,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.cornchipss.custombosses.boss.BossExpirer;
+import com.cornchipss.custombosses.boss.LivingBoss;
 import com.cornchipss.custombosses.boss.handler.BossHandler;
 import com.cornchipss.custombosses.boss.spawner.BossSpawner;
 import com.cornchipss.custombosses.commands.CommandManager;
@@ -63,6 +64,11 @@ public class CustomBosses extends JavaPlugin
 	
 	public void onDisable()
 	{
+		for(LivingBoss b : getBossHandler().getLivingBosses())
+		{
+			b.getBossBar().removeAll();
+		}
+		
 		Bukkit.getScheduler().cancelTask(spawningTask);
 		Bukkit.getScheduler().cancelTask(bossExpiringTask);
 	}
