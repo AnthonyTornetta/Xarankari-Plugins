@@ -10,11 +10,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
 import com.cornchipss.custombosses.Debug;
@@ -36,6 +39,7 @@ public class BossHandler extends Debug
 	private List<Boss> loadedBosses = new ArrayList<>();
 	private List<LivingBoss> livingBosses = new ArrayList<>();
 	private List<BossSpawnArea> bossSpawnAreas;
+	private Map<UUID, Integer> bossUUIDsNotLoaded = new HashMap<>();
 	private final File folderPath;
 	
 	public BossHandler(File folderPath) throws IOException
@@ -123,15 +127,10 @@ public class BossHandler extends Debug
 			System.out.println("ASDF: " + jsonBosses);
 			
 			BufferedWriter bw = new BufferedWriter(new FileWriter(bossFile));
-			//bw.write(Reference.DEFAULT_BOSS_JSON);
-			System.out.println(jsonBosses);
+
 			String json = new GsonBuilder().setPrettyPrinting().create().toJson(jsonBosses);
 			bw.write(json);
-			if(json.isEmpty())
-			{
-				System.out.println("BAD BOI");
-			}
-			System.out.println(json);
+			
 			bw.close();
 		}
 		
@@ -174,7 +173,7 @@ public class BossHandler extends Debug
 			serializedAliveBosses.put(id, split[1]);
 			if(!Reference.getBossIds(getLoadedBosses()).contains(id))
 			{
-				Bukkit.getLogger().info("CustomBosses> Invalid boss id in saved alive bosses file (" + id + ") - disabling to avoid damage");
+				Bukkit.getLogger().info("CustomBosses> Invalid boss id in saved alive bosses file (" + id + ") - disabling plugin to avoid weird effects");
 				Bukkit.getPluginManager().disablePlugin(Reference.getPlugin());
 			}
 			LivingBoss b = LivingBoss.deserialize(loadedBosses, serializedAliveBosses);
@@ -182,7 +181,9 @@ public class BossHandler extends Debug
 				livingBosses.add(b);
 			else
 			{
-				debug("loadLivingBosses", 185, "living boss is null!!!");
+				Entry<Integer, String> es = serializedAliveBosses.entrySet().iterator().next();
+				String[] bossInfo = es.getValue().split(";");
+				bossUUIDsNotLoaded.put(UUID.fromString(bossInfo[0]), es.getKey());
 			}
 		}
 		br.close();
@@ -286,5 +287,43 @@ public class BossHandler extends Debug
 				return b;
 		}
 		return null;
+	}
+	
+	public Map<UUID, Integer> getBossUUIDsNotLoaded() { return this.bossUUIDsNotLoaded; }
+	public boolean isUUIDNotLoaded(UUID id)
+	{
+		return getBossUUIDsNotLoaded().containsKey(id);
+	}
+	/**
+	 * Creates a boss from a specified entity by checking its UUID against a list of UUIDS that haven't been loaded<br>
+	 * If the UUID is not contained in the list, nothing happens
+	 * @param e The entity to check
+	 */
+	public void createBossFromPreviousEntity(Entity e)
+	{
+		if(!isUUIDNotLoaded(e.getUniqueId()))
+			return;
+		
+		UUID uuidToRemove = null;
+		
+		for(UUID uuid : getBossUUIDsNotLoaded().keySet())
+		{
+			if(e.getUniqueId().equals(uuid))
+			{
+				int bossId = getBossUUIDsNotLoaded().get(uuid);
+				
+				LivingBoss b = new LivingBoss(Reference.getBossFromId(getLoadedBosses(), bossId), e);
+				
+				debug("createBossFromPreviousEntity", b);
+				
+				addLivingBoss(b);
+				
+				uuidToRemove = uuid;
+				break;
+			}
+		}
+		
+		if(uuidToRemove != null)
+			getBossUUIDsNotLoaded().remove(uuidToRemove);
 	}
 }

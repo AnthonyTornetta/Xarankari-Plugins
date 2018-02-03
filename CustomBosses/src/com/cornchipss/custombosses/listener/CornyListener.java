@@ -22,6 +22,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -41,6 +42,7 @@ public class CornyListener extends Debug implements Listener
 	private BossHandler bossHandler;
 	// Because in 1.9 there are two hands, and I only have access to one (1.8), I must ignore the second call because that's for the off hand
 	// So I store a list of players that have called it and if they are in said list I ignore the event and remove them
+	// TODO: Update to 1.12.2
 	private List<Player> playerThatInteracted = new ArrayList<>();
 	
 	private Map<LivingBoss, List<Player>> playersListening = new HashMap<>();
@@ -285,6 +287,21 @@ public class CornyListener extends Debug implements Listener
 			double newHealth = b.getEntity().getHealth() - e.getFinalDamage();
 			
 			b.getBossBar().setProgress(Helper.clamp(newHealth, 0, maxHealth) / maxHealth);
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.NORMAL)
+	public void onChunkLoad(ChunkLoadEvent e)
+	{
+		//System.out.println("Chunk Loaded");
+		for(Entity ent : e.getChunk().getEntities())
+		{
+			if(bossHandler.isUUIDNotLoaded(ent.getUniqueId()))
+			{
+				debug("onChunkLoad", ent);
+				debug("onChunkLoad", "Boss Entity Found!!!");
+				bossHandler.createBossFromPreviousEntity(ent);
+			}
 		}
 	}
 	
