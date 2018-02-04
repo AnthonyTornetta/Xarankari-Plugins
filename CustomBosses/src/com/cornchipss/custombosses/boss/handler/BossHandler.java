@@ -34,15 +34,48 @@ import com.cornchipss.custombosses.util.json.PluginJsonParser;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
 
+/**
+ * The boss handler handles all boss templates (loaded bosses), bosses in the world (living bosses)<br>
+ * It also loads them into the game and spawns them in
+ */
 public class BossHandler extends Debug
 {
+	/*
+	 * Loaded bosses are templates for how to make a living boss.
+	 * They are almost like a holder for the equipment they will wear and how they will function.
+	 */
 	private List<Boss> loadedBosses = new ArrayList<>();
+	
+	/*
+	 * Living bosses are the actual bosses that are in the world.
+	 * These get their information from the Boss template they contain, and use those traits to enhance their stored entity
+	 */
 	private List<LivingBoss> livingBosses = new ArrayList<>();
+	
+	/*
+	 * These are areas where bosses will spawn at random.
+	 */
 	private List<BossSpawnArea> bossSpawnAreas;
+	
+	/*
+	 * This stores the UUIDs as well as the ids of bosses who could not be loaded in on a startup.
+	 * It will then store the information the boss is loaded in, when it will be deleted and a living boss loaded in it's place.
+	 * This is primarily used for the world not finding the entities needed because their chunks aren't loaded
+	 */
 	private Map<UUID, Integer> bossUUIDsNotLoaded = new HashMap<>();
+	
+	/*
+	 * Just stores the folder path where all the saved data will go to
+	 */
 	private final File folderPath;
 	
-	public BossHandler(File folderPath) throws IOException
+	/**
+	 * The boss handler handles all boss templates (loaded bosses), bosses in the world (living bosses)<br>
+	 * It also loads them into the game and spawns them in
+	 * @param folderPath The folder path to read and save the config files to
+	 * @throws IOException if there is an error reading/writing the config files
+	 */
+	public BossHandler(final File folderPath) throws IOException
 	{		
 		this.folderPath = folderPath;
 		initFiles();
@@ -51,7 +84,11 @@ public class BossHandler extends Debug
 		this.livingBosses = (loadLivingBosses(getLoadedBosses()));
 		setSpawnAreas(loadSpawnAreas(getLoadedBosses()));
 	}
-
+	
+	/**
+	 * Saves every configuration file
+	 * @throws IOException if there is an error writing the config files
+	 */
 	public void saveAll() throws IOException
 	{
 		saveBosses(getLoadedBosses());
@@ -59,7 +96,12 @@ public class BossHandler extends Debug
 		saveSpawnAreas(getSpawnAreas());
 	}
 	
-	public void saveBosses(List<Boss> bosses) throws IOException
+	/**
+	 * Saves a list of Boss templates to the config file
+	 * @param bosses The List of boss templates to save
+	 * @throws IOException if there is an error writing to the config file
+	 */
+	public void saveBosses(final List<Boss> bosses) throws IOException
 	{
 		List<JsonBoss> jsonBosses = JsonBoss.fromBossList(bosses);
 		BufferedWriter bw = new BufferedWriter(new FileWriter(this.getDataFolder() + Reference.BOSSES_CONFIG_NAME));
@@ -67,7 +109,12 @@ public class BossHandler extends Debug
 		bw.close();
 	}
 	
-	public void saveLivingBosses(List<LivingBoss> livingBosses) throws IOException
+	/**
+	 * Saves a list of living bosses to their storage file
+	 * @param livingBosses The List of living bosses to save
+	 * @throws IOException if there is an error writing to the storage file
+	 */
+	public void saveLivingBosses(final List<LivingBoss> livingBosses) throws IOException
 	{		
 			BufferedWriter bw = new BufferedWriter(new FileWriter(this.getDataFolder() + Reference.SAVED_ALIVED_BOSSES));
 			
@@ -84,7 +131,12 @@ public class BossHandler extends Debug
 			bw.close();
 	}
 	
-	public void saveSpawnAreas(List<BossSpawnArea> locations) throws IOException
+	/**
+	 * Saves a list of boss spawn areas to their storage file
+	 * @param locations The List of areas to save
+	 * @throws IOException if there is an error writing to the storage file
+	 */
+	public void saveSpawnAreas(final List<BossSpawnArea> locations) throws IOException
 	{
 		String serializedJson = PluginJsonParser.serializeLocations(locations);
 		
@@ -93,7 +145,12 @@ public class BossHandler extends Debug
 		bw.close();
 	}
 	
-	public void initFiles() throws IOException
+	/**
+	 * Makes sure all the files exist, and makes sure the directories to the configs exist<br>
+	 * If the file(s) do not exist, it creates them, and if needed adds starting content to them
+	 * @throws IOException if there is an error writing to the files
+	 */
+	private void initFiles() throws IOException
 	{
 		this.getDataFolder().mkdirs();
 		File bossFile = new File(this.getDataFolder() + Reference.BOSSES_CONFIG_NAME);
@@ -143,6 +200,12 @@ public class BossHandler extends Debug
 		new File(this.getDataFolder() + Reference.SAVED_ALIVED_BOSSES).createNewFile();
 	}
 	
+	/**
+	 * Loads every boss template from the json config file, and returns them in a List
+	 * @return The loaded in boss templates
+	 * @throws IOException if there is an error reading from the file
+	 * @throws JsonParseException if the json is invalid
+	 */
 	public List<Boss> loadBosses() throws IOException, JsonParseException
 	{		
 		BufferedReader br = new BufferedReader(new FileReader(this.getDataFolder() + Reference.BOSSES_CONFIG_NAME));
@@ -157,6 +220,12 @@ public class BossHandler extends Debug
 		return PluginJsonParser.deserializeBosses(json);
 	}
 	
+	/**
+	 * Loads every living boss from the data file, while also making sure the entity exists, and if not storing it for later
+	 * @param loadedBosses The boss templates to read from to form the living bosses
+	 * @return The list of living bosses able to be loaded in
+	 * @throws IOException if there is an error reading the data file
+	 */
 	public List<LivingBoss> loadLivingBosses(final List<Boss> loadedBosses) throws IOException
 	{
 		List<LivingBoss> livingBosses = new ArrayList<>();
@@ -191,6 +260,12 @@ public class BossHandler extends Debug
 		return livingBosses;
 	}
 	
+	/**
+	 * Loads every spawn area from the data file
+	 * @param loadedBosses Boss templates to read from to let it know which bosses to spawn
+	 * @return A list of boss spawn areas
+	 * @throws IOException if there is an error reading from the data file
+	 */
 	public List<BossSpawnArea>loadSpawnAreas(final List<Boss> loadedBosses) throws IOException
 	{
 		BufferedReader br = new BufferedReader(new FileReader(getDataFolder() + Reference.LOCATIONS_CONFIG_NAME));
@@ -205,6 +280,39 @@ public class BossHandler extends Debug
 		
 		return locsDeserialized;
 	}
+	
+	/**
+	 * Creates a boss from a specified entity, while making sure that entity hasn't been loaded in yet<br>
+	 * If the entity has been loaded in, or is not on the list to be loaded in, nothing happens
+	 * @param e The entity to check
+	 */
+	public void createBossFromPreviousEntity(Entity e)
+	{
+		if(!isUUIDNotLoaded(e.getUniqueId()))
+			return;
+		
+		UUID uuidToRemove = null;
+		
+		for(UUID uuid : getBossUUIDsNotLoaded().keySet())
+		{
+			if(e.getUniqueId().equals(uuid))
+			{
+				int bossId = getBossUUIDsNotLoaded().get(uuid);
+				
+				LivingBoss b = new LivingBoss(Reference.getBossFromId(getLoadedBosses(), bossId), e);
+				
+				addLivingBoss(b);
+				
+				uuidToRemove = uuid;
+				break;
+			}
+		}
+		
+		if(uuidToRemove != null)
+			getBossUUIDsNotLoaded().remove(uuidToRemove);
+	}
+	
+	// Getters & Setters //
 	
 	private final File getDataFolder() { return folderPath; }
 
@@ -293,37 +401,5 @@ public class BossHandler extends Debug
 	public boolean isUUIDNotLoaded(UUID id)
 	{
 		return getBossUUIDsNotLoaded().containsKey(id);
-	}
-	/**
-	 * Creates a boss from a specified entity by checking its UUID against a list of UUIDS that haven't been loaded<br>
-	 * If the UUID is not contained in the list, nothing happens
-	 * @param e The entity to check
-	 */
-	public void createBossFromPreviousEntity(Entity e)
-	{
-		if(!isUUIDNotLoaded(e.getUniqueId()))
-			return;
-		
-		UUID uuidToRemove = null;
-		
-		for(UUID uuid : getBossUUIDsNotLoaded().keySet())
-		{
-			if(e.getUniqueId().equals(uuid))
-			{
-				int bossId = getBossUUIDsNotLoaded().get(uuid);
-				
-				LivingBoss b = new LivingBoss(Reference.getBossFromId(getLoadedBosses(), bossId), e);
-				
-				debug("createBossFromPreviousEntity", b);
-				
-				addLivingBoss(b);
-				
-				uuidToRemove = uuid;
-				break;
-			}
-		}
-		
-		if(uuidToRemove != null)
-			getBossUUIDsNotLoaded().remove(uuidToRemove);
 	}
 }

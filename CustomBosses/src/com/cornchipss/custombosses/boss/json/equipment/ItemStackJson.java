@@ -5,11 +5,21 @@ import java.util.Map;
 
 public class ItemStackJson
 {
+	/*
+	 * Storage containers for the information of the ItemStack
+	 */
 	private String material, display;
 	private List<String> lore;
 	private Map<String, Integer> enchants;
 	
-	public ItemStackJson(String material, String display, List<String> lore, Map<String, Integer> enchants) 
+	/**
+	 * A nice way of putting an ItemStack into JSON or visa versa
+	 * @param material The String name of the material the ItemStack is
+	 * @param display The display name of the ItemStack
+	 * @param lore The lore of the ItemStack
+	 * @param enchants The enchantments as their name and level
+	 */
+	public ItemStackJson(final String material, final String display, final List<String> lore, final Map<String, Integer> enchants) 
 	{
 		this.material = material;
 		this.display = display;
@@ -22,6 +32,8 @@ public class ItemStackJson
 	{
 		return "ArmorJson [" + getDisplay() + "; Material: " + getMaterial() + "; Lore: " + getLore() + "; Enchants: " + getEnchants() + "]";
 	}
+	
+	// Getters & Setters //
 	
 	public String getMaterial() { return material; }
 	public void setMaterial(String material) { this.material = material; }
