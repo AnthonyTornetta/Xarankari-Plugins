@@ -1,55 +1,115 @@
 package com.cornchipss.guilds.guilds;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import com.cornchipss.guilds.Guilds;
-import com.cornchipss.guilds.ref.Reference;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class GuildManager 
 {
-	private Guilds guilds;
+	private List<Player> guildChatters = new ArrayList<>();
 	
-	public GuildManager(Guilds guilds)
-	{
-		this.guilds = guilds;
-	}
+	private List<Guild> guilds = new ArrayList<>();
 	
-	public int getGuildIDFromUUID(UUID uuid)
-	{
-		if(guilds.getConfig().contains(uuid.toString()))
-			return guilds.getConfig().getInt(uuid.toString());
-		else
-			return -1;
-	}
+	private File guildsStorage;
 	
-	public String getGuildNameFromID(int id)
+	public GuildManager(String guildsFilePath) throws IOException
 	{
-		if(guilds.getConfig().contains(Reference.CFG_GUILD_PREFIX + id))
-			return guilds.getConfig().getString(Reference.CFG_GUILD_PREFIX + id);
-		else
-			return null;
-	}
-	
-	public ArrayList<Player> getOnlinePlayersInGuild(int id)
-	{
-		ArrayList<Player> playersInGuild = new ArrayList<>();
-		for(Player p : Bukkit.getOnlinePlayers())
+		this.guildsStorage = new File(guildsFilePath);
+		guildsStorage.createNewFile();
+		
+		String json = "";
+		
+		BufferedReader br = new BufferedReader(new FileReader(guildsStorage));
+		for(String line = br.readLine(); line != null; line = br.readLine())
 		{
-			if(getGuildIDFromUUID(p.getUniqueId()) == id)
-				playersInGuild.add(p);
+			json += line;
+		}
+		br.close();
+		
+		if(json.isEmpty())
+		{
+			List<GuildJson> tempGuilds = new ArrayList<>();
+			List<String> uuids = new ArrayList<>();
+			uuids.add("2e3f560c-7495-401c-98c6-d21b4460ad3c");
+			uuids.add("bede35f6-75aa-404c-b591-cf7d722ca8db");
+			tempGuilds.add(new GuildJson("Armadale", uuids));
+			
+			for(GuildJson guildJson : tempGuilds)
+			{
+				guilds.add(guildJson.toGuild());
+			}
+			
+			saveGuilds();
+		}
+		else
+		{
+			Gson gson = new Gson();
+			
+			List<GuildJson> jsonList = Arrays.asList(gson.fromJson(json, GuildJson[].class));
+			for(GuildJson guildJson : jsonList)
+			{
+				guilds.add(guildJson.toGuild());
+			}
+		}
+	}
+	
+	public void saveGuilds() throws IOException
+	{
+		BufferedWriter bw = new BufferedWriter(new FileWriter(guildsStorage));
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		List<GuildJson> guildJson = new ArrayList<>();
+		for(Guild g : guilds)
+		{
+			guildJson.add(GuildJson.fromGuild(g));
 		}
 		
-		return playersInGuild;
+		bw.write(gson.toJson(guildJson));
+		bw.close();
+	}
+	
+	public Guild getGuildFromUUID(UUID id)
+	{
+		for(Guild g : guilds)
+			if(g.getMembers().contains(id))
+				return g;
+		return null;
 	}
 
 	public boolean playerHasGuild(Player p) 
 	{
-		if(getGuildIDFromUUID(p.getUniqueId()) != -1)
-			return true;
-		return false;
+		return getGuildFromUUID(p.getUniqueId()) != null;
+	}
+
+	public List<Player> getGuildChatters() { return guildChatters; }
+	public void setGuildChatters(List<Player> guildChatters) { this.guildChatters = guildChatters; }
+
+	public List<Guild> getGuilds() { return guilds; }
+	public void setGuilds(List<Guild> guilds) { this.guilds = guilds; }
+
+	public List<Player> getOnlinePlayersInGuild(Guild guild) 
+	{
+		List<Player> onlinePlayers = new ArrayList<>();
+		
+		for(UUID id : guild.getMembers())
+		{
+			Player potentialPlayer = Bukkit.getPlayer(id);
+			if(potentialPlayer != null)
+				onlinePlayers.add(potentialPlayer);
+		}
+		
+		return onlinePlayers;
 	}
 }

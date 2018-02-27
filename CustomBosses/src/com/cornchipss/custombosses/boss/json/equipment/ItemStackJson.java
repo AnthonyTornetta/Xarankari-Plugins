@@ -19,7 +19,7 @@ public class ItemStackJson
 	 * @param lore The lore of the ItemStack
 	 * @param enchants The enchantments as their name and level
 	 */
-	public ItemStackJson(final String material, final String display, final List<String> lore, final Map<String, Integer> enchants) 
+	public ItemStackJson(String material, String display, List<String> lore, Map<String, Integer> enchants) 
 	{
 		this.material = material;
 		this.display = display;

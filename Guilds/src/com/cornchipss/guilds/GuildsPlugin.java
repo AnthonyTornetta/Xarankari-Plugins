@@ -1,5 +1,7 @@
 package com.cornchipss.guilds;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
@@ -11,30 +13,30 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.cornchipss.guilds.cmds.CommandMgr;
-import com.cornchipss.guilds.config.Config;
+import com.cornchipss.guilds.guilds.Guild;
 import com.cornchipss.guilds.guilds.GuildManager;
 import com.cornchipss.guilds.ref.Reference;
 
-public class Guilds extends JavaPlugin
+public class GuildsPlugin extends JavaPlugin
 {
-	private GuildManager guildMgr;
+	private GuildManager guildManager;
 	private ArrayList<Player> guildChatters = new ArrayList<>();
 	private ArrayList<Player> socialSpies = new ArrayList<>();
-	
-	private Config guildsCfg;
-	
+		
 	@Override
 	public void onEnable()
 	{
 		init();
 		
+		
+
 		getLogger().info(Reference.NAME + " plugin by " + Reference.AUTHOR + " V" + Reference.VERSION + " is ready for action!");
 	}
 	
 	@Override
 	public void onDisable()
 	{
-		guildsCfg.save();
+		
 	}
 	
 	@Override
@@ -57,32 +59,40 @@ public class Guilds extends JavaPlugin
 	
 	private void init()
 	{
+		this.getDataFolder().mkdirs();
+		
+		try
+		{
+			guildManager = new GuildManager(this.getDataFolder() + File.separator + "guilds.yml");
+		} 
+		catch (IOException e) 
+		{
+			Bukkit.getPluginManager().disablePlugin(this);
+			e.printStackTrace();
+		}
+		
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvents(new CornyListener(this), this);
-		
-		guildsCfg = new Config(this.getDataFolder() + "\\guilds.yml");
-		//guildsCfg.save();
-		//guildMgr = new GuildManager(this);
-		
-		updateTabList(); // For reloads
+				
+		updateTabList();
 	}
 	
 	public void updateTabList()
 	{
 		for(Player p : Bukkit.getOnlinePlayers())
 		{
-			int guildId = guildMgr.getGuildIDFromUUID(p.getUniqueId());
+			Guild guild = guildManager.getGuildFromUUID(p.getUniqueId());
 			
-			if(guildId != -1)
+			if(guild != null)
 			{
-				String guild = guildMgr.getGuildNameFromID(guildId);
-				p.setPlayerListName(ChatColor.AQUA + "[" + guild + ChatColor.AQUA + "]" + ChatColor.RESET + " " + p.getDisplayName());
+				String guildName = guild.getName();
+				p.setPlayerListName(ChatColor.AQUA + "[" + guildName + ChatColor.AQUA + "]" + ChatColor.RESET + " " + p.getDisplayName());
 			}
 		}
 	}
 	
 	// Getters & Setters \\
-	public GuildManager getGuildManager() { return guildMgr; }
+	public GuildManager getGuildManager() { return guildManager; }
 
 	public ArrayList<Player> getGuildChatters() { return guildChatters; }
 	public ArrayList<Player> getSocialSpies() { return socialSpies; }

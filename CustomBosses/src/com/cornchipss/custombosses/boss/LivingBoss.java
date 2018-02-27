@@ -113,14 +113,7 @@ public class LivingBoss extends Debug
 						}
 					}
 					
-					if(ent == null)	
-					{
-						debug("LivingBoss", "init", 115, "entity == null!");
-					}
-					else
-					{
-						return new LivingBoss(b, ent);
-					}
+					return new LivingBoss(b, ent);
 				}
 			}
 		}		

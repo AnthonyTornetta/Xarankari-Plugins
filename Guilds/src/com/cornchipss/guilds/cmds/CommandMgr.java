@@ -5,7 +5,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.cornchipss.guilds.Guilds;
+import com.cornchipss.guilds.GuildsPlugin;
 import com.cornchipss.guilds.ref.Reference;
 
 public class CommandMgr 
@@ -18,7 +18,7 @@ public class CommandMgr
 	 * @param bb The java plugin class
 	 * @return True if it was successful
 	 */
-	public static boolean runThruCommands(Command command, CommandSender sender, String[] args, Guilds guildsPl)
+	public static boolean runThruCommands(Command command, CommandSender sender, String[] args, GuildsPlugin guildsPl)
 	{
 		String gCmd = command.getName().toLowerCase();
 		

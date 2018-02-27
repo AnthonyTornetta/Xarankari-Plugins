@@ -1,8 +1,9 @@
 package com.cornchipss.guilds;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -11,13 +12,13 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import net.md_5.bungee.api.ChatColor;
+import com.cornchipss.guilds.guilds.Guild;
 
 public class CornyListener implements Listener
 {
-	private Guilds guildsPlugin;
+	private GuildsPlugin guildsPlugin;
 	
-	public CornyListener(Guilds guildsPlugin) 
+	public CornyListener(GuildsPlugin guildsPlugin) 
 	{
 		this.guildsPlugin = guildsPlugin;
 	}
@@ -38,6 +39,7 @@ public class CornyListener implements Listener
 	public void onPlayerChat(AsyncPlayerChatEvent e)
 	{
 		Player p = e.getPlayer();
+		
 		if(guildsPlugin.getGuildChatters().contains(p))
 		{
 			if(!guildsPlugin.getGuildManager().playerHasGuild(p))
@@ -46,9 +48,9 @@ public class CornyListener implements Listener
 				return;
 			}
 			
-			int id = guildsPlugin.getGuildManager().getGuildIDFromUUID(p.getUniqueId());
+			Guild guild = guildsPlugin.getGuildManager().getGuildFromUUID(p.getUniqueId());
 			
-			ArrayList<Player> playersInGuild = guildsPlugin.getGuildManager().getOnlinePlayersInGuild(id);
+			List<Player> playersInGuild = guildsPlugin.getGuildManager().getOnlinePlayersInGuild(guild);
 			
 			e.setFormat(ChatColor.AQUA + "[GC] " + ChatColor.RESET + e.getFormat());
 			

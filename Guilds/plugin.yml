@@ -1,5 +1,5 @@
 name: Guilds
-main: com.cornchipss.guilds.Guilds
+main: com.cornchipss.guilds.GuildsPlugin
 version: 1.0
 commands:
     guilds:
