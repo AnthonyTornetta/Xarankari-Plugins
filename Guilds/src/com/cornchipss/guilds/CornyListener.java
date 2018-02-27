@@ -1,5 +1,6 @@
 package com.cornchipss.guilds;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -13,6 +14,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import com.cornchipss.guilds.guilds.Guild;
+import com.cornchipss.guilds.ref.Reference;
 
 public class CornyListener implements Listener
 {
@@ -40,11 +42,11 @@ public class CornyListener implements Listener
 	{
 		Player p = e.getPlayer();
 		
-		if(guildsPlugin.getGuildChatters().contains(p))
-		{
+		if(guildsPlugin.getGuildManager().getGuildChatters().contains(p))
+		{			
 			if(!guildsPlugin.getGuildManager().playerHasGuild(p))
 			{
-				guildsPlugin.getGuildChatters().remove(p);
+				guildsPlugin.getGuildManager().getGuildChatters().remove(p);
 				return;
 			}
 			
@@ -56,12 +58,41 @@ public class CornyListener implements Listener
 			
 			for(Player onlinePlayer : Bukkit.getOnlinePlayers())
 			{
-				if(guildsPlugin.getSocialSpies().contains(onlinePlayer))
+				if(guildsPlugin.getGuildManager().getGuildChatSpies().contains(onlinePlayer))
 					continue;
 				
 				if(!playersInGuild.contains(onlinePlayer))
 				{
+					System.out.println("Removed.");
 					e.getRecipients().remove(onlinePlayer);
+				}
+			}
+		}
+		else
+		{
+			boolean didContain = guildsPlugin.getMainConfig().containsKey(Reference.CFG_DISPLAY_GUILD_TAG);
+			
+			if(guildsPlugin.getMainConfig().getOrSetString(Reference.CFG_DISPLAY_GUILD_TAG, "true").equalsIgnoreCase("true"))
+			{				
+				String name;
+				
+				if(guildsPlugin.getGuildManager().playerHasGuild(p))
+					name = guildsPlugin.getGuildManager().getGuildFromUUID(p.getUniqueId()).getName();
+				else
+					name = "Guildless";
+				
+				e.setFormat(ChatColor.AQUA + "[" + name + ChatColor.AQUA + "] " + ChatColor.RESET + e.getFormat());
+			}
+			
+			if(!didContain)
+			{
+				try 
+				{
+					guildsPlugin.getMainConfig().save();
+				} 
+				catch (IOException ex) 
+				{
+					ex.printStackTrace();
 				}
 			}
 		}

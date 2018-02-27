@@ -2,7 +2,6 @@ package com.cornchipss.guilds;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -13,23 +12,23 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.cornchipss.guilds.cmds.CommandMgr;
+import com.cornchipss.guilds.config.Config;
 import com.cornchipss.guilds.guilds.Guild;
 import com.cornchipss.guilds.guilds.GuildManager;
 import com.cornchipss.guilds.ref.Reference;
 
 public class GuildsPlugin extends JavaPlugin
 {
+	private Config mainConfig;
+	
 	private GuildManager guildManager;
-	private ArrayList<Player> guildChatters = new ArrayList<>();
-	private ArrayList<Player> socialSpies = new ArrayList<>();
+	private CommandMgr cmdMgr;
 		
 	@Override
 	public void onEnable()
 	{
 		init();
 		
-		
-
 		getLogger().info(Reference.NAME + " plugin by " + Reference.AUTHOR + " V" + Reference.VERSION + " is ready for action!");
 	}
 	
@@ -42,19 +41,7 @@ public class GuildsPlugin extends JavaPlugin
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args)
 	{
-		return CommandMgr.runThruCommands(command, sender, args, this);	
-	}
-	
-	public boolean tabDisplayGuild()
-	{
-		if(getConfig().contains(Reference.CFG_DISPLAY_GUILD_TAB))
-			return getConfig().getBoolean(Reference.CFG_DISPLAY_GUILD_TAB);
-		else
-		{
-			getConfig().set(Reference.CFG_DISPLAY_GUILD_TAB, "true");
-			saveConfig();
-			return true;
-		}
+		return cmdMgr.runThruCommands(command, sender, args);
 	}
 	
 	private void init()
@@ -63,37 +50,69 @@ public class GuildsPlugin extends JavaPlugin
 		
 		try
 		{
-			guildManager = new GuildManager(this.getDataFolder() + File.separator + "guilds.yml");
+			guildManager = new GuildManager(this.getDataFolder() + File.separator + "guilds-list.json");
+			
+			mainConfig = new Config(this.getDataFolder() + File.separator + "guilds-config.yml");
 		} 
-		catch (IOException e) 
+		catch (IOException e)
 		{
-			Bukkit.getPluginManager().disablePlugin(this);
 			e.printStackTrace();
+			Bukkit.getPluginManager().disablePlugin(this);
 		}
 		
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvents(new CornyListener(this), this);
-				
+		
+		cmdMgr = new CommandMgr(this);
+		pm.registerEvents(cmdMgr, this);
+		
+		resetTabList();
 		updateTabList();
 	}
 	
 	public void updateTabList()
 	{
+		boolean containedTabnames = mainConfig.containsKey(Reference.CFG_DISPLAY_GUILD_TAB);
+		
+		if(mainConfig.getOrSetString(Reference.CFG_DISPLAY_GUILD_TAB, "true").equalsIgnoreCase("true"))
+		{
+			System.out.println("RAN");
+			for(Player p : Bukkit.getOnlinePlayers())
+			{
+				Guild guild = guildManager.getGuildFromUUID(p.getUniqueId());
+				
+				if(guild != null)
+				{
+					String guildName = guild.getName();
+					p.setPlayerListName(ChatColor.AQUA + "[" + guildName + ChatColor.AQUA + "]" + ChatColor.RESET + " " + p.getDisplayName());
+				}
+			}
+		}
+		
+		if(!containedTabnames)
+		{
+			try 
+			{
+				mainConfig.save();
+			}
+			catch (IOException e) 
+			{
+				getLogger().info("Error saving Config!");
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void resetTabList()
+	{
 		for(Player p : Bukkit.getOnlinePlayers())
 		{
-			Guild guild = guildManager.getGuildFromUUID(p.getUniqueId());
-			
-			if(guild != null)
-			{
-				String guildName = guild.getName();
-				p.setPlayerListName(ChatColor.AQUA + "[" + guildName + ChatColor.AQUA + "]" + ChatColor.RESET + " " + p.getDisplayName());
-			}
+			p.setPlayerListName(p.getDisplayName());
 		}
 	}
 	
 	// Getters & Setters \\
 	public GuildManager getGuildManager() { return guildManager; }
 
-	public ArrayList<Player> getGuildChatters() { return guildChatters; }
-	public ArrayList<Player> getSocialSpies() { return socialSpies; }
+	public Config getMainConfig() { return mainConfig; }
 }

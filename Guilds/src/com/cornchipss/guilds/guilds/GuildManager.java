@@ -19,9 +19,10 @@ import com.google.gson.GsonBuilder;
 
 public class GuildManager 
 {
-	private List<Player> guildChatters = new ArrayList<>();
-	
 	private List<Guild> guilds = new ArrayList<>();
+	
+	private List<Player> guildChatters = new ArrayList<>();
+	private List<Player> guildChatSpies = new ArrayList<>();
 	
 	private File guildsStorage;
 	
@@ -61,7 +62,9 @@ public class GuildManager
 			List<GuildJson> jsonList = Arrays.asList(gson.fromJson(json, GuildJson[].class));
 			for(GuildJson guildJson : jsonList)
 			{
-				guilds.add(guildJson.toGuild());
+				Guild guild = guildJson.toGuild();
+				
+				guilds.add(guild);
 			}
 		}
 	}
@@ -111,5 +114,32 @@ public class GuildManager
 		}
 		
 		return onlinePlayers;
+	}
+
+	public List<Player> getGuildChatSpies() { return guildChatSpies; }
+	public void setGuildChatSpies(List<Player> guildChatSpies) { this.guildChatSpies = guildChatSpies; }
+
+	public boolean createGuild(String name, Player founder) throws IOException
+	{		
+		for(Guild g : getGuilds())
+		{
+			if(g.getName().equalsIgnoreCase(name))
+				return false;
+		}
+		
+		List<UUID> members = new ArrayList<>();
+		members.add(founder.getUniqueId());
+		
+		getGuilds().add(new Guild(name, members));
+		
+		saveGuilds();
+		
+		return true;
+	}
+
+	public void deleteGuild(Guild g) throws IOException 
+	{
+		getGuilds().remove(g);
+		saveGuilds();
 	}
 }
