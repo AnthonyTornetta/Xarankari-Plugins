@@ -76,7 +76,6 @@ public class GuildsPlugin extends JavaPlugin
 		
 		if(mainConfig.getOrSetString(Reference.CFG_DISPLAY_GUILD_TAB, "true").equalsIgnoreCase("true"))
 		{
-			System.out.println("RAN");
 			for(Player p : Bukkit.getOnlinePlayers())
 			{
 				Guild guild = guildManager.getGuildFromUUID(p.getUniqueId());
@@ -85,6 +84,10 @@ public class GuildsPlugin extends JavaPlugin
 				{
 					String guildName = guild.getName();
 					p.setPlayerListName(ChatColor.AQUA + "[" + guildName + ChatColor.AQUA + "]" + ChatColor.RESET + " " + p.getDisplayName());
+				}
+				else
+				{
+					p.setPlayerListName(p.getDisplayName());
 				}
 			}
 		}

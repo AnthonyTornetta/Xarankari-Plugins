@@ -2,8 +2,11 @@ package com.cornchipss.guilds.cmds;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -16,9 +19,13 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import com.cornchipss.guilds.GuildsPlugin;
 import com.cornchipss.guilds.guilds.Guild;
 
+import mkremins.fanciful.FancyMessage;
+
 public class CommandMgr implements Listener
 {
 	private List<Player> possibleGuildDeletions = new ArrayList<>();
+	private Map<Player, Guild> guildJoinProposals = new HashMap<>();
+	
 	private GuildsPlugin plugin;
 	
 	public CommandMgr(GuildsPlugin plugin)
@@ -31,8 +38,7 @@ public class CommandMgr implements Listener
 	 * @param command The command passed in by the sender
 	 * @param sender The command sender
 	 * @param args The arguments to the command
-	 * @param bb The java plugin class
-	 * @return True if it was successful
+	 * @return true if it was successful
 	 */
 	public boolean runThruCommands(Command command, CommandSender sender, String[] args)
 	{
@@ -98,6 +104,122 @@ public class CommandMgr implements Listener
 					
 					p.sendMessage(ChatColor.RED + "Are you sure you want to delete your guild? Type your guild's name to confirm. " + ChatColor.DARK_RED + "WARNING:" + ChatColor.RED + " THIS CANNOT BE UNDONE!!!");
 				}
+			}
+			else if(cmd.equals("accept"))
+			{
+				if(iop(sender))
+				{
+					Player p = (Player)sender;
+					
+					if(plugin.getGuildManager().playerHasGuild(p))
+					{
+						p.sendMessage(ChatColor.RED + "You are already in a guild!");
+						return true;
+					}
+					
+					if(guildJoinProposals.containsKey(p))
+					{					
+						Guild g = guildJoinProposals.get(p);
+						try 
+						{
+							plugin.getGuildManager().addPlayerToGuild(p, g);
+							p.sendMessage(ChatColor.GREEN + "Guild " + g.getName() + " successfully joined!");
+						}
+						catch (IOException e) 
+						{
+							e.printStackTrace();
+							p.sendMessage(ChatColor.RED + "A server error occurred when trying to join the guild.");
+						}
+						
+						guildJoinProposals.remove(p);
+					}
+					else
+					{
+						p.sendMessage(ChatColor.RED + "You have no pending invites.");
+						return true;
+					}
+				}
+			}
+			else if(cmd.equals("deny"))
+			{
+				if(iop(sender))
+				{
+					Player p = (Player)sender;
+					
+					if(guildJoinProposals.containsKey(p))
+					{					
+						p.sendMessage(ChatColor.GREEN + "Guild request rejected.");
+						guildJoinProposals.remove(p);
+					}
+					else
+					{
+						p.sendMessage(ChatColor.RED + "You have no pending invites.");
+						return true;
+					}
+				}
+			}
+			else if(cmd.equals("invite"))
+			{
+				if(iop(sender))
+				{
+					Player p = (Player)sender;
+					
+					Guild g = plugin.getGuildManager().getGuildFromUUID(p.getUniqueId());
+					
+					if(g == null)
+					{
+						p.sendMessage(ChatColor.RED + "You aren't in a guild.");
+						return true;
+					}
+					
+					if(args.length < 2)
+					{
+						p.sendMessage(ChatColor.RED + "You must specify the player to invite.");
+						return true;
+					}
+					
+					Player toInvite = Bukkit.getPlayer(args[1]);
+					if(toInvite == null)
+					{
+						p.sendMessage(ChatColor.RED + "Unable to find player " + args[1] + ".");
+						return true;
+					}
+					
+					Guild potentialGuild = plugin.getGuildManager().getGuildFromUUID(p.getUniqueId());
+					if(potentialGuild != null)
+					{
+						p.sendMessage(ChatColor.RED + p.getDisplayName() + ChatColor.RED + " is already in the guild \"" + potentialGuild.getName() + "\".");
+						return true;
+					}
+					
+					if(guildJoinProposals.containsKey(p))
+					{
+						p.sendMessage(ChatColor.RED + "That player, " + toInvite.getDisplayName() + ChatColor.RED + ", already has a pending invite.");
+						return true;
+					}
+					
+					p.sendMessage(ChatColor.GREEN + "Guild invite sent to " + toInvite.getDisplayName() + ChatColor.GREEN + ".");
+					guildJoinProposals.put(toInvite, g);
+					
+					List<String> acceptText = new ArrayList<>();
+					acceptText.add(ChatColor.GREEN + "Accepts the guild join request.");
+					acceptText.add(ChatColor.GREEN + "/guilds accept");
+					
+					List<String> denyText = new ArrayList<>();
+					denyText.add(ChatColor.RED + "Rejects the guild join request.");
+					denyText.add(ChatColor.RED + "/guilds deny");
+					
+					FancyMessage inviteSpeil = new FancyMessage("You have been invited to the guild \"" + g.getName() + "\".\n").color(ChatColor.GREEN);
+					inviteSpeil.then(ChatColor.BOLD + "Accept").color(ChatColor.GREEN).tooltip(acceptText).suggest("/guilds accept");
+					inviteSpeil.then(ChatColor.BOLD + " - ");
+					inviteSpeil.then(ChatColor.BOLD + "Deny").color(ChatColor.RED).tooltip(denyText).suggest("/guilds deny");
+					
+					inviteSpeil.send(toInvite);
+				}
+			}
+			else
+			{
+				displayHelp(sender);
 			}
 		}
 		

@@ -116,9 +116,6 @@ public class GuildManager
 		return onlinePlayers;
 	}
 
-	public List<Player> getGuildChatSpies() { return guildChatSpies; }
-	public void setGuildChatSpies(List<Player> guildChatSpies) { this.guildChatSpies = guildChatSpies; }
-
 	public boolean createGuild(String name, Player founder) throws IOException
 	{		
 		for(Guild g : getGuilds())
@@ -136,10 +133,19 @@ public class GuildManager
 		
 		return true;
 	}
+	
+	public void addPlayerToGuild(Player p, Guild g) throws IOException 
+	{
+		g.getMembers().add(p.getUniqueId());
+		saveGuilds();
+	}
 
 	public void deleteGuild(Guild g) throws IOException 
 	{
 		getGuilds().remove(g);
 		saveGuilds();
 	}
+	
+	public List<Player> getGuildChatSpies() { return guildChatSpies; }
+	public void setGuildChatSpies(List<Player> guildChatSpies) { this.guildChatSpies = guildChatSpies; }
 }

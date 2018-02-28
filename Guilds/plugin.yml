@@ -5,6 +5,9 @@ commands:
     guilds:
         description: Gateway to all guilds commands
         usage: /guilds
+    guild:
+        description: Gateway to all guilds commands
+        usage: /guild
     guildchat:
         description: Guild Chat
         usage: /guildchat
