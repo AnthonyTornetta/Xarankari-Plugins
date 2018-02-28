@@ -8,10 +8,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import com.google.gson.Gson;
@@ -46,7 +49,7 @@ public class GuildManager
 			List<String> uuids = new ArrayList<>();
 			uuids.add("2e3f560c-7495-401c-98c6-d21b4460ad3c");
 			uuids.add("bede35f6-75aa-404c-b591-cf7d722ca8db");
-			tempGuilds.add(new GuildJson("Armadale", uuids));
+			tempGuilds.add(new GuildJson("Armadale", uuids, new HashMap<>(), null));
 			
 			for(GuildJson guildJson : tempGuilds)
 			{
@@ -115,6 +118,21 @@ public class GuildManager
 		
 		return onlinePlayers;
 	}
+	
+	public Guild getGuildClaimingBlock(Block block) 
+	{
+		for(Guild g : getGuilds())
+		{
+			for(Chunk c : g.getOwnedChunks())
+			{
+				if(block.getChunk().equals(c))
+				{
+					return g;
+				}
+			}
+		}
+		return null;
+	}
 
 	public boolean createGuild(String name, Player founder) throws IOException
 	{		
@@ -127,7 +145,7 @@ public class GuildManager
 		List<UUID> members = new ArrayList<>();
 		members.add(founder.getUniqueId());
 		
-		getGuilds().add(new Guild(name, members));
+		getGuilds().add(new Guild(name, members, new ArrayList<>(), null));
 		
 		saveGuilds();
 		
