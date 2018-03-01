@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -217,6 +218,111 @@ public class CommandMgr implements Listener
 					inviteSpeil.send(toInvite);
 				}
 			}
+			else if(cmd.equals("claim"))
+			{
+				if(iop(sender))
+				{
+					Player p = (Player)sender;
+					Guild g = plugin.getGuildManager().getGuildFromUUID(p.getUniqueId());
+					
+					if(g == null)
+					{
+						p.sendMessage(ChatColor.RED + "You must be in a guild to claim land.");
+						return true;
+					}
+					else
+					{
+						Chunk c = p.getLocation().getChunk();
+						if(g.getOwnedChunks().contains(c))
+						{
+							p.sendMessage(ChatColor.RED + "Your guild already owns this chunk.");
+							return true;
+						}
+						else
+						{
+							g.addOwnedChunk(c);
+							p.sendMessage(ChatColor.GREEN + "Area added to claim!");
+							
+							try 
+							{
+								plugin.getGuildManager().saveGuilds();
+							} 
+							catch (IOException e) 
+							{
+								e.printStackTrace();
+							}
+							return true;
+						}
+					}
+				}
+			}
+			else if(cmd.equals("delclaim"))
+			{
+				if(iop(sender))
+				{
+					Player p = (Player)sender;
+					Guild g = plugin.getGuildManager().getGuildFromUUID(p.getUniqueId());
+					
+					if(g == null)
+					{
+						p.sendMessage(ChatColor.RED + "You must be in a guild to delete a land claim.");
+						return true;
+					}
+					else
+					{
+						Chunk c = p.getLocation().getChunk();
+						if(!g.getOwnedChunks().contains(c))
+						{
+							p.sendMessage(ChatColor.RED + "Your guild doesn't own this chunk.");
+							return true;
+						}
+						else
+						{
+							g.removeOwnedChunk(c);
+							p.sendMessage(ChatColor.GREEN + "Area remove from claims!");
+							
+							try 
+							{
+								plugin.getGuildManager().saveGuilds();
+							} 
+							catch (IOException e) 
+							{
+								e.printStackTrace();
+							}
+							return true;
+						}
+					}
+				}
+			}
+			else if(cmd.equals("leave"))
+			{
+				if(iop(sender))
+				{
+					Player p = (Player)sender;
+					Guild g = plugin.getGuildManager().getGuildFromUUID(p.getUniqueId());
+					if(g != null)
+					{
+						g.removeMember(p.getUniqueId());
+						p.sendMessage(ChatColor.GREEN + "You have left the guild \"" + g.getName() + "\".");
+						
+						try 
+						{
+							plugin.getGuildManager().saveGuilds();
+						} 
+						catch (IOException e) 
+						{
+							e.printStackTrace();
+						}
+						
+						plugin.updateTabList();
+						return true;
+					}
+					else
+					{
+						p.sendMessage(ChatColor.RED + "You are not in a guild.");
+					}
+				}
+			}
 			else
 			{
 				displayHelp(sender);
@@ -296,7 +402,9 @@ public class CommandMgr implements Listener
 		
 		sender.sendMessage(ChatColor.GREEN + "- new/create [name] - creates a new guild");
 		sender.sendMessage(ChatColor.GREEN + "- delete - deletes your guild");
-		sender.sendMessage(ChatColor.GREEN + "- join [name] - asks the officials of a guild if you can join");
+		sender.sendMessage(ChatColor.GREEN + "- invite [player] - Invites a player to your guild");
+		sender.sendMessage(ChatColor.GREEN + "- claim - Claims the chunk you are standing on to your guild");
+		sender.sendMessage(ChatColor.GREEN + "- delclaim - Removes the chunk you are standing on from your guild's land claims");
 	}
 
 	private static boolean iop(CommandSender sender)

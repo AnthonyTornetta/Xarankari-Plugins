@@ -5,11 +5,17 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -17,6 +23,10 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import com.cornchipss.guilds.guilds.Guild;
 import com.cornchipss.guilds.ref.Reference;
+import com.cornchipss.guilds.util.Vector2;
+
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 
 public class CornyListener implements Listener
 {
@@ -65,7 +75,6 @@ public class CornyListener implements Listener
 				
 				if(!playersInGuild.contains(onlinePlayer))
 				{
-					System.out.println("Removed.");
 					e.getRecipients().remove(onlinePlayer);
 				}
 			}
@@ -91,7 +100,7 @@ public class CornyListener implements Listener
 				try 
 				{
 					plugin.getMainConfig().save();
-				} 
+				}
 				catch (IOException ex) 
 				{
 					ex.printStackTrace();
@@ -116,22 +125,132 @@ public class CornyListener implements Listener
 	}
 	
 	@EventHandler(priority = EventPriority.HIGH)
+	public void onBlockExplode(BlockExplodeEvent e)
+	{
+		for(int i = 0; i < e.blockList().size(); i++)
+		{
+			Block b = e.blockList().get(i);
+			
+			if(plugin.getGuildManager().getGuildClaimingBlock(b) != null)
+			{
+				e.blockList().remove(b);
+				i--;
+			}
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.HIGH)
+	public void onEntityExplode(EntityExplodeEvent e)
+	{
+		for(int i = 0; i < e.blockList().size(); i++)
+		{
+			Block b = e.blockList().get(i);
+			
+			if(plugin.getGuildManager().getGuildClaimingBlock(b) != null)
+			{
+				e.blockList().remove(b);
+				i--;
+			}
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.HIGH)
+	public void onPistonExtend(BlockPistonExtendEvent e)
+	{
+		Guild pistonGuild = plugin.getGuildManager().getGuildClaimingBlock(e.getBlock());
+		
+		Vector2<Integer, Integer> moveDir = new Vector2<>(0, 0);
+		
+		if(e.getDirection() == BlockFace.NORTH)
+		{
+			moveDir.setY(-1);
+		}
+		else if(e.getDirection() == BlockFace.SOUTH)
+		{
+			moveDir.setY(1);
+		}
+		else if(e.getDirection() == BlockFace.EAST)
+		{
+			moveDir.setX(1);
+		}
+		else if(e.getDirection() == BlockFace.WEST)
+		{
+			moveDir.setX(-1);
+		}
+		else
+			return;
+		
+		for(Block b : e.getBlocks())
+		{
+			Guild messedWithGuild = plugin.getGuildManager().getGuildClaimingBlock(b.getLocation().add(moveDir.getX(), 0, moveDir.getY()).getBlock());
+			
+			if(pistonGuild == null)
+			{
+				if(messedWithGuild != null)
+				{
+					e.setCancelled(true);
+					return;
+				}
+			}
+			else
+			{
+				if(!pistonGuild.equals(messedWithGuild))
+				{
+					e.setCancelled(true);
+					return;
+				}
+			}
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.HIGH)
+	public void onPistonRetract(BlockPistonRetractEvent e)
+	{		
+		if(!e.isSticky())
+			return;
+		
+		Guild pistonGuild = plugin.getGuildManager().getGuildClaimingBlock(e.getBlock());
+		
+		for(Block b : e.getBlocks())
+		{
+			Guild messedWithGuild = plugin.getGuildManager().getGuildClaimingBlock(b);
+			
+			if(pistonGuild == null)
+			{
+				if(messedWithGuild != null)
+				{
+					e.setCancelled(true);
+					return;
+				}
+			}
+			else
+			{
+				if(!pistonGuild.equals(messedWithGuild))
+				{
+					e.setCancelled(true);
+					return;
+				}
+			}
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onBlockInteract(PlayerInteractEvent e)
 	{
+		if(e.getClickedBlock() == null)
+			return;
+		
 		Player p = e.getPlayer();
 		
-		Guild blockClaimedBy = plugin.getGuildManager().getGuildClaimingBlock(e.getClickedBlock());
-		if(blockClaimedBy == null || blockClaimedBy.equals(plugin.getGuildManager().getGuildFromUUID(p.getUniqueId())))
-			return;
-		else
+		if(!plugin.getGuildManager().canPlayerInteract(p, e.getClickedBlock().getLocation()))
 		{
-			sendActionbarMessage(p, ChatColor.RED + "That's claimed by the \"" + blockClaimedBy.getName() + "\" guild.");
+			sendActionbarMessage(p, ChatColor.RED + "That's claimed by the \"" + plugin.getGuildManager().getGuildClaimingBlock(e.getClickedBlock()).getName() + "\" guild.");
 			e.setCancelled(true);
 		}
 	}
 	
 	private void sendActionbarMessage(Player p, String message)
 	{
-		// TODO: Code
+		p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
 	}
 }

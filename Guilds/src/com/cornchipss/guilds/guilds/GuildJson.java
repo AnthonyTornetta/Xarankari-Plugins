@@ -1,24 +1,22 @@
 package com.cornchipss.guilds.guilds;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Chunk;
 
 import com.cornchipss.guilds.util.Serializer;
-import com.cornchipss.guilds.util.Vector2;
+import com.cornchipss.guilds.util.Vector3;
 
 public class GuildJson 
 {
 	private String guildName;
 	private List<String> members;
-	Map<String, Vector2<Integer, Integer>> ownedChunks;
+	List<Vector3<String, Integer, Integer>> ownedChunks;
 	private String guildHome;
 	
-	public GuildJson(String name, List<String> members, Map<String, Vector2<Integer, Integer>> ownedChunkLocations, String homeLocation)
+	public GuildJson(String name, List<String> members, List<Vector3<String, Integer, Integer>> ownedChunkLocations, String homeLocation)
 	{
 		this.guildName = name;
 		this.members = members;
@@ -45,11 +43,11 @@ public class GuildJson
 			memberUUIDStrings.add(id.toString());
 		}
 		
-		Map<String, Vector2<Integer, Integer>> ownedChunkLocations = new HashMap<>();
+		List<Vector3<String, Integer, Integer>> ownedChunkLocations = new ArrayList<>();
 		
 		for(Chunk c : g.getOwnedChunks())
 		{
-			ownedChunkLocations.putAll(Serializer.serializeChunk(c));
+			ownedChunkLocations.addAll(Serializer.serializeChunk(c));
 		}
 		
 		String homeLocation = Serializer.serializeLocation(g.getHome());

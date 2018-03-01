@@ -1,4 +1,4 @@
-package net.amoebaman.util;
+package mkremins.fanciful;
 
 import org.apache.commons.lang.Validate;
 

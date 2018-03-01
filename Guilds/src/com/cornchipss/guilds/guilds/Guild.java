@@ -21,7 +21,40 @@ public class Guild
 		
 		this.home = home;
 	}
-
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		if(obj instanceof Guild)
+		{
+			Guild g = (Guild)obj;
+			return name.equals(g.getName()) && members.equals(g.getMembers());
+		}
+		return false;
+	}
+	
+	public void addOwnedChunk(Chunk c) 
+	{
+		getOwnedChunks().add(c);
+	}
+	
+	public void removeOwnedChunk(Chunk c) 
+	{
+		getOwnedChunks().remove(c);
+	}
+	
+	public void addMember(UUID uuid)
+	{
+		getMembers().add(uuid);
+	}
+	
+	public void removeMember(UUID uuid) 
+	{
+		getMembers().remove(uuid);
+	}
+	
+	// Getters & Setters //
+	
 	public String getName() { return name; }
 	public void setName(String name) { this.name = name; }
 

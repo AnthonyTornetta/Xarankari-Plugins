@@ -1,9 +1,7 @@
 package com.cornchipss.guilds.util;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -30,24 +28,20 @@ public class Serializer
 							Double.parseDouble(split[1]), Double.parseDouble(split[2]), Double.parseDouble(split[3]));
 	}
 	
-	public static Map<String, Vector2<Integer, Integer>> serializeChunk(Chunk c)
+	public static List<Vector3<String, Integer, Integer>> serializeChunk(Chunk c)
 	{
-		Map<String, Vector2<Integer, Integer>> serialized = new HashMap<>();
-		serialized.put(c.getWorld().getName(), 
-				new Vector2<>(c.getX(), c.getZ()));
-		
+		List<Vector3<String, Integer, Integer>> serialized = new ArrayList<>();
+		serialized.add(new Vector3<>(c.getWorld().getName(), c.getX(), c.getZ()));
 		return serialized;
 	}
 	
-	public static List<Chunk> deserializeChunks(Map<String, Vector2<Integer, Integer>> serialized)
+	public static List<Chunk> deserializeChunks(List<Vector3<String, Integer, Integer>> serialized)
 	{
 		List<Chunk> chunks = new ArrayList<>();
 		
-		for(String s : serialized.keySet())
-		{
-			Vector2<Integer, Integer> position = serialized.get(s);
-			
-			Chunk c = Bukkit.getWorld(s).getChunkAt(position.getX(), position.getY());
+		for(Vector3<String, Integer, Integer> serializedChunk : serialized)
+		{			
+			Chunk c = Bukkit.getWorld(serializedChunk.getX()).getChunkAt(serializedChunk.getY(), serializedChunk.getZ());
 			
 			chunks.add(c);
 		}

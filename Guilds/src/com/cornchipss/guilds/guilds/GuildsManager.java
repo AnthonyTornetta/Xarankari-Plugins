@@ -8,19 +8,19 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-public class GuildManager 
+public class GuildsManager 
 {
 	private List<Guild> guilds = new ArrayList<>();
 	
@@ -29,7 +29,7 @@ public class GuildManager
 	
 	private File guildsStorage;
 	
-	public GuildManager(String guildsFilePath) throws IOException
+	public GuildsManager(String guildsFilePath) throws IOException
 	{
 		this.guildsStorage = new File(guildsFilePath);
 		guildsStorage.createNewFile();
@@ -48,8 +48,7 @@ public class GuildManager
 			List<GuildJson> tempGuilds = new ArrayList<>();
 			List<String> uuids = new ArrayList<>();
 			uuids.add("2e3f560c-7495-401c-98c6-d21b4460ad3c");
-			uuids.add("bede35f6-75aa-404c-b591-cf7d722ca8db");
-			tempGuilds.add(new GuildJson("Armadale", uuids, new HashMap<>(), null));
+			tempGuilds.add(new GuildJson("Armadale", uuids, new ArrayList<>(), null));
 			
 			for(GuildJson guildJson : tempGuilds)
 			{
@@ -74,6 +73,8 @@ public class GuildManager
 	
 	public void saveGuilds() throws IOException
 	{
+		removeUselessGuilds();
+		
 		BufferedWriter bw = new BufferedWriter(new FileWriter(guildsStorage));
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		List<GuildJson> guildJson = new ArrayList<>();
@@ -98,12 +99,23 @@ public class GuildManager
 	{
 		return getGuildFromUUID(p.getUniqueId()) != null;
 	}
-
-	public List<Player> getGuildChatters() { return guildChatters; }
-	public void setGuildChatters(List<Player> guildChatters) { this.guildChatters = guildChatters; }
-
-	public List<Guild> getGuilds() { return guilds; }
-	public void setGuilds(List<Guild> guilds) { this.guilds = guilds; }
+	
+	public boolean removeUselessGuilds()
+	{
+		boolean anyRemoved = false;
+		
+		for(int i = 0; i < getGuilds().size(); i++)
+		{			
+			if(getGuilds().get(i).getMembers().size() == 0)
+			{
+				getGuilds().remove(i);
+				i--;
+				anyRemoved = true;
+			}
+		}
+		
+		return anyRemoved;
+	}
 
 	public List<Player> getOnlinePlayersInGuild(Guild guild) 
 	{
@@ -132,6 +144,26 @@ public class GuildManager
 			}
 		}
 		return null;
+	}
+	
+	public boolean canPlayerInteract(Player p, Location loc)
+	{
+		for(Guild g : getGuilds())
+		{
+			for(Chunk c : g.getOwnedChunks())
+			{
+				if(loc.getChunk().equals(c))
+				{
+					if(getOnlinePlayersInGuild(g).contains(p))
+						return true; // Guild owned but player is in the guild
+					else
+						return false; // Guild owned and player not in that guild
+				}
+			}
+		}
+		
+		// No guild owns that location
+		return true;
 	}
 
 	public boolean createGuild(String name, Player founder) throws IOException
@@ -166,4 +198,10 @@ public class GuildManager
 	
 	public List<Player> getGuildChatSpies() { return guildChatSpies; }
 	public void setGuildChatSpies(List<Player> guildChatSpies) { this.guildChatSpies = guildChatSpies; }
+	
+	public List<Player> getGuildChatters() { return guildChatters; }
+	public void setGuildChatters(List<Player> guildChatters) { this.guildChatters = guildChatters; }
+
+	public List<Guild> getGuilds() { return guilds; }
+	public void setGuilds(List<Guild> guilds) { this.guilds = guilds; }
 }

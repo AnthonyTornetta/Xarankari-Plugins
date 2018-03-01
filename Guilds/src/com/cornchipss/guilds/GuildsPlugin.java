@@ -14,14 +14,14 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.cornchipss.guilds.cmds.CommandMgr;
 import com.cornchipss.guilds.config.Config;
 import com.cornchipss.guilds.guilds.Guild;
-import com.cornchipss.guilds.guilds.GuildManager;
+import com.cornchipss.guilds.guilds.GuildsManager;
 import com.cornchipss.guilds.ref.Reference;
 
 public class GuildsPlugin extends JavaPlugin
 {
 	private Config mainConfig;
 	
-	private GuildManager guildManager;
+	private GuildsManager guildManager;
 	private CommandMgr cmdMgr;
 		
 	@Override
@@ -50,7 +50,12 @@ public class GuildsPlugin extends JavaPlugin
 		
 		try
 		{
-			guildManager = new GuildManager(this.getDataFolder() + File.separator + "guilds-list.json");
+			guildManager = new GuildsManager(this.getDataFolder() + File.separator + "guilds-list.json");
+			
+			if(guildManager.removeUselessGuilds())
+			{
+				guildManager.saveGuilds();
+			}
 			
 			mainConfig = new Config(this.getDataFolder() + File.separator + "guilds-config.yml");
 		} 
@@ -115,7 +120,7 @@ public class GuildsPlugin extends JavaPlugin
 	}
 	
 	// Getters & Setters \\
-	public GuildManager getGuildManager() { return guildManager; }
+	public GuildsManager getGuildManager() { return guildManager; }
 
 	public Config getMainConfig() { return mainConfig; }
 }
