@@ -13,15 +13,17 @@ public class GuildJson
 {
 	private String guildName;
 	private List<String> members;
-	List<Vector3<String, Integer, Integer>> ownedChunks;
+	private List<Vector3<String, Integer, Integer>> ownedChunks;
 	private String guildHome;
+	private double balance;
 	
-	public GuildJson(String name, List<String> members, List<Vector3<String, Integer, Integer>> ownedChunkLocations, String homeLocation)
+	public GuildJson(String name, List<String> members, List<Vector3<String, Integer, Integer>> ownedChunkLocations, String homeLocation, double balance)
 	{
 		this.guildName = name;
 		this.members = members;
 		this.ownedChunks = ownedChunkLocations;
 		this.guildHome = homeLocation;
+		this.balance = balance;
 	}
 	
 	public Guild toGuild()
@@ -32,7 +34,7 @@ public class GuildJson
 			memberUuids.add(UUID.fromString(s));
 		}
 		
-		return new Guild(guildName, memberUuids, Serializer.deserializeChunks(ownedChunks), Serializer.deserializeLocation(guildHome));
+		return new Guild(guildName, memberUuids, Serializer.deserializeChunks(ownedChunks), Serializer.deserializeLocation(guildHome), balance);
 	}
 	
 	public static GuildJson fromGuild(Guild g)
@@ -52,6 +54,6 @@ public class GuildJson
 		
 		String homeLocation = Serializer.serializeLocation(g.getHome());
 		
-		return new GuildJson(g.getName(), memberUUIDStrings, ownedChunkLocations, homeLocation);
+		return new GuildJson(g.getName(), memberUUIDStrings, ownedChunkLocations, homeLocation, g.getBalance());
 	}
 }

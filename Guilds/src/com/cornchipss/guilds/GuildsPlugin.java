@@ -9,6 +9,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.cornchipss.guilds.cmds.CommandMgr;
@@ -17,12 +18,16 @@ import com.cornchipss.guilds.guilds.Guild;
 import com.cornchipss.guilds.guilds.GuildsManager;
 import com.cornchipss.guilds.ref.Reference;
 
+import net.milkbowl.vault.economy.Economy;
+
 public class GuildsPlugin extends JavaPlugin
 {
 	private Config mainConfig;
 	
 	private GuildsManager guildManager;
 	private CommandMgr cmdMgr;
+	
+	private Economy econ;
 		
 	@Override
 	public void onEnable()
@@ -46,6 +51,12 @@ public class GuildsPlugin extends JavaPlugin
 	
 	private void init()
 	{
+		if(!setupEconomy())
+		{
+			getLogger().info("Disabling due to no vault dependancy");
+			Bukkit.getPluginManager().disablePlugin(this);
+		}
+		
 		this.getDataFolder().mkdirs();
 		
 		try
@@ -73,6 +84,22 @@ public class GuildsPlugin extends JavaPlugin
 		
 		resetTabList();
 		updateTabList();
+	}
+	
+	private boolean setupEconomy() 
+	{
+        if (Bukkit.getPluginManager().getPlugin("Vault") == null) 
+        {
+            return false;
+        }
+
+        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        if (rsp == null) 
+        {
+            return false;
+        }
+        econ = rsp.getProvider();
+        return econ != null;
 	}
 	
 	public void updateTabList()
@@ -123,4 +150,6 @@ public class GuildsPlugin extends JavaPlugin
 	public GuildsManager getGuildManager() { return guildManager; }
 
 	public Config getMainConfig() { return mainConfig; }
+	
+	public Economy getEcononomy() { return econ; }
 }

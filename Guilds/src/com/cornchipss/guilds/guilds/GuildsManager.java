@@ -48,7 +48,7 @@ public class GuildsManager
 			List<GuildJson> tempGuilds = new ArrayList<>();
 			List<String> uuids = new ArrayList<>();
 			uuids.add("2e3f560c-7495-401c-98c6-d21b4460ad3c");
-			tempGuilds.add(new GuildJson("Armadale", uuids, new ArrayList<>(), null));
+			tempGuilds.add(new GuildJson("Armadale", uuids, new ArrayList<>(), null, 0.0));
 			
 			for(GuildJson guildJson : tempGuilds)
 			{
@@ -177,7 +177,7 @@ public class GuildsManager
 		List<UUID> members = new ArrayList<>();
 		members.add(founder.getUniqueId());
 		
-		getGuilds().add(new Guild(name, members, new ArrayList<>(), null));
+		getGuilds().add(new Guild(name, members, new ArrayList<>(), null, 0.0));
 		
 		saveGuilds();
 		

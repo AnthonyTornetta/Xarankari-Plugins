@@ -9,6 +9,7 @@ import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -19,6 +20,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import com.cornchipss.guilds.GuildsPlugin;
 import com.cornchipss.guilds.guilds.Guild;
+import com.cornchipss.guilds.util.Helper;
 
 import mkremins.fanciful.FancyMessage;
 
@@ -320,6 +322,134 @@ public class CommandMgr implements Listener
 					else
 					{
 						p.sendMessage(ChatColor.RED + "You are not in a guild.");
+					}
+				}
+			}
+			else if(cmd.equals("borders"))
+			{
+				if(iop(sender))
+				{
+					Player p = (Player) sender;
+					Guild g = plugin.getGuildManager().getGuildFromUUID(p.getUniqueId());
+					if(g == null)
+					{
+						p.sendMessage(ChatColor.RED + "You are not in a guild!");
+						return false;
+					}
+					
+					g.toggleBorders();
+				}
+			}
+			else if(cmd.equals("balance"))
+			{
+				if(iop(sender))
+				{
+					Player p = (Player) sender;
+					Guild g = plugin.getGuildManager().getGuildFromUUID(p.getUniqueId());
+					if(g == null)
+					{
+						p.sendMessage(ChatColor.RED + "You are not in a guild!");
+						return true;
+					}
+					
+					p.sendMessage(ChatColor.GREEN + "Guild Balance: $" + g.getBalance());
+				}
+			}
+			else if(cmd.equals("deposit"))
+			{
+				if(iop(sender))
+				{
+					Player p = (Player) sender;
+					Guild g = plugin.getGuildManager().getGuildFromUUID(p.getUniqueId());
+					if(g == null)
+					{
+						p.sendMessage(ChatColor.RED + "You are not in a guild!");
+						return true;
+					}
+					
+					if(args.length < 2)
+					{
+						p.sendMessage(ChatColor.RED + "You must specify the amount to deposit.");
+						return true;
+					}
+					
+					double amt;
+					
+					if(!Helper.isDouble(args[1]) || (amt = Double.parseDouble(args[1])) <= 0)
+					{
+						p.sendMessage(ChatColor.RED + "You must give a valid amount of money.");
+						return true;
+					}
+					
+					if(!plugin.getEcononomy().withdrawPlayer((OfflinePlayer)p, amt).transactionSuccess())
+					{
+						p.sendMessage(ChatColor.RED + "You do not have the proper funds.");
+						return true;
+					}
+					
+					g.deposit(amt);
+					p.sendMessage(ChatColor.GREEN + "$" + amt + " successfully deposited into your guild's balance.");
+					
+					try 
+					{
+						plugin.getGuildManager().saveGuilds();
+					} 
+					catch (IOException e) 
+					{
+						e.printStackTrace();
+					}
+				}
+			}
+			else if(cmd.equals("withdraw"))
+			{
+				if(iop(sender))
+				{
+					Player p = (Player) sender;
+					Guild g = plugin.getGuildManager().getGuildFromUUID(p.getUniqueId());
+					if(g == null)
+					{
+						p.sendMessage(ChatColor.RED + "You are not in a guild!");
+						return true;
+					}
+					
+					if(args.length < 2)
+					{
+						p.sendMessage(ChatColor.RED + "You must specify the amount to withdraw.");
+						return true;
+					}
+					
+					double amt;
+					
+					if(!Helper.isDouble(args[1]) || (amt = Double.parseDouble(args[1])) <= 0)
+					{
+						p.sendMessage(ChatColor.RED + "You must give a valid amount of money.");
+						return true;
+					}
+					
+					if(!g.canWithdrawAmount(amt))
+					{
+						p.sendMessage(ChatColor.RED + "Your guild does not have the proper funds.");
+						return true;
+					}
+					
+					if(plugin.getEcononomy().depositPlayer((OfflinePlayer)p, amt).transactionSuccess())
+					{
+						g.withdrawAmount(amt);
+						p.sendMessage(ChatColor.GREEN + "$" + amt + " successfully withdrawn from the guild's balance.");
+					}
+					else
+					{
+						p.sendMessage(ChatColor.RED + "Unable to withdraw money from guild's balance.");
+						return true;
+					}
+					
+					try 
+					{
+						plugin.getGuildManager().saveGuilds();
+					} 
+					catch (IOException e) 
+					{
+						e.printStackTrace();
 					}
 				}
 			}
