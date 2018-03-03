@@ -21,14 +21,21 @@ public class Guild
 	private Location home;
 	private double balance;
 	
+	/**
+	 * A group of players in a membership that has claimed land<br>
+	 * @param name The name of the guild to show up to players
+	 * @param members The members in the guild
+	 * @param ownedChunks The chunks the guild owns
+	 * @param home The home of the guild (null if none)
+	 * @param balance The balance of the guild
+	 */
 	public Guild(String name, Map<UUID, GuildRank> members, List<Chunk> ownedChunks, Location home, double balance)
 	{
-		this.name = name;
-		this.members = members;
 		this.ownedChunks = ownedChunks;
-		
+		this.members = members;
 		this.balance = balance;
-		this.home = home;
+		this.name = name;
+		this.home = home;	
 	}
 	
 	@Override
@@ -42,34 +49,66 @@ public class Guild
 		return false;
 	}
 	
-	// In case I ever decide to add certain conditions
+	/**
+	 * Checks if the chunk should be added
+	 * @param c The chunk to check
+	 * @return true if it can be added - false if not
+	 */
 	public boolean shouldAddChunk(Chunk c)
 	{
 		return true;
 	}
 	
-	public boolean addOwnedChunk(Chunk c) 
+	/**
+	 * Adds an owned chunks to the owned chunks of the faction<br>
+	 * Prevents duplicate additions
+	 * @param c The chunk to add
+	 */
+	public void addOwnedChunk(Chunk c) 
 	{
+		if(getOwnedChunks().contains(c))
+			return;
 		getOwnedChunks().add(c);
-		return true;
 	}
 	
-	// In case I ever decide to add certain conditions
+	/**
+	 * Checks if the chunk should be removed
+	 * @param c The chunk to check
+	 * @return true if it can be removed - false if not
+	 */
 	public boolean shouldRemoveChunk(Chunk c)
 	{
 		return true;
 	}
 	
+	/**
+	 * Removes an owned chunk from the owned chunks of the guild<br>
+	 * Sets the faction home to null if the home was in said chunk
+	 * @param c The chunk to remove
+	 */
 	public void removeOwnedChunk(Chunk c) 
 	{
 		getOwnedChunks().remove(c);
+		if(getHome().getChunk().equals(c))
+			setHome(null);
 	}
 	
+	/**
+	 * Adds a member to the guild<br>
+	 * This will override an existing member with the same UUID
+	 * @param uuid The uuid of the member
+	 * @param rank The rank of the member
+	 */
 	public void addMember(UUID uuid, GuildRank rank)
 	{
 		getMembersFull().put(uuid, rank);
 	}
 	
+	/**
+	 * Gets a member's rank
+	 * @param uuid The member's UUID
+	 * @return The member's rank
+	 */
 	public GuildRank getMemberRank(UUID uuid)
 	{
 		return getMembersFull().get(uuid);

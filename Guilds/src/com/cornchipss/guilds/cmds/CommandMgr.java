@@ -269,8 +269,9 @@ public class CommandMgr implements Listener
 					}
 					else
 					{
-						if(g.shouldAddChunk(c) && g.addOwnedChunk(c))
+						if(g.shouldAddChunk(c))
 						{
+							g.addOwnedChunk(c);
 							p.sendMessage(ChatColor.GREEN + "Area added to claim!");
 							try 
 							{
