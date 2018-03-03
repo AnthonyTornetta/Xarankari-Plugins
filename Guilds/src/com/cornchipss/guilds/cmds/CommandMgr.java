@@ -859,14 +859,14 @@ public class CommandMgr implements Listener
 		sender.sendMessage(ChatColor.GREEN + "Balance: $" + g.getBalance());
 		sender.sendMessage(ChatColor.GREEN + "Claims: " + g.getOwnedChunks().size() + "/" + g.getMaxClaims());
 		
-		Player king = null;
-		List<Player> commanders = new ArrayList<>();
-		List<Player> knights = new ArrayList<>();;
-		List<Player> peons = new ArrayList<>();;
+		OfflinePlayer king = null;
+		List<OfflinePlayer> commanders = new ArrayList<>();
+		List<OfflinePlayer> knights = new ArrayList<>();;
+		List<OfflinePlayer> peons = new ArrayList<>();;
 		
 		for(UUID uuid : g.getMembers())
 		{
-			Player player = Bukkit.getPlayer(uuid);
+			OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
 			if(player == null)
 				continue;
 			
@@ -890,26 +890,26 @@ public class CommandMgr implements Listener
 		}
 		
 		if(king != null)
-			sender.sendMessage(ChatColor.GREEN + "King: " + king.getDisplayName());
+			sender.sendMessage(ChatColor.GREEN + "King: " + king.getName());
 		
 		String commandersStr = "";
 		for(int i = 0; i < commanders.size(); i++)
 		{
-			commandersStr += commanders.get(i).getDisplayName() + ChatColor.GREEN;
+			commandersStr += commanders.get(i).getName() + ChatColor.GREEN;
 			if(i + 1 != commanders.size())
 				commandersStr += ChatColor.GREEN + ", ";
 		}
 		String knightsStr = "";
 		for(int i = 0; i < commanders.size(); i++)
 		{
-			knightsStr += commanders.get(i).getDisplayName() + ChatColor.GREEN;
+			knightsStr += commanders.get(i).getName() + ChatColor.GREEN;
 			if(i + 1 != commanders.size())
 				knightsStr += ChatColor.GREEN + ", ";
 		}
 		String peonsStr = "";
 		for(int i = 0; i < commanders.size(); i++)
 		{
-			peonsStr += commanders.get(i).getDisplayName() + ChatColor.GREEN;
+			peonsStr += commanders.get(i).getName() + ChatColor.GREEN;
 			if(i + 1 != commanders.size())
 				peonsStr += ChatColor.GREEN + ", ";
 		}

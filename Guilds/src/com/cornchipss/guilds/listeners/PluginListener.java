@@ -286,8 +286,6 @@ public class PluginListener implements Listener
     	Guild gFrom = plugin.getGuildManager().getGuildFromUUID(p.getUniqueId());
         Guild gTo = plugin.getGuildManager().getGuildClaimingLocation(e.getEntity().getLocation());
         
-        System.out.println("RAN");
-        
         Entity ent = e.getEntity();
     	if(ent instanceof Monster)
     	{
