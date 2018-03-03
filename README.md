@@ -1,2 +1,2 @@
 # Xarankari-Plugins
-Plugins for the dev team of Xarankari
+Plugins for various servers I work on.

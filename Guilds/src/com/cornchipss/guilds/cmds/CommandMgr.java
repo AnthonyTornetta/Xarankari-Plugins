@@ -57,6 +57,7 @@ public class CommandMgr implements Listener
 				return true;
 			}
 			
+			// Reset the command to args[0] because that is the new command to interpret
 			cmd = args[0].toLowerCase();
 			
 			if(cmd.equals("new") || cmd.equals("create"))
