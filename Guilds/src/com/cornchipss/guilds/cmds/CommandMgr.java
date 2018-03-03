@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -53,7 +54,7 @@ public class CommandMgr implements Listener
 		{
 			if(args.length < 1)
 			{
-				displayHelp(sender);
+				// TODO: Display guild info
 				return true;
 			}
 			
@@ -493,6 +494,15 @@ public class CommandMgr implements Listener
 					g.deposit(amt);
 					p.sendMessage(ChatColor.GREEN + "$" + amt + " successfully deposited into your guild's balance.");
 					
+					for(UUID uuid : g.getMembers())
+					{
+						Player pToSend = Bukkit.getPlayer(uuid);
+						if(pToSend.isOnline())
+						{
+							pToSend.sendMessage(ChatColor.GREEN + p.getDisplayName() + ChatColor.GREEN + " has deposited $" + amt + " into the guild's balance.");
+						}
+					}
+					
 					try 
 					{
 						plugin.getGuildManager().saveGuilds();
@@ -547,6 +557,15 @@ public class CommandMgr implements Listener
 					{
 						g.withdrawAmount(amt);
 						p.sendMessage(ChatColor.GREEN + "$" + amt + " successfully withdrawn from the guild's balance.");
+						
+						for(UUID uuid : g.getMembers())
+						{
+							Player pToSend = Bukkit.getPlayer(uuid);
+							if(pToSend.isOnline())
+							{
+								pToSend.sendMessage(ChatColor.GREEN + p.getDisplayName() + ChatColor.GREEN + " has withdrawn $" + amt + " from the guild's balance.");
+							}
+						}
 					}
 					else
 					{
@@ -729,9 +748,27 @@ public class CommandMgr implements Listener
 					p.sendMessage(ChatColor.GREEN + "You are the rank of \"" + Helper.firstLetterUpper(g.getMemberRank(p.getUniqueId()).name().toLowerCase() + "\" in your guild."));
 				}
 			}
+			else if(cmd.equals("help"))
+			{
+				if(args.length < 2)
+				{
+					displayHelp(sender, 1);
+				}
+				else
+				{
+					if(Helper.isInt(args[1]))
+					{
+						displayHelp(sender, Integer.parseInt(args[1]));
+					}
+					else
+					{
+						sender.sendMessage(ChatColor.RED + args[1] + " is not a valid page number.");
+					}
+				}
+			}
 			else
 			{
-				displayHelp(sender);
+				sender.sendMessage(ChatColor.RED + "Invalid command, do /guilds help to see the help page.");
 			}
 		}
 		
@@ -801,17 +838,36 @@ public class CommandMgr implements Listener
 		possibleGuildDeletions.remove(p);
 	}
 	
-	private static void displayHelp(CommandSender sender) 
+	private static void displayHelp(CommandSender sender, int page) 
 	{
-		sender.sendMessage(ChatColor.GREEN + "=== Guilds Help ===");
-		sender.sendMessage(ChatColor.GREEN + "- /gc - Enter Guild Chat (used without /guilds at the start)");
+		final int MAX_PAGE = 2;
+		sender.sendMessage(ChatColor.GREEN + "=== Guilds Help (" + (page > MAX_PAGE ? MAX_PAGE : page) + "/" + MAX_PAGE + ") ===");
 		
-		sender.sendMessage(ChatColor.GREEN + "- new/create [name] - creates a new guild");
-		sender.sendMessage(ChatColor.GREEN + "- delete - deletes your guild");
-		sender.sendMessage(ChatColor.GREEN + "- invite [player] - Invites a player to your guild");
-		sender.sendMessage(ChatColor.GREEN + "- claim - Claims the chunk you are standing on to your guild");
-		sender.sendMessage(ChatColor.GREEN + "- delclaim - Removes the chunk you are standing on from your guild's land claims");
-		
+		switch(page)
+		{
+			case 1:
+			{
+				sender.sendMessage(ChatColor.GREEN + "- /gc - Enter Guild Chat (used without /guilds at the start)");
+				sender.sendMessage(ChatColor.GREEN + "- new/create [name] - creates a new guild");
+				sender.sendMessage(ChatColor.GREEN + "- delete - deletes your guild");
+				sender.sendMessage(ChatColor.GREEN + "- invite [player] - Invites a player to your guild");
+				sender.sendMessage(ChatColor.GREEN + "- claim - Claims the chunk you are standing on to your guild");
+				sender.sendMessage(ChatColor.GREEN + "- unclaim - Removes the chunk you are standing on from your guild's land claims");
+				sender.sendMessage(ChatColor.GREEN + "- help [pagenum]");
+				break;
+			}
+			case 2:
+			{
+				sender.sendMessage(ChatColor.GREEN + "- promote - Promotes a player in your guild that is below your rank");
+				sender.sendMessage(ChatColor.GREEN + "- demote - Demotes a player in your guild that is below your rank");
+				sender.sendMessage(ChatColor.GREEN + "- rank - View your rank in your guild");
+				sender.sendMessage(ChatColor.GREEN + "- deposit - Deposits a specified amount into your guild's vault");
+				sender.sendMessage(ChatColor.GREEN + "- withdraw - Withdraws a specified amount from your guild's vault");
+				break;
+			}
+			default:
+				displayHelp(sender, MAX_PAGE);
+		}
 	}
 
 	private static boolean iop(CommandSender sender)
