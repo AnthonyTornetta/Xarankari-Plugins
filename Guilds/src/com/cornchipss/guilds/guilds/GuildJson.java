@@ -1,7 +1,9 @@
 package com.cornchipss.guilds.guilds;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Chunk;
@@ -12,12 +14,12 @@ import com.cornchipss.guilds.util.Vector3;
 public class GuildJson 
 {
 	private String guildName;
-	private List<String> members;
+	private Map<String, GuildRank> members;
 	private List<Vector3<String, Integer, Integer>> ownedChunks;
 	private String guildHome;
 	private double balance;
 	
-	public GuildJson(String name, List<String> members, List<Vector3<String, Integer, Integer>> ownedChunkLocations, String homeLocation, double balance)
+	public GuildJson(String name, Map<String, GuildRank> members, List<Vector3<String, Integer, Integer>> ownedChunkLocations, String homeLocation, double balance)
 	{
 		this.guildName = name;
 		this.members = members;
@@ -28,21 +30,21 @@ public class GuildJson
 	
 	public Guild toGuild()
 	{
-		List<UUID> memberUuids = new ArrayList<>();
-		for(String s : members)
+		Map<UUID, GuildRank> membersComplete = new HashMap<>();
+		for(String s : members.keySet())
 		{
-			memberUuids.add(UUID.fromString(s));
+			membersComplete.put(UUID.fromString(s), members.get(s));
 		}
 		
-		return new Guild(guildName, memberUuids, Serializer.deserializeChunks(ownedChunks), Serializer.deserializeLocation(guildHome), balance);
+		return new Guild(guildName, membersComplete, Serializer.deserializeChunks(ownedChunks), Serializer.deserializeLocation(guildHome), balance);
 	}
 	
 	public static GuildJson fromGuild(Guild g)
 	{
-		List<String> memberUUIDStrings = new ArrayList<>();
-		for(UUID id : g.getMembers())
+		Map<String, GuildRank> memberUUIDStrings = new HashMap<>();
+		for(UUID id : g.getMembersFull().keySet())
 		{
-			memberUUIDStrings.add(id.toString());
+			memberUUIDStrings.put(id.toString(), g.getMembersFull().get(id));
 		}
 		
 		List<Vector3<String, Integer, Integer>> ownedChunkLocations = new ArrayList<>();

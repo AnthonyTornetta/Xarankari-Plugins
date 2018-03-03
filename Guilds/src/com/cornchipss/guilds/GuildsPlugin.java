@@ -16,6 +16,7 @@ import com.cornchipss.guilds.cmds.CommandMgr;
 import com.cornchipss.guilds.config.Config;
 import com.cornchipss.guilds.guilds.Guild;
 import com.cornchipss.guilds.guilds.GuildsManager;
+import com.cornchipss.guilds.listeners.PluginListener;
 import com.cornchipss.guilds.ref.Reference;
 
 import net.milkbowl.vault.economy.Economy;
@@ -77,7 +78,7 @@ public class GuildsPlugin extends JavaPlugin
 		}
 		
 		PluginManager pm = getServer().getPluginManager();
-		pm.registerEvents(new CornyListener(this), this);
+		pm.registerEvents(new PluginListener(this), this);
 		
 		cmdMgr = new CommandMgr(this);
 		pm.registerEvents(cmdMgr, this);

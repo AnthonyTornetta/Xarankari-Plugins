@@ -8,7 +8,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -46,8 +48,8 @@ public class GuildsManager
 		if(json.isEmpty())
 		{
 			List<GuildJson> tempGuilds = new ArrayList<>();
-			List<String> uuids = new ArrayList<>();
-			uuids.add("2e3f560c-7495-401c-98c6-d21b4460ad3c");
+			Map<String, GuildRank> uuids = new HashMap<>();
+			uuids.put("2e3f560c-7495-401c-98c6-d21b4460ad3c", GuildRank.KING);
 			tempGuilds.add(new GuildJson("Armadale", uuids, new ArrayList<>(), null, 0.0));
 			
 			for(GuildJson guildJson : tempGuilds)
@@ -174,8 +176,8 @@ public class GuildsManager
 				return false;
 		}
 		
-		List<UUID> members = new ArrayList<>();
-		members.add(founder.getUniqueId());
+		Map<UUID, GuildRank> members = new HashMap<>();
+		members.put(founder.getUniqueId(), GuildRank.KING);
 		
 		getGuilds().add(new Guild(name, members, new ArrayList<>(), null, 0.0));
 		
@@ -184,9 +186,9 @@ public class GuildsManager
 		return true;
 	}
 	
-	public void addPlayerToGuild(Player p, Guild g) throws IOException 
+	public void addPlayerToGuild(Player p, Guild g, GuildRank rank) throws IOException 
 	{
-		g.getMembers().add(p.getUniqueId());
+		g.addMember(p.getUniqueId(), rank);
 		saveGuilds();
 	}
 

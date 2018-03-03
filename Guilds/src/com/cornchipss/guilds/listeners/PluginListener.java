@@ -1,4 +1,4 @@
-package com.cornchipss.guilds;
+package com.cornchipss.guilds.listeners;
 
 import java.io.IOException;
 import java.util.List;
@@ -21,6 +21,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import com.cornchipss.guilds.GuildsPlugin;
 import com.cornchipss.guilds.guilds.Guild;
 import com.cornchipss.guilds.ref.Reference;
 import com.cornchipss.guilds.util.Vector2;
@@ -28,11 +29,11 @@ import com.cornchipss.guilds.util.Vector2;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 
-public class CornyListener implements Listener
+public class PluginListener implements Listener
 {
 	private GuildsPlugin plugin;
 	
-	public CornyListener(GuildsPlugin guildsPlugin) 
+	public PluginListener(GuildsPlugin guildsPlugin) 
 	{
 		this.plugin = guildsPlugin;
 	}
