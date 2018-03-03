@@ -5,20 +5,28 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
+import org.bukkit.event.block.BlockSpreadEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import com.cornchipss.guilds.GuildsPlugin;
@@ -234,7 +242,81 @@ public class PluginListener implements Listener
 			}
 		}
 	}
-	
+	 
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onBlockFromTo(BlockFromToEvent e) 
+    {
+        Block block = e.getBlock();
+        Block blockTo = e.getToBlock();
+        
+        Guild gFrom = plugin.getGuildManager().getGuildClaimingBlock(block);
+        Guild gTo = plugin.getGuildManager().getGuildClaimingBlock(blockTo);
+        
+        if(gTo == null)
+        	return;
+        
+        // It's flowing from wilderness into guild territory
+        if(gFrom == null)
+        {
+        	e.setCancelled(true);
+        	return;
+        }
+        
+        if(!gFrom.equals(gTo))
+        {
+        	e.setCancelled(true);
+        }
+	}
+    
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onBlockSpread(BlockSpreadEvent e) 
+    {
+    	if(plugin.getGuildManager().getGuildClaimingBlock(e.getBlock()) != null)
+    		e.setCancelled(true);
+    }
+    
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onEntityDamageByEntity(EntityDamageByEntityEvent e)
+    {
+    	if(!(e.getDamager() instanceof Player))
+    		return;
+    	
+    	Player p = (Player)(e.getDamager());
+    	
+    	Guild gFrom = plugin.getGuildManager().getGuildFromUUID(p.getUniqueId());
+        Guild gTo = plugin.getGuildManager().getGuildClaimingLocation(e.getEntity().getLocation());
+        
+        System.out.println("RAN");
+        
+        Entity ent = e.getEntity();
+    	if(ent instanceof Monster)
+    	{
+    		return; // They can kill hostiles
+    	}
+        
+        if(gTo == null)
+        	return;
+        
+        // damageer from wilderness into guild territory
+        if(gFrom == null)
+        {
+        	e.setCancelled(true);
+        }
+        
+        if(!gFrom.equals(gTo))
+        {
+        	e.setCancelled(true);
+        }
+    }
+    
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onEntityInteract(EntityInteractEvent e)
+    {
+    	Block b = e.getBlock();
+    	if(plugin.getGuildManager().getGuildClaimingBlock(b) != null)
+    		e.setCancelled(true);
+    }
+    
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onBlockInteract(PlayerInteractEvent e)
 	{
@@ -247,6 +329,37 @@ public class PluginListener implements Listener
 		{
 			sendActionbarMessage(p, ChatColor.RED + "That's claimed by the \"" + plugin.getGuildManager().getGuildClaimingBlock(e.getClickedBlock()).getName() + "\" guild.");
 			e.setCancelled(true);
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.NORMAL)
+	public void onPlayerMove(PlayerMoveEvent e)
+	{
+		Location loc = e.getTo();
+		Location locFrom = e.getFrom();
+		
+		Guild fromGuild = plugin.getGuildManager().getGuildClaimingLocation(locFrom);
+		Guild toGuild = plugin.getGuildManager().getGuildClaimingLocation(loc);
+		
+		Player p = e.getPlayer();
+		
+		if(fromGuild != null)
+		{
+			if(toGuild == null)
+			{
+				sendActionbarMessage(p, ChatColor.GREEN + "~ Wilderness ~");
+			}
+			else if(!fromGuild.equals(toGuild))
+			{
+				sendActionbarMessage(p, ChatColor.GREEN + "~ " + toGuild.getName() + " ~");
+			}
+		}
+		else
+		{
+			if(toGuild != null)
+			{
+				sendActionbarMessage(p, ChatColor.GREEN + "~ " + toGuild.getName() + " ~");
+			}
 		}
 	}
 	

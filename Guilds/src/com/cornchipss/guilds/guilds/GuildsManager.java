@@ -135,11 +135,16 @@ public class GuildsManager
 	
 	public Guild getGuildClaimingBlock(Block block) 
 	{
+		return getGuildClaimingLocation(block.getLocation());
+	}
+	
+	public Guild getGuildClaimingLocation(Location loc) 
+	{
 		for(Guild g : getGuilds())
 		{
 			for(Chunk c : g.getOwnedChunks())
 			{
-				if(block.getChunk().equals(c))
+				if(loc.getChunk().equals(c))
 				{
 					return g;
 				}
@@ -170,6 +175,12 @@ public class GuildsManager
 
 	public boolean createGuild(String name, Player founder) throws IOException
 	{		
+		if(name == null)
+			return false;
+		
+		if(name.equalsIgnoreCase("wilderness"))
+			return false;
+		
 		for(Guild g : getGuilds())
 		{
 			if(g.getName().equalsIgnoreCase(name))

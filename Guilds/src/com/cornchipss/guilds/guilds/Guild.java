@@ -56,7 +56,7 @@ public class Guild
 	 */
 	public boolean shouldAddChunk(Chunk c)
 	{
-		return true;
+		return getMaxClaims() > getOwnedChunks().size();
 	}
 	
 	/**
@@ -89,8 +89,9 @@ public class Guild
 	public void removeOwnedChunk(Chunk c) 
 	{
 		getOwnedChunks().remove(c);
-		if(getHome().getChunk().equals(c))
-			setHome(null);
+		if(getHome() != null)
+			if(getHome().getChunk().equals(c))
+				setHome(null);
 	}
 	
 	/**
@@ -318,5 +319,10 @@ public class Guild
 				}
 			}
 		}
+	}
+
+	public int getMaxClaims() 
+	{
+		return 4 * (getMembers().size() - 1) + 8;
 	}
 }
