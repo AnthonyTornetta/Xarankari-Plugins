@@ -54,78 +54,24 @@ public class CommandMgr implements Listener
 		{
 			if(args.length < 1)
 			{
-				Player p = (Player)sender;
-				Guild g = plugin.getGuildManager().getGuildFromUUID(p.getUniqueId());
-				
-				if(g == null)
+				if(iop(sender))
 				{
-					p.sendMessage(ChatColor.RED + "You are not in a guild to view your guild's stats.");
-					p.sendMessage(ChatColor.RED + "Do /guilds help to view the help");
-					return true;
-				}
-				
-				p.sendMessage(ChatColor.GREEN + "= " + g.getName() + " =");
-				p.sendMessage(ChatColor.GREEN + "Balance: $" + g.getBalance());
-				p.sendMessage(ChatColor.GREEN + "Claims: " + g.getOwnedChunks().size() + "/" + g.getMaxClaims());
-				
-				Player king = null;
-				List<Player> commanders = new ArrayList<>();
-				List<Player> knights = new ArrayList<>();;
-				List<Player> peons = new ArrayList<>();;
-				
-				for(UUID uuid : g.getMembers())
-				{
-					Player player = Bukkit.getPlayer(uuid);
-					if(player == null)
-						continue;
+					Player p = (Player)sender;
+					Guild g = plugin.getGuildManager().getGuildFromUUID(p.getUniqueId());
 					
-					switch(g.getMemberRank(uuid))
+					if(g == null)
 					{
-					case KING:
-						king = player;
-						break;
-					case COMMANDER:
-						commanders.add(player);
-						break;
-					case KNIGHT:
-						knights.add(player);
-						break;
-					case PEON:
-						peons.add(player);
-						break;
-					default:
-						break;
+						p.sendMessage(ChatColor.RED + "You are not in a guild to view your guild's stats.");
+						p.sendMessage(ChatColor.RED + "Do /guilds help to view the help");
+						return true;
 					}
+					
+					guildInfo(g, sender);
 				}
-				
-				if(king != null)
-					p.sendMessage(ChatColor.GREEN + "King: " + king.getDisplayName());
-				
-				String commandersStr = "";
-				for(int i = 0; i < commanders.size(); i++)
+				else
 				{
-					commandersStr += commanders.get(i).getDisplayName() + ChatColor.GREEN;
-					if(i + 1 != commanders.size())
-						commandersStr += ChatColor.GREEN + ", ";
+					displayHelp(sender, 1);
 				}
-				String knightsStr = "";
-				for(int i = 0; i < commanders.size(); i++)
-				{
-					knightsStr += commanders.get(i).getDisplayName() + ChatColor.GREEN;
-					if(i + 1 != commanders.size())
-						knightsStr += ChatColor.GREEN + ", ";
-				}
-				String peonsStr = "";
-				for(int i = 0; i < commanders.size(); i++)
-				{
-					peonsStr += commanders.get(i).getDisplayName() + ChatColor.GREEN;
-					if(i + 1 != commanders.size())
-						peonsStr += ChatColor.GREEN + ", ";
-				}
-				
-				p.sendMessage(ChatColor.GREEN + "Commanders: " + commandersStr);
-				p.sendMessage(ChatColor.GREEN + "Knights: " + knightsStr);
-				p.sendMessage(ChatColor.GREEN + "Peons: " + peonsStr);
 				
 				return true;
 			}
@@ -196,6 +142,52 @@ public class CommandMgr implements Listener
 					if(!possibleGuildDeletions.contains(p))
 						possibleGuildDeletions.add(p);
 					p.sendMessage(ChatColor.RED + "Are you sure you want to delete your guild? Type your guild's name to confirm. " + ChatColor.DARK_RED + "WARNING:" + ChatColor.RED + " THIS CANNOT BE UNDONE!!!");
+				}
+			}
+			else if(cmd.equals("info"))
+			{
+				if(args.length < 2)
+				{
+					if(sender instanceof Player)
+					{
+						Player p = (Player)sender;
+						Guild g = plugin.getGuildManager().getGuildFromUUID(p.getUniqueId());
+						
+						if(g == null)
+						{
+							p.sendMessage(ChatColor.RED + "You are not in a guild to view your guild's stats.");
+							p.sendMessage(ChatColor.RED + "Do /guilds help to view the help");
+							return true;
+						}
+						guildInfo(g, sender);
+					}
+					else
+					{
+						sender.sendMessage("You must specify which guild to see the information of.");
+						return true;
+					}
+				}
+				else
+				{
+					Guild g = plugin.getGuildManager().getGuildFromName(args[1]);
+					if(g == null)
+					{
+						sender.sendMessage(ChatColor.RED + "Unable to find guild with name of \"" + args[1] + "\".");
+						return true;
+					}
+					else
+					{
+						guildInfo(g, sender);
+					}
+				}
+			}
+			else if(cmd.equals("list"))
+			{
+				sender.sendMessage(ChatColor.GREEN + "= Guilds =");
+				for(Guild g : plugin.getGuildManager().getGuilds())
+				{
+					sender.sendMessage(ChatColor.GREEN + g.getName() + "(" + g.getMembers().size() + ")");
+					return true;
 				}
 			}
 			else if(cmd.equals("accept"))
@@ -861,6 +853,72 @@ public class CommandMgr implements Listener
 		return true;
 	}
 	
+	private void guildInfo(Guild g, CommandSender sender) 
+	{
+		sender.sendMessage(ChatColor.GREEN + "= " + g.getName() + " =");
+		sender.sendMessage(ChatColor.GREEN + "Balance: $" + g.getBalance());
+		sender.sendMessage(ChatColor.GREEN + "Claims: " + g.getOwnedChunks().size() + "/" + g.getMaxClaims());
+		
+		Player king = null;
+		List<Player> commanders = new ArrayList<>();
+		List<Player> knights = new ArrayList<>();;
+		List<Player> peons = new ArrayList<>();;
+		
+		for(UUID uuid : g.getMembers())
+		{
+			Player player = Bukkit.getPlayer(uuid);
+			if(player == null)
+				continue;
+			
+			switch(g.getMemberRank(uuid))
+			{
+			case KING:
+				king = player;
+				break;
+			case COMMANDER:
+				commanders.add(player);
+				break;
+			case KNIGHT:
+				knights.add(player);
+				break;
+			case PEON:
+				peons.add(player);
+				break;
+			default:
+				break;
+			}
+		}
+		
+		if(king != null)
+			sender.sendMessage(ChatColor.GREEN + "King: " + king.getDisplayName());
+		
+		String commandersStr = "";
+		for(int i = 0; i < commanders.size(); i++)
+		{
+			commandersStr += commanders.get(i).getDisplayName() + ChatColor.GREEN;
+			if(i + 1 != commanders.size())
+				commandersStr += ChatColor.GREEN + ", ";
+		}
+		String knightsStr = "";
+		for(int i = 0; i < commanders.size(); i++)
+		{
+			knightsStr += commanders.get(i).getDisplayName() + ChatColor.GREEN;
+			if(i + 1 != commanders.size())
+				knightsStr += ChatColor.GREEN + ", ";
+		}
+		String peonsStr = "";
+		for(int i = 0; i < commanders.size(); i++)
+		{
+			peonsStr += commanders.get(i).getDisplayName() + ChatColor.GREEN;
+			if(i + 1 != commanders.size())
+				peonsStr += ChatColor.GREEN + ", ";
+		}
+		
+		sender.sendMessage(ChatColor.GREEN + "Commanders: " + commandersStr);
+		sender.sendMessage(ChatColor.GREEN + "Knights: " + knightsStr);
+		sender.sendMessage(ChatColor.GREEN + "Peons: " + peonsStr);
+	}
+
 	private boolean gc(CommandSender sender)
 	{
 		if(iop(sender))

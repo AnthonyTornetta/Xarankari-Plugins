@@ -96,6 +96,16 @@ public class GuildsManager
 				return g;
 		return null;
 	}
+	
+	public Guild getGuildFromName(String name) 
+	{
+		for(Guild g : guilds)
+		{
+			if(g.getName().equalsIgnoreCase(name))
+				return g;
+		}
+		return null;
+	}
 
 	public boolean playerHasGuild(Player p) 
 	{
