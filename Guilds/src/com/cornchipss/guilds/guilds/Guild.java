@@ -6,10 +6,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 
 import com.cornchipss.guilds.money.CurrencyExchangeResult;
 
@@ -200,6 +202,43 @@ public class Guild
 	}
 	
 	/**
+	 * Gets the king uuid in the guild
+	 * @return The king's UUID or null if no king found
+	 */
+	public UUID getKing() 
+	{
+		for(UUID uuid : getMembers())
+		{
+			if(getMembersFull().get(uuid).equals(GuildRank.KING))
+				return uuid;
+		}
+		return null;
+	}
+	
+	/**
+	 * Calculates the maximum amount of claims the guild can have
+	 * @return The maximum amount of claims the guild can have
+	 */
+	public int getMaxClaims() 
+	{
+		return 4 * (getMembers().size() - 1) + 8;
+	}
+	
+	/**
+	 * Sends every online player in the guild a message
+	 * @param msg The message to send them
+	 */
+	public void broadcast(String msg) 
+	{
+		for(UUID uuid : getMembers())
+		{
+			Player p = Bukkit.getPlayer(uuid);
+			if(p != null && p.isOnline())
+				p.sendMessage(msg);
+		}
+	}
+	
+	/**
 	 * Gets chunks around a specified chunk that the guild owns
 	 * @param c The chunk to search around
 	 * @return A list in the order of: East chunk, West chunk, South chunk, North chunk
@@ -319,10 +358,5 @@ public class Guild
 				}
 			}
 		}
-	}
-
-	public int getMaxClaims() 
-	{
-		return 4 * (getMembers().size() - 1) + 8;
 	}
 }

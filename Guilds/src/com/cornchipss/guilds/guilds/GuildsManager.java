@@ -45,21 +45,7 @@ public class GuildsManager
 		}
 		br.close();
 		
-		if(json.isEmpty())
-		{
-			List<GuildJson> tempGuilds = new ArrayList<>();
-			Map<String, GuildRank> uuids = new HashMap<>();
-			uuids.put("2e3f560c-7495-401c-98c6-d21b4460ad3c", GuildRank.KING);
-			tempGuilds.add(new GuildJson("Armadale", uuids, new ArrayList<>(), null, 0.0));
-			
-			for(GuildJson guildJson : tempGuilds)
-			{
-				guilds.add(guildJson.toGuild());
-			}
-			
-			saveGuilds();
-		}
-		else
+		if(!json.isEmpty())
 		{
 			Gson gson = new Gson();
 			
@@ -188,7 +174,7 @@ public class GuildsManager
 		if(name == null)
 			return false;
 		
-		if(name.equalsIgnoreCase("wilderness"))
+		if(name.equalsIgnoreCase("wilderness") || name.equalsIgnoreCase("guildless"))
 			return false;
 		
 		for(Guild g : getGuilds())

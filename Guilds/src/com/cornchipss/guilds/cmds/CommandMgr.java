@@ -24,6 +24,7 @@ import com.cornchipss.guilds.GuildsPlugin;
 import com.cornchipss.guilds.guilds.Guild;
 import com.cornchipss.guilds.guilds.GuildRank;
 import com.cornchipss.guilds.util.Helper;
+import com.cornchipss.guilds.util.Util;
 
 import mkremins.fanciful.FancyMessage;
 
@@ -62,7 +63,7 @@ public class CommandMgr implements Listener
 					if(g == null)
 					{
 						p.sendMessage(ChatColor.RED + "You are not in a guild to view your guild's stats.");
-						p.sendMessage(ChatColor.RED + "Do /guilds help to view the help");
+						p.sendMessage(ChatColor.RED + "Do /guilds help to view the help.");
 						return true;
 					}
 					
@@ -144,6 +145,21 @@ public class CommandMgr implements Listener
 					p.sendMessage(ChatColor.RED + "Are you sure you want to delete your guild? Type your guild's name to confirm. " + ChatColor.DARK_RED + "WARNING:" + ChatColor.RED + " THIS CANNOT BE UNDONE!!!");
 				}
 			}
+			else if(cmd.equals("admin"))
+			{
+				if(iop(sender))
+				{
+					Player p = (Player)sender;
+					if(Util.invertAdmin(p))
+					{
+						p.sendMessage(ChatColor.GREEN + "Guilds admin mode activated.");
+					}
+					else
+					{
+						p.sendMessage(ChatColor.GREEN + "Guilds admin mode deactivated.");
+					}
+				}
+			}
 			else if(cmd.equals("info"))
 			{
 				if(args.length < 2)
@@ -208,6 +224,7 @@ public class CommandMgr implements Listener
 						try 
 						{
 							plugin.getGuildManager().addPlayerToGuild(p, g, GuildRank.PEON);
+							g.broadcast(ChatColor.GREEN + p.getDisplayName() + ChatColor.GREEN + " has joined the guild!");
 							p.sendMessage(ChatColor.GREEN + "Guild " + g.getName() + " successfully joined!");
 						}
 						catch (IOException e) 
@@ -263,7 +280,7 @@ public class CommandMgr implements Listener
 					
 					GuildRank rank = g.getMemberRank(p.getUniqueId());
 					
-					if(rank.lessThan(GuildRank.COMMANDER))
+					if(rank.lessThan(GuildRank.COMMANDER) && !Util.isPlayerAdmin(p))
 					{
 						p.sendMessage(ChatColor.RED + "You are not qualified enough in your guild to do this.");
 						return true;
@@ -329,7 +346,7 @@ public class CommandMgr implements Listener
 					
 					GuildRank rank = g.getMemberRank(p.getUniqueId());
 					
-					if(rank.lessThan(GuildRank.KNIGHT))
+					if(rank.lessThan(GuildRank.KNIGHT) && !Util.isPlayerAdmin(p))
 					{
 						p.sendMessage(ChatColor.RED + "You are not qualified enough in your guild to do this.");
 						return true;
@@ -380,7 +397,7 @@ public class CommandMgr implements Listener
 					
 					GuildRank rank = g.getMemberRank(p.getUniqueId());
 					
-					if(rank.lessThan(GuildRank.KNIGHT))
+					if(rank.lessThan(GuildRank.KNIGHT) && !Util.isPlayerAdmin(p))
 					{
 						p.sendMessage(ChatColor.RED + "You are not qualified enough in your guild to do this.");
 						return true;
@@ -423,7 +440,7 @@ public class CommandMgr implements Listener
 					
 					GuildRank rank = g.getMemberRank(p.getUniqueId());
 					
-					if(rank.lessThan(GuildRank.COMMANDER))
+					if(rank.lessThan(GuildRank.COMMANDER) && !Util.isPlayerAdmin(p))
 					{
 						p.sendMessage(ChatColor.RED + "You are not qualified enough in your guild to do this.");
 						return true;
@@ -482,7 +499,7 @@ public class CommandMgr implements Listener
 					{
 						g.removeMember(p.getUniqueId());
 						p.sendMessage(ChatColor.GREEN + "You have left the guild \"" + g.getName() + "\".");
-						
+						g.broadcast(ChatColor.GREEN + p.getDisplayName() + ChatColor.GREEN + " has left the guild!");
 						try 
 						{
 							plugin.getGuildManager().saveGuilds();
@@ -599,7 +616,7 @@ public class CommandMgr implements Listener
 					
 					GuildRank rank = g.getMemberRank(p.getUniqueId());
 					
-					if(rank.lessThan(GuildRank.COMMANDER))
+					if(rank.lessThan(GuildRank.COMMANDER) && !Util.isPlayerAdmin(p))
 					{
 						p.sendMessage(ChatColor.RED + "You are not qualified enough in your guild to do this.");
 						return true;
@@ -669,7 +686,7 @@ public class CommandMgr implements Listener
 					
 					GuildRank rank = g.getMemberRank(p.getUniqueId());
 					
-					if(rank.lessThan(GuildRank.COMMANDER))
+					if(rank.lessThan(GuildRank.COMMANDER) && !Util.isPlayerAdmin(p))
 					{
 						p.sendMessage(ChatColor.RED + "You are not qualified enough in your guild to do this.");
 						return true;
@@ -695,13 +712,17 @@ public class CommandMgr implements Listener
 						return true;
 					}
 					
-					GuildRank demoteeRank = g.getMemberRank(demotee.getUniqueId());
+					GuildRank demoteeRank = demoteeGuild.getMemberRank(demotee.getUniqueId());
 					
-					if(demoteeRank.lessThan(rank))
+					if(demoteeRank.lessThan(rank) || Util.isPlayerAdmin(p))
 					{
 						if(demoteeRank.getValue() == 0)
 						{
 							p.sendMessage(ChatColor.RED + "That player is already the lowest rank possible.");
+						}
+						else if(demoteeRank == GuildRank.KING)
+						{
+							p.sendMessage(ChatColor.RED + "You cannot demote a king - you must transfer ownership.");
 						}
 						else
 						{
@@ -739,7 +760,7 @@ public class CommandMgr implements Listener
 					
 					GuildRank rank = g.getMemberRank(p.getUniqueId());
 					
-					if(rank.lessThan(GuildRank.COMMANDER))
+					if(rank.lessThan(GuildRank.COMMANDER) && !Util.isPlayerAdmin(p))
 					{
 						p.sendMessage(ChatColor.RED + "You are not qualified enough in your guild to do this.");
 						return true;
@@ -758,22 +779,22 @@ public class CommandMgr implements Listener
 						return true;
 					}
 					
-					if(promotee.equals(p))
+					if(promotee.equals(p) && !Util.isPlayerAdmin(p))
 					{
 						p.sendMessage(ChatColor.RED + "I get it - you're egotistical. Sadly though, you cannot promote yourself.");
 						return true;
 					}
 					
 					Guild promoteeGuild = plugin.getGuildManager().getGuildFromUUID(promotee.getUniqueId());
-					if(!g.equals(promoteeGuild))
+					if(!g.equals(promoteeGuild) && !Util.isPlayerAdmin(p))
 					{
 						p.sendMessage(ChatColor.RED + "That player isn't in your guild.");
 						return true;
 					}
 					
-					GuildRank promoteeRank = g.getMemberRank(promotee.getUniqueId());
+					GuildRank promoteeRank = promoteeGuild.getMemberRank(promotee.getUniqueId());
 					
-					if(promoteeRank.lessThan(rank))
+					if(promoteeRank.lessThan(rank) && !Util.isPlayerAdmin(p))
 					{
 						if(promoteeRank.getValue() == GuildRank.KING.getValue())
 						{
@@ -781,7 +802,7 @@ public class CommandMgr implements Listener
 						}
 						else if(promoteeRank.getValue() == GuildRank.KING.getValue() - 1)
 						{
-							p.sendMessage(ChatColor.RED + "You cannot promote someone to king - you must transfer ownership by using /guild transfer [player]");
+							p.sendMessage(ChatColor.RED + "You cannot promote someone to king - you must transfer ownership by using the transfer [player] command");
 							p.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Be Warned" + ChatColor.RESET + "" + ChatColor.RED + "--- Once done only the new king can give you back ownership.");
 						}
 						else
@@ -805,19 +826,201 @@ public class CommandMgr implements Listener
 					}
 				}
 			}
+			else if(cmd.equals("transfer"))
+			{
+				if(args.length < 2)
+				{
+					sender.sendMessage(ChatColor.RED + "You must specify who to give ownership to.");
+					return true;
+				}
+				if(sender instanceof Player)
+				{
+					Player p = (Player)sender;
+					if(!Util.isPlayerAdmin(p))
+					{
+						if(!plugin.getGuildManager().playerHasGuild(p))
+						{
+							p.sendMessage(ChatColor.RED + "You must be in a guild to use this.");
+							return true;
+						}
+						
+						Guild g = plugin.getGuildManager().getGuildFromUUID(p.getUniqueId());
+						
+						GuildRank rank = g.getMemberRank(p.getUniqueId());
+						
+						if(rank.lessThan(GuildRank.KING))
+						{
+							p.sendMessage(ChatColor.RED + "You are not qualified enough in your guild to do this.");
+							return true;
+						}
+						
+						Player giveTo = Bukkit.getPlayer(args[1]);
+						if(giveTo == null)
+						{
+							p.sendMessage(ChatColor.RED + "Unable to find player " + args[1]);
+							return true;
+						}
+						
+						if(!g.equals(plugin.getGuildManager().getGuildFromUUID(giveTo.getUniqueId())))
+						{
+							p.sendMessage(ChatColor.RED + p.getDisplayName() + ChatColor.RED + " must be in your guild.");
+							return true;
+						}
+						
+						g.setMemberRank(p.getUniqueId(), GuildRank.COMMANDER);
+						g.setMemberRank(giveTo.getUniqueId(), GuildRank.KING);
+						
+						p.sendMessage(ChatColor.GREEN + "Ownership transferred to " + giveTo.getDisplayName() + ChatColor.GREEN + ".");
+						
+						g.broadcast(ChatColor.GREEN + "Your new king is " + giveTo.getDisplayName() + ChatColor.GREEN + "!");
+						
+						try 
+						{
+							plugin.getGuildManager().saveGuilds();
+						} 
+						catch (IOException e) 
+						{
+							e.printStackTrace();
+						}
+						
+						return true;
+					}
+				}
+				
+				// Sender is either console or admin
+				Player giveTo = Bukkit.getPlayer(args[1]);
+				if(giveTo == null)
+				{
+					sender.sendMessage(ChatColor.RED + "Unable to find player " + args[1]);
+					return true;
+				}
+				
+				Guild g = plugin.getGuildManager().getGuildFromUUID(giveTo.getUniqueId());
+				if(g == null)
+				{
+					sender.sendMessage(ChatColor.RED + "That player isn't in a guild.");
+					return true;
+				}
+				
+				g.setMemberRank(g.getKing(), GuildRank.COMMANDER);
+				g.setMemberRank(giveTo.getUniqueId(), GuildRank.KING);
+				
+				sender.sendMessage(ChatColor.GREEN + "Ownership transferred to " + giveTo.getDisplayName() + ChatColor.GREEN + ".");
+				
+				g.broadcast(ChatColor.GREEN + "Your new king is " + giveTo.getDisplayName() + ChatColor.GREEN + "!");
+				
+				try 
+				{
+					plugin.getGuildManager().saveGuilds();
+				} 
+				catch (IOException e) 
+				{
+					e.printStackTrace();
+				}
+			}
 			else if(cmd.equals("rank"))
 			{
 				if(iop(sender))
 				{
 					Player p = (Player) sender;
-					Guild g = plugin.getGuildManager().getGuildFromUUID(p.getUniqueId());
-					if(g == null)
+					
+					if(args.length < 2)
 					{
-						p.sendMessage(ChatColor.RED + "You are not in a guild!");
+						Guild g = plugin.getGuildManager().getGuildFromUUID(p.getUniqueId());
+						if(g == null)
+						{
+							p.sendMessage(ChatColor.RED + "You are not in a guild!");
+							return true;
+						}
+						
+						p.sendMessage(ChatColor.GREEN + "You are the rank of \"" + Helper.firstLetterUpper(g.getMemberRank(p.getUniqueId()).name().toLowerCase() + "\" in your guild."));
+					}
+					else
+					{
+						Player find = Bukkit.getPlayer(args[1]);
+						if(find == null)
+						{
+							p.sendMessage(ChatColor.RED + "Unable to find player " + args[1] + ".");
+							return true;
+						}
+						else
+						{
+							Guild g = plugin.getGuildManager().getGuildFromUUID(find.getUniqueId());
+							if(g == null)
+							{
+								p.sendMessage(ChatColor.RED + find.getDisplayName() + ChatColor.RED + " is not in a guild!");
+								return true;
+							}
+							p.sendMessage(ChatColor.GREEN + find.getDisplayName() + ChatColor.GREEN + " is the rank \"" + Helper.firstLetterUpper(g.getMemberRank(p.getUniqueId()).name().toLowerCase() + "\" in the " + g.getName() + " guild"));
+						}
+					}
+				}
+			}
+			else if(cmd.equals("kick"))
+			{
+				if(args.length < 2)
+				{
+					sender.sendMessage(ChatColor.RED + "You must specify who to kick.");
+					return true;
+				}
+				else
+				{
+					Player find = Bukkit.getPlayer(args[1]);
+					if(find == null)
+					{
+						sender.sendMessage(ChatColor.RED + "Unable to find player " + args[1] + ".");
 						return true;
 					}
 					
-					p.sendMessage(ChatColor.GREEN + "You are the rank of \"" + Helper.firstLetterUpper(g.getMemberRank(p.getUniqueId()).name().toLowerCase() + "\" in your guild."));
+					Guild g = plugin.getGuildManager().getGuildFromUUID(find.getUniqueId());
+					if(g == null)
+					{
+						sender.sendMessage(ChatColor.RED + find.getDisplayName() + ChatColor.RED + " is not in a guild!");
+						return true;
+					}
+					
+					if(sender instanceof Player)
+					{
+						Player p = (Player)sender;
+						if(find.equals(p))
+						{
+							p.sendMessage(ChatColor.RED + "You cannot kick yourself...");
+							return true;
+						}
+						if(!Util.isPlayerAdmin(p))
+						{
+							GuildRank rank = g.getMemberRank(p.getUniqueId());
+							if(rank.lessThan(GuildRank.COMMANDER) || !g.getMemberRank(find.getUniqueId()).lessThan(rank))
+							{
+								sender.sendMessage(ChatColor.RED + "You do not have the proper rank to do this.");
+								return true;
+							}
+						}
+					}
+					
+					GuildRank rank = g.getMemberRank(find.getUniqueId());
+					if(rank.lessThan(GuildRank.KING))
+					{
+						sender.sendMessage(ChatColor.RED + "You do not have the proper rank to do this.");
+						sender.sendMessage(ChatColor.GREEN + find.getDisplayName() + ChatColor.GREEN + " has been kicked.");
+						g.broadcast(ChatColor.GREEN + find.getDisplayName() + ChatColor.GREEN + " has been kicked out of the guild.");
+						g.removeMember(find.getUniqueId());
+						
+						try 
+						{
+							plugin.getGuildManager().saveGuilds();
+						} 
+						catch (IOException e) 
+						{
+							e.printStackTrace();
+						}
+						plugin.updateTabList();
+					}
+					else
+					{
+						sender.sendMessage(ChatColor.RED + "You cannot kick the king from his guild!");
+					}
+					return true;
 				}
 			}
 			else if(cmd.equals("help"))
@@ -984,7 +1187,7 @@ public class CommandMgr implements Listener
 	
 	private static void displayHelp(CommandSender sender, int page) 
 	{
-		final int MAX_PAGE = 2;
+		final int MAX_PAGE = 3;
 		if(page > MAX_PAGE)
 		{
 			displayHelp(sender, MAX_PAGE);
@@ -1008,16 +1211,18 @@ public class CommandMgr implements Listener
 			}
 			case 2:
 			{
-				sender.sendMessage(ChatColor.GREEN + "- promote - Promotes a player in your guild that is below your rank");
-				sender.sendMessage(ChatColor.GREEN + "- demote - Demotes a player in your guild that is below your rank");
-				sender.sendMessage(ChatColor.GREEN + "- rank - View your rank in your guild");
-				sender.sendMessage(ChatColor.GREEN + "- deposit - Deposits a specified amount into your guild's vault");
-				sender.sendMessage(ChatColor.GREEN + "- withdraw - Withdraws a specified amount from your guild's vault");
-				sender.sendMessage(ChatColor.GREEN + "- transfer - Transfers the ownership of the guild");
+				sender.sendMessage(ChatColor.GREEN + "- promote [player]  - Promotes a player in your guild that is below your rank");
+				sender.sendMessage(ChatColor.GREEN + "- demote [player] - Demotes a player in your guild that is below your rank");
+				sender.sendMessage(ChatColor.GREEN + "- rank <player> - View your rank in your guild");
+				sender.sendMessage(ChatColor.GREEN + "- deposit [amount] - Deposits a specified amount into your guild's vault");
+				sender.sendMessage(ChatColor.GREEN + "- withdraw [amount] - Withdraws a specified amount from your guild's vault");
+				sender.sendMessage(ChatColor.GREEN + "- transfer [player] - Transfers the ownership of the guild");
 				break;
 			}
-			default:
-				displayHelp(sender, MAX_PAGE);
+			case 3:
+			{
+				sender.sendMessage(ChatColor.GREEN + "- kick [player] - Kicks the specified player from the guild");
+			}
 		}
 	}
 
