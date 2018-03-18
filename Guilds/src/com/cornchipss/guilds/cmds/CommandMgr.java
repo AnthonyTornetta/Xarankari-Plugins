@@ -23,6 +23,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import com.cornchipss.guilds.GuildsPlugin;
 import com.cornchipss.guilds.guilds.Guild;
 import com.cornchipss.guilds.guilds.GuildRank;
+import com.cornchipss.guilds.guilds.GuildRelation;
 import com.cornchipss.guilds.util.Helper;
 import com.cornchipss.guilds.util.Util;
 
@@ -149,14 +150,17 @@ public class CommandMgr implements Listener
 			{
 				if(iop(sender))
 				{
-					Player p = (Player)sender;
-					if(Util.invertAdmin(p))
+					if(sender.hasPermission("guilds.admin"))
 					{
-						p.sendMessage(ChatColor.GREEN + "Guilds admin mode activated.");
-					}
-					else
-					{
-						p.sendMessage(ChatColor.GREEN + "Guilds admin mode deactivated.");
+						Player p = (Player)sender;
+						if(Util.invertAdmin(p))
+						{
+							p.sendMessage(ChatColor.GREEN + "Guilds admin mode activated.");
+						}
+						else
+						{
+							p.sendMessage(ChatColor.GREEN + "Guilds admin mode deactivated.");
+						}
 					}
 				}
 			}
@@ -518,21 +522,6 @@ public class CommandMgr implements Listener
 					}
 				}
 			}
-			else if(cmd.equals("borders"))
-			{
-				if(iop(sender))
-				{
-					Player p = (Player) sender;
-					Guild g = plugin.getGuildManager().getGuildFromUUID(p.getUniqueId());
-					if(g == null)
-					{
-						p.sendMessage(ChatColor.RED + "You are not in a guild!");
-						return false;
-					}
-					
-					g.showBorders();
-				}
-			}
 			else if(cmd.equals("balance"))
 			{
 				if(iop(sender))
@@ -607,11 +596,31 @@ public class CommandMgr implements Listener
 				if(iop(sender))
 				{
 					Player p = (Player) sender;
-					Guild g = plugin.getGuildManager().getGuildFromUUID(p.getUniqueId());
-					if(g == null)
+					Guild g;
+					
+					if(args.length >= 3)
 					{
-						p.sendMessage(ChatColor.RED + "You are not in a guild!");
-						return true;
+						if(!Util.isPlayerAdmin(p))
+						{
+							p.sendMessage(ChatColor.RED + "You cannot withdraw from another guild");
+							return true;
+						}
+						g = plugin.getGuildManager().getGuildFromName(args[2]);
+						if(g == null)
+						{
+							p.sendMessage(ChatColor.RED + "Invalid guild!");
+							return true;
+						}
+						
+					}
+					else
+					{
+						g = plugin.getGuildManager().getGuildFromUUID(p.getUniqueId());
+						if(g == null)
+						{
+							p.sendMessage(ChatColor.RED + "You are not in a guild!");
+							return true;
+						}
 					}
 					
 					GuildRank rank = g.getMemberRank(p.getUniqueId());
@@ -1023,6 +1032,90 @@ public class CommandMgr implements Listener
 					return true;
 				}
 			}
+			else if(cmd.equals("relation") || cmd.equals("relations"))
+			{
+				if(!iop(sender))
+					return true;
+				Player p = (Player)sender;
+				
+				if(args.length < 2)
+				{
+					sender.sendMessage(ChatColor.RED + "You must specify who to go to war with.");
+					return true;
+				}
+				else if(args.length < 3)
+				{
+					sender.sendMessage(ChatColor.RED + "You must specify what relation to set them to");
+				}
+				else
+				{
+					Guild g = plugin.getGuildManager().getGuildFromUUID(p.getUniqueId());
+					if(g == null)
+					{
+						sender.sendMessage(ChatColor.RED + "You are not in a guild!");
+						return true;
+					}
+					
+					GuildRank rank = g.getMemberRank(p.getUniqueId());
+					if(rank.lessThan(GuildRank.COMMANDER))
+					{
+						sender.sendMessage(ChatColor.RED + "You do not have the proper rank to do this.");
+						return true;
+					}
+					
+					Guild guildToChangeRelation = plugin.getGuildManager().getGuildFromName(args[1]);
+					if(guildToChangeRelation == null)
+					{
+						p.sendMessage(ChatColor.RED + "Unable to find guild.");
+						return true;
+					}
+					
+					args[2] = args[2].toLowerCase();
+					
+					GuildRelation relation = null;
+					
+					if(args[2].equals("neutral") || args[2].equals("peace"))
+					{
+						relation = GuildRelation.NEUTRAL;
+					}
+					else if(args[2].equals("enemy") || args[2].equals("war"))
+					{
+						relation = GuildRelation.ENEMY;
+					}
+					else if(args[2].equals("friend") || args[2].equals("ally"))
+					{
+						relation = GuildRelation.ALLY;
+					}
+					
+					if(relation != null)
+					{
+						if(guildToChangeRelation.getRelation(g) != relation)
+						{
+							// TODO: This
+						}
+						else
+						{
+							g.setRelations(guildToChangeRelation, relation);
+							p.sendMessage(ChatColor.GREEN + "Relation set.");
+						}
+					}
+					else
+					{
+						p.sendMessage(ChatColor.RED + "Unknown relation: Ally/Neutral/Enemy");
+						return true;
+					}
+					
+					try
+					{
+						plugin.getGuildManager().saveGuilds();
+					} 
+					catch (IOException e) 
+					{
+						e.printStackTrace();
+					}
+					return true;
+				}
+			}
 			else if(cmd.equals("help"))
 			{
 				if(args.length < 2)
@@ -1222,6 +1315,7 @@ public class CommandMgr implements Listener
 			case 3:
 			{
 				sender.sendMessage(ChatColor.GREEN + "- kick [player] - Kicks the specified player from the guild");
+				sender.sendMessage(ChatColor.GREEN + "- relation [guild] [relation] - sets a specified relation with another guild");
 			}
 		}
 	}

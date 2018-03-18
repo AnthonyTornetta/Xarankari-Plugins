@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Chunk;
@@ -15,16 +16,18 @@ public class GuildJson
 {
 	private String guildName;
 	private Map<String, GuildRank> members;
+	private Map<String, GuildRelation> relations;
 	private List<Vector3<String, Integer, Integer>> ownedChunks;
 	private String guildHome;
 	private double balance;
 	
-	public GuildJson(String name, Map<String, GuildRank> members, List<Vector3<String, Integer, Integer>> ownedChunkLocations, String homeLocation, double balance)
+	public GuildJson(String name, Map<String, GuildRank> members, Map<String, GuildRelation> relations, List<Vector3<String, Integer, Integer>> ownedChunkLocations, String homeLocation, double balance)
 	{
 		this.guildName = name;
 		this.members = members;
 		this.ownedChunks = ownedChunkLocations;
 		this.guildHome = homeLocation;
+		this.relations = relations;
 		this.balance = balance;
 	}
 	
@@ -56,6 +59,29 @@ public class GuildJson
 		
 		String homeLocation = Serializer.serializeLocation(g.getHome());
 		
-		return new GuildJson(g.getName(), memberUUIDStrings, ownedChunkLocations, homeLocation, g.getBalance());
+		Map<String, GuildRelation> relations = new HashMap<>();
+		for(Guild guildRelation : g.getAllRelations().keySet())
+		{
+			relations.put(guildRelation.getName(), g.getAllRelations().get(guildRelation));
+		}
+		
+		return new GuildJson(g.getName(), memberUUIDStrings, relations, ownedChunkLocations, homeLocation, g.getBalance());
+	}
+	
+	public Map<Guild, GuildRelation> getRelations(List<Guild> allGuilds)
+	{
+		Map<Guild, GuildRelation> relationsComplete = new HashMap<>();
+		
+		Set<String> relationsNames = relations.keySet();
+		
+		for(Guild g : allGuilds)
+		{
+			if(relationsNames.contains(g.getName()))
+			{
+				relationsComplete.put(g, relations.get(g.getName()));
+			}
+		}
+		
+		return relationsComplete;
 	}
 }

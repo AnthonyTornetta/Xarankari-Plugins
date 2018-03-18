@@ -19,6 +19,7 @@ public class Guild
 {
 	private String name;
 	private Map<UUID, GuildRank> members;
+	private Map<Guild, GuildRelation> relations;
 	private List<Chunk> ownedChunks;
 	private Location home;
 	private double balance;
@@ -38,6 +39,20 @@ public class Guild
 		this.balance = balance;
 		this.name = name;
 		this.home = home;	
+	}
+	
+	/**
+	 * A group of players in a membership that has claimed land<br>
+	 * @param name The name of the guild to show up to players
+	 * @param members The members in the guild
+	 * @param ownedChunks The chunks the guild owns
+	 * @param home The home of the guild (null if none)
+	 * @param balance The balance of the guild
+	 */
+	public Guild(String name, Map<UUID, GuildRank> members, Map<Guild, GuildRelation> relations, List<Chunk> ownedChunks, Location home, double balance)
+	{
+		this(name, members, ownedChunks, home, balance);
+		this.relations = relations;
 	}
 	
 	@Override
@@ -236,6 +251,67 @@ public class Guild
 			if(p != null && p.isOnline())
 				p.sendMessage(msg);
 		}
+	}
+	
+	/**
+	 * Gets a this guild's relation with another guild
+	 * @param guild The guild to get relations of
+	 * @return The GuildRelation this guild has with the other
+	 */
+	public GuildRelation getRelation(Guild guild)
+	{
+		if(getAllRelations().containsKey(guild))
+			return getAllRelations().get(guild);
+		
+		return GuildRelation.NEUTRAL;
+	}
+	
+	/**
+	 * Sets the relations with another guild - Note: The relations of the other guild are NOT upated
+	 * @param g The guild to set relations with
+	 * @param relation The relations to set it to
+	 */
+	public void setRelations(Guild g, GuildRelation relation) 
+	{
+		if(relation == GuildRelation.NEUTRAL)
+		{
+			if(relations.containsKey(g))
+			{
+				// No point in storing neutral relations since all guilds are by-default reguarded as neutrals
+				removeRelation(g);
+			}
+		}
+		else
+		{
+			relations.put(g, relation);
+		}
+	}
+	
+	/**
+	 * Removes a guild from the relations list
+	 * @param g The guild to remove
+	 */
+	public void removeRelation(Guild g) 
+	{
+		getAllRelations().remove(g);
+	}
+	
+	/**
+	 * Gets all relations with other guilds
+	 * @return all the relations with other guilds
+	 */
+	public Map<Guild, GuildRelation> getAllRelations()
+	{
+		return relations;
+	}
+	
+	/**
+	 * Sets all the relations with other guilds
+	 * @param relations The relations list
+	 */
+	public void setAllRelations(Map<Guild, GuildRelation> relations)
+	{
+		this.relations = relations;
 	}
 	
 	/**

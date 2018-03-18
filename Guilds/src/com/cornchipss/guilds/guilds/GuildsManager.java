@@ -56,6 +56,12 @@ public class GuildsManager
 				
 				guilds.add(guild);
 			}
+			
+			for(int i = 0; i < guilds.size(); i++)
+			{
+				Guild g = guilds.get(i);
+				g.setAllRelations(jsonList.get(i).getRelations(guilds));
+			}
 		}
 	}
 	
@@ -186,7 +192,7 @@ public class GuildsManager
 		Map<UUID, GuildRank> members = new HashMap<>();
 		members.put(founder.getUniqueId(), GuildRank.KING);
 		
-		getGuilds().add(new Guild(name, members, new ArrayList<>(), null, 0.0));
+		getGuilds().add(new Guild(name, members, new HashMap<>(), new ArrayList<>(), null, 0.0));
 		
 		saveGuilds();
 		
@@ -201,6 +207,10 @@ public class GuildsManager
 
 	public void deleteGuild(Guild g) throws IOException 
 	{
+		for(Guild guild : getGuilds())
+		{
+			guild.removeRelation(g);
+		}
 		getGuilds().remove(g);
 		saveGuilds();
 	}

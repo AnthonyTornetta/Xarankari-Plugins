@@ -21,7 +21,6 @@ import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -135,21 +134,6 @@ public class PluginListener implements Listener
 	
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onBlockExplode(BlockExplodeEvent e)
-	{
-		for(int i = 0; i < e.blockList().size(); i++)
-		{
-			Block b = e.blockList().get(i);
-			
-			if(plugin.getGuildManager().getGuildClaimingBlock(b) != null)
-			{
-				e.blockList().remove(b);
-				i--;
-			}
-		}
-	}
-	
-	@EventHandler(priority = EventPriority.HIGH)
-	public void onEntityExplode(EntityExplodeEvent e)
 	{
 		for(int i = 0; i < e.blockList().size(); i++)
 		{
